@@ -1,1 +1,172 @@
-/**\n * Visualization Component\n * Renders interactive plots using Plotly\n * Supports scatter plots, line plots, confusion matrices, etc.\n */\n\nimport React from 'react'; \nimport Plot from 'react-plotly.js'; \n\ninterface VisualizationProps { \n  type: 'scatter' | 'line' | 'heatmap' | 'histogram' | 'box'; \n  data: any[]; \n  layout ?: any; \n  title ?: string; \n  xLabel ?: string; \n  yLabel ?: string; \n  height ?: number; \n } \n\nexport const Visualization: React.FC<VisualizationProps> = ({ \n  type, \n  data, \n  layout = {}, \n  title, \n  xLabel = 'X', \n  yLabel = 'Y', \n  height = 400, \n }) => { \n  const defaultLayout = { \n    title: title || '', \n    xaxis: { title: xLabel }, \n    yaxis: { title: yLabel }, \n    hovermode: 'closest', \n    height, \n    margin: { l: 60, r: 40, t: 40, b: 60 }, \n    ...layout, \n }; \n\n  return (\n < div className =\"w-full bg-white rounded-lg border border-slate-200 p-4 shadow-sm\">\n      <Plot\n        data={data}\n        layout={defaultLayout}\n        config={{\n          responsive: true,\n          displayModeBar: true,\n          displaylogo: false,\n        }}\n      />\n    </div>\n  );\n};\n\ninterface ScatterPlotProps {\n  points: Array<{ x: number; y: number; label?: string }>;\n  line?: { x: number[]; y: number[] };\n  title?: string;\n  xLabel?: string;\n  yLabel?: string;\n}\n\nexport const ScatterPlot: React.FC<ScatterPlotProps> = ({\n  points,\n  line,\n  title = 'Scatter Plot',\n  xLabel = 'X',\n  yLabel = 'Y',\n}) => {\n  const traces: any[] = [\n    {\n      x: points.map(p => p.x),\n      y: points.map(p => p.y),\n      mode: 'markers',\n      type: 'scatter',\n      name: 'Data Points',\n      marker: {\n        size: 8,\n        color: 'rgba(31, 119, 180, 0.8)',\n        line: { color: 'rgba(31, 119, 180, 1)', width: 1 },\n      },\n    },\n  ];\n\n  if (line) {\n    traces.push({\n      x: line.x,\n      y: line.y,\n      mode: 'lines',\n      type: 'scatter',\n      name: 'Fitted Line',\n      line: {\n        color: 'rgba(255, 127, 14, 1)',\n        width: 2,\n      },\n    });\n  }\n\n  return (\n    <Visualization\n      type=\"scatter\"\n      data={traces}\n      title={title}\n      xLabel={xLabel}\n      yLabel={yLabel}\n    />\n  );\n};\n\ninterface ConfusionMatrixProps {\n  matrix: number[][];\n  labels: string[];\n  title?: string;\n}\n\nexport const ConfusionMatrix: React.FC<ConfusionMatrixProps> = ({\n  matrix,\n  labels,\n  title = 'Confusion Matrix',\n}) => {\n  const trace = {\n    z: matrix,\n    x: labels,\n    y: labels,\n    type: 'heatmap',\n    colorscale: 'Blues',\n    text: matrix.map(row => row.map(val => val.toString())),\n    texttemplate: '%{text}',\n    textfont: { size: 14 },\n  };\n\n  return (\n    <Visualization\n      type=\"heatmap\"\n      data={[trace]}\n      title={title}\n      xLabel=\"Predicted\"\n      yLabel=\"Actual\"\n      layout={{\n        xaxis: { title: 'Predicted', side: 'bottom' },\n        yaxis: { title: 'Actual' },\n      }}\n    />\n  );\n};\n\ninterface HistogramProps {\n  data: number[];\n  title?: string;\n  xLabel?: string;\n  bins?: number;\n}\n\nexport const Histogram: React.FC<HistogramProps> = ({\n  data,\n  title = 'Distribution',\n  xLabel = 'Value',\n  bins = 20,\n}) => {\n  const trace = {\n    x: data,\n    type: 'histogram',\n    nbinsx: bins,\n    marker: { color: 'rgba(31, 119, 180, 0.7)' },\n  };\n\n  return (\n    <Visualization\n      type=\"histogram\"\n      data={[trace]}\n      title={title}\n      xLabel={xLabel}\n      yLabel=\"Frequency\"\n    />\n  );\n};\n\nexport default Visualization;
+import React, { useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
+
+const Plot = dynamic(() => import('react-plotly.js'), { ssr: false });
+
+interface VisualizationProps {
+    type: 'scatter' | 'line' | 'heatmap' | 'histogram' | 'box';
+    data: any[];
+    layout?: any;
+    title?: string;
+    xLabel?: string;
+    yLabel?: string;
+    height?: number;
+}
+
+export const Visualization: React.FC<VisualizationProps> = ({
+    type,
+    data,
+    layout = {},
+    title,
+    xLabel = 'X',
+    yLabel = 'Y',
+    height = 400,
+}) => {
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    if (!mounted) return <div style={{ height }} className="w-full bg-slate-100 rounded-xl animate-pulse" />;
+
+    const defaultLayout = {
+        title: {
+            text: title || '',
+            font: { family: 'inherit', size: 18, color: '#1e293b' },
+        },
+        xaxis: {
+            title: xLabel,
+            gridcolor: '#f1f5f9',
+            linecolor: '#cbd5e1',
+        },
+        yaxis: {
+            title: yLabel,
+            gridcolor: '#f1f5f9',
+            linecolor: '#cbd5e1',
+        },
+        hovermode: 'closest',
+        height,
+        autosize: true,
+        paper_bgcolor: 'rgba(0,0,0,0)',
+        plot_bgcolor: 'rgba(0,0,0,0)',
+        margin: { l: 60, r: 40, t: 60, b: 60 },
+        font: { family: 'inherit', color: '#64748b' },
+        ...layout,
+    };
+
+    return (
+        <div className="w-full bg-white rounded-2xl border border-slate-200 p-6 shadow-sm overflow-hidden">
+            <Plot
+                data={data}
+                layout={defaultLayout}
+                useResizeHandler={true}
+                style={{ width: '100%', height: '100%' }}
+                config={{
+                    responsive: true,
+                    displayModeBar: false,
+                    displaylogo: false,
+                }}
+            />
+        </div>
+    );
+};
+
+interface ScatterPlotProps {
+    points: Array<{ x: number; y: number; label?: string }>;
+    line?: { x: number[]; y: number[] };
+    title?: string;
+    xLabel?: string;
+    yLabel?: string;
+}
+
+export const ScatterPlot: React.FC<ScatterPlotProps> = ({
+    points,
+    line,
+    title = 'Scatter Plot',
+    xLabel = 'X',
+    yLabel = 'Y',
+}) => {
+    const traces: any[] = [
+        {
+            x: points.map(p => p.x),
+            y: points.map(p => p.y),
+            mode: 'markers',
+            type: 'scatter',
+            name: 'Data Points',
+            marker: {
+                size: 10,
+                color: '#3b82f6',
+                opacity: 0.6,
+                line: { color: '#1d4ed8', width: 1 },
+            },
+        },
+    ];
+
+    if (line) {
+        traces.push({
+            x: line.x,
+            y: line.y,
+            mode: 'lines',
+            type: 'scatter',
+            name: 'Fitted Line',
+            line: {
+                color: '#f97316',
+                width: 3,
+                shape: 'spline',
+            },
+        });
+    }
+
+    return (
+        <Visualization
+            type="scatter"
+            data={traces}
+            title={title}
+            xLabel={xLabel}
+            yLabel={yLabel}
+        />
+    );
+};
+
+interface ConfusionMatrixProps {
+    matrix: number[][];
+    labels: string[];
+    title?: string;
+}
+
+export const ConfusionMatrix: React.FC<ConfusionMatrixProps> = ({
+    matrix,
+    labels,
+    title = 'Confusion Matrix',
+}) => {
+    const trace = {
+        z: matrix,
+        x: labels,
+        y: labels,
+        type: 'heatmap',
+        colorscale: [
+            [0, '#f8fafc'],
+            [1, '#3b82f6'],
+        ],
+        showscale: true,
+        xgap: 4,
+        ygap: 4,
+    };
+
+    return (
+        <Visualization
+            type="heatmap"
+            data={[trace]}
+            title={title}
+            xLabel="Predicted"
+            yLabel="Actual"
+            layout={{
+                xaxis: { title: 'Predicted', side: 'bottom' },
+                yaxis: { title: 'Actual', autorange: 'reversed' },
+            }}
+        />
+    );
+};
+
+export default Visualization;

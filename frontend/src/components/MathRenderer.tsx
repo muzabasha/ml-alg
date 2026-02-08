@@ -1,7 +1,70 @@
-/**
- * MathRenderer Component
- * Renders LaTeX mathematical equations using KaTeX
- * Supports both inline and display modes
- */
+import React, { useEffect, useRef } from 'react';
+import katex from 'katex';
+import 'katex/dist/katex.min.css';
 
-import React, { useEffect, useRef } from 'react'; \nimport katex from 'katex'; \nimport 'katex/dist/katex.min.css'; \n\ninterface MathRendererProps { \n  latex: string; \n  display ?: boolean; // true for display mode (centered), false for inline\n  className?: string;\n}\n\nexport const MathRenderer: React.FC<MathRendererProps> = ({\n  latex,\n  display = false,\n  className = '',\n}) => {\n  const containerRef = useRef<HTMLDivElement>(null);\n\n  useEffect(() => {\n    if (containerRef.current && latex) {\n      try {\n        katex.render(latex, containerRef.current, {\n          displayMode: display,\n          throwOnError: false,\n        });\n      } catch (error) {\n        console.error('KaTeX rendering error:', error);\n        if (containerRef.current) {\n          containerRef.current.textContent = latex;\n        }\n      }\n    }\n  }, [latex, display]);\n\n  return (\n    <div\n      ref={containerRef}\n      className={`${\n        display ? 'flex justify-center my-4 p-4 bg-slate-50 rounded' : 'inline'\n      } ${className}`}\n    />\n  );\n};\n\ninterface EquationBlockProps {\n  name: string;\n  latex: string;\n  explanation: string;\n}\n\nexport const EquationBlock: React.FC<EquationBlockProps> = ({\n  name,\n  latex,\n  explanation,\n}) => {\n  return (\n    <div className=\"mb-6 p-4 bg-blue-50 border-l-4 border-blue-500 rounded\">\n      <h4 className=\"font-semibold text-slate-900 mb-2\">{name}</h4>\n      <div className=\"mb-3\">\n        <MathRenderer latex={latex} display={true} />\n      </div>\n      <p className=\"text-slate-700 text-sm leading-relaxed\">{explanation}</p>\n    </div>\n  );\n};\n\nexport default MathRenderer;
+interface MathRendererProps {
+    latex: string;
+    display?: boolean;
+    className?: string;
+}
+
+export const MathRenderer: React.FC<MathRendererProps> = ({
+    latex,
+    display = false,
+    className = '',
+}) => {
+    const containerRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (containerRef.current && latex) {
+            try {
+                katex.render(latex, containerRef.current, {
+                    displayMode: display,
+                    throwOnError: false,
+                });
+            } catch (error) {
+                console.error('KaTeX rendering error:', error);
+                if (containerRef.current) {
+                    containerRef.current.textContent = latex;
+                }
+            }
+        }
+    }, [latex, display]);
+
+    return (
+        <div
+            ref={containerRef}
+            className={`${display ? 'flex justify-center my-6 p-6 bg-slate-50 border border-slate-100 rounded-xl shadow-inner scroll-x-auto' : 'inline'
+                } ${className}`}
+        />
+    );
+};
+
+interface EquationBlockProps {
+    name: string;
+    latex: string;
+    explanation: string;
+}
+
+export const EquationBlock: React.FC<EquationBlockProps> = ({
+    name,
+    latex,
+    explanation,
+}) => {
+    return (
+        <div className="mb-8 p-6 bg-blue-50 border border-blue-100 rounded-2xl shadow-sm">
+            <h4 className="font-bold text-blue-900 mb-4 text-lg border-b border-blue-200 pb-2">{name}</h4>
+            <div className="overflow-x-auto">
+                <MathRenderer latex={latex} display={true} />
+            </div>
+            <div className="mt-4 flex items-start space-x-3">
+                <div className="min-w-fit mt-1">
+                    <span className="text-blue-500 font-bold ml-1 italic">i</span>
+                </div>
+                <p className="text-blue-800 text-sm leading-relaxed">{explanation}</p>
+            </div>
+        </div>
+    );
+};
+
+export default MathRenderer;

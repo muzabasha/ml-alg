@@ -1,9 +1,3 @@
-/**
- * ContentAccordion Component
- * Displays algorithm content in expandable accordion sections
- * Each section corresponds to a learning module (Introduction, Math, Implementation, etc.)
- */
-
 import React, { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 
@@ -29,36 +23,39 @@ export const ContentAccordion: React.FC<ContentAccordionProps> = ({ sections }) 
     };
 
     return (
-        <div className=\"space-y-3\">
-    {
-        sections.map((section) => (
-            <div
-                n key={section.id}
-                className=\"border border-slate-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow\"
+        <div className="space-y-4">
+            {sections.map((section) => (
+                <div
+                    key={section.id}
+                    className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all divide-y divide-slate-100"
                 >
-                {/* Accordion Header */ }
-        < button
-            onClick = {() => toggleSection(section.id)}
-className =\"w-full px-6 py-4 bg-gradient-to-r from-slate-50 to-slate-100 hover:from-slate-100 hover:to-slate-150 flex items-center justify-between transition-colors\"
-    >
-    <div className=\"flex items-center gap-3 text-left\">
-        < span className =\"text-2xl\">{section.icon}</span>
-            < h3 className =\"font-semibold text-slate-900\">{section.title}</h3>\n            </div>
-                < ChevronDown
-size = { 20}
-className = {`text-slate-600 transition-transform ${\n                expandedId === section.id ? 'rotate-180' : ''\n              }`}
-            />
-          </button>
+                    <button
+                        onClick={() => toggleSection(section.id)}
+                        className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-slate-50 transition-colors group"
+                    >
+                        <div className="flex items-center space-x-4 text-slate-900 font-semibold text-lg">
+                            <span className="p-2 bg-slate-100 rounded-lg group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors">
+                                {section.icon}
+                            </span>
+                            <span>{section.title}</span>
+                        </div>
+                        <ChevronDown
+                            className={`h-5 w-5 text-slate-400 transition-transform duration-300 ${expandedId === section.id ? 'rotate-180' : ''
+                                }`}
+                        />
+                    </button>
 
-          {/* Accordion Content */}
-          {expandedId === section.id && (
-            <div className=\"px-6 py-4 bg-white border-t border-slate-200 animate-in fade-in duration-200\">
-              {section.content}
-            </div>\n          )}
+                    {expandedId === section.id && (
+                        <div className="px-6 py-8">
+                            <div className="prose prose-slate max-w-none">
+                                {section.content}
+                            </div>
+                        </div>
+                    )}
+                </div>
+            ))}
         </div>
-      ))}
-    </div>
-  );
+    );
 };
 
 export default ContentAccordion;

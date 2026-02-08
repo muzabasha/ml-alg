@@ -1,1 +1,170 @@
-/**\n * CodeBlock Component\n * Displays code with syntax highlighting and execution capabilities\n * Supports toggling between \"From Scratch\" and \"API\" implementations\n */\n\nimport React, { useState } from 'react'; \nimport { Copy, Play } from 'lucide-react'; \nimport SyntaxHighlighter from 'react-syntax-highlighter'; \nimport { atomOneDark } from 'react-syntax-highlighter/dist/esm/styles/hljs'; \n\ninterface CodeBlockProps { \n  code: string; \n  language ?: string; \n  title ?: string; \n  description ?: string; \n  onExecute ?: (code: string) => Promise<void>; \n  isExecuting ?: boolean; \n } \n\nexport const CodeBlock: React.FC<CodeBlockProps> = ({ \n  code, \n  language = 'python', \n  title, \n  description, \n  onExecute, \n  isExecuting = false, \n }) => { \n  const [copied, setCopied] = useState(false); \n\n  const handleCopy = () => { \n    navigator.clipboard.writeText(code); \n    setCopied(true); \n    setTimeout(() => setCopied(false), 2000); \n }; \n\n  const handleExecute = async () => { \n    if (onExecute) { \n      await onExecute(code); \n } \n }; \n\n  return (\n < div className =\"mb-6 rounded-lg overflow-hidden border border-slate-300 shadow-md\">\n      {/* Header */}\n      {(title || description) && (\n        <div className=\"bg-slate-800 text-white px-4 py-3\">\n          {title && <h4 className=\"font-semibold\">{title}</h4>}\n          {description && <p className=\"text-sm text-slate-300 mt-1\">{description}</p>}\n        </div>\n      )}\n\n      {/* Code */}\n      <div className=\"relative\">\n        <SyntaxHighlighter\n          language={language}\n          style={atomOneDark}\n          customStyle={{\n            margin: 0,\n            padding: '1rem',\n            fontSize: '0.875rem',\n            lineHeight: '1.5',\n          }}\n          showLineNumbers\n        >\n          {code}\n        </SyntaxHighlighter>\n\n        {/* Action Buttons */}\n        <div className=\"absolute top-2 right-2 flex gap-2\">\n          <button\n            onClick={handleCopy}\n            className=\"p-2 bg-slate-700 hover:bg-slate-600 text-white rounded transition-colors\"\n            title=\"Copy code\"\n          >\n            <Copy size={16} />\n          </button>\n          {onExecute && (\n            <button\n              onClick={handleExecute}\n              disabled={isExecuting}\n              className=\"p-2 bg-green-600 hover:bg-green-700 text-white rounded transition-colors disabled:opacity-50\"\n              title=\"Execute code\"\n            >\n              <Play size={16} />\n            </button>\n          )}\n        </div>\n      </div>\n\n      {/* Copy Feedback */}\n      {copied && (\n        <div className=\"bg-green-100 text-green-800 px-4 py-2 text-sm\">\n          ✓ Code copied to clipboard\n        </div>\n      )}\n    </div>\n  );\n};\n\ninterface CodeToggleProps {\n  scratchCode: string;\n  apiCode: string;\n  scratchTitle?: string;\n  apiTitle?: string;\n  scratchDescription?: string;\n  apiDescription?: string;\n  comparison?: string;\n  onExecute?: (code: string, type: 'scratch' | 'api') => Promise<void>;\n  isExecuting?: boolean;\n}\n\nexport const CodeToggle: React.FC<CodeToggleProps> = ({\n  scratchCode,\n  apiCode,\n  scratchTitle = 'From Scratch (NumPy)',\n  apiTitle = 'Using scikit-learn',\n  scratchDescription,\n  apiDescription,\n  comparison,\n  onExecute,\n  isExecuting,\n}) => {\n  const [activeTab, setActiveTab] = useState<'scratch' | 'api'>('scratch');\n\n  return (\n    <div>\n      {/* Tab Buttons */}\n      <div className=\"flex gap-2 mb-4 border-b border-slate-300\">\n        <button\n          onClick={() => setActiveTab('scratch')}\n          className={`px-4 py-2 font-semibold transition-colors ${\n            activeTab === 'scratch'\n              ? 'text-blue-600 border-b-2 border-blue-600'\n              : 'text-slate-600 hover:text-slate-900'\n          }`}\n        >\n          {scratchTitle}\n        </button>\n        <button\n          onClick={() => setActiveTab('api')}\n          className={`px-4 py-2 font-semibold transition-colors ${\n            activeTab === 'api'\n              ? 'text-blue-600 border-b-2 border-blue-600'\n              : 'text-slate-600 hover:text-slate-900'\n          }`}\n        >\n          {apiTitle}\n        </button>\n      </div>\n\n      {/* Code Blocks */}\n      {activeTab === 'scratch' && (\n        <CodeBlock\n          code={scratchCode}\n          title={scratchTitle}\n          description={scratchDescription}\n          onExecute={onExecute ? (code) => onExecute(code, 'scratch') : undefined}\n          isExecuting={isExecuting}\n        />\n      )}\n      {activeTab === 'api' && (\n        <CodeBlock\n          code={apiCode}\n          title={apiTitle}\n          description={apiDescription}\n          onExecute={onExecute ? (code) => onExecute(code, 'api') : undefined}\n          isExecuting={isExecuting}\n        />\n      )}\n\n      {/* Comparison Note */}\n      {comparison && (\n        <div className=\"mt-4 p-4 bg-amber-50 border-l-4 border-amber-500 rounded\">\n          <p className=\"text-sm text-slate-700\">\n            <strong>💡 Comparison:</strong> {comparison}\n          </p>\n        </div>\n      )}\n    </div>\n  );\n};\n\nexport default CodeBlock;
+import React, { useState } from 'react';
+import { Copy, Play, Check } from 'lucide-react';
+import { Light as SyntaxHighlighter } from 'react-syntax-highlighter';
+import python from 'react-syntax-highlighter/dist/esm/languages/hljs/python';
+import { atomOneDark } from 'react-syntax-highlighter/dist/esm/styles/hljs';
+
+SyntaxHighlighter.registerLanguage('python', python);
+
+interface CodeBlockProps {
+    code: string;
+    language?: string;
+    title?: string;
+    description?: string;
+    onExecute?: (code: string) => Promise<void>;
+    isExecuting?: boolean;
+}
+
+export const CodeBlock: React.FC<CodeBlockProps> = ({
+    code,
+    language = 'python',
+    title,
+    description,
+    onExecute,
+    isExecuting = false,
+}) => {
+    const [copied, setCopied] = useState(false);
+
+    const handleCopy = () => {
+        navigator.clipboard.writeText(code);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    };
+
+    const handleExecute = async () => {
+        if (onExecute) {
+            await onExecute(code);
+        }
+    };
+
+    return (
+        <div className="mb-6 rounded-xl overflow-hidden border border-slate-200 shadow-sm">
+            {(title || description) && (
+                <div className="bg-slate-50 border-b border-slate-200 px-6 py-3">
+                    {title && <h4 className="font-semibold text-slate-900">{title}</h4>}
+                    {description && <p className="text-xs text-slate-500 mt-1">{description}</p>}
+                </div>
+            )}
+
+            <div className="relative group">
+                <SyntaxHighlighter
+                    language={language}
+                    style={atomOneDark}
+                    customStyle={{
+                        margin: 0,
+                        padding: '1.5rem',
+                        fontSize: '0.875rem',
+                        lineHeight: '1.7',
+                        backgroundColor: '#1a1a1a',
+                    }}
+                    showLineNumbers
+                >
+                    {code}
+                </SyntaxHighlighter>
+
+                <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button
+                        onClick={handleCopy}
+                        className="p-2 bg-slate-700/50 hover:bg-slate-700 text-white rounded-lg backdrop-blur-sm transition-all"
+                        title="Copy code"
+                    >
+                        {copied ? <Check size={16} className="text-green-400" /> : <Copy size={16} />}
+                    </button>
+                    {onExecute && (
+                        <button
+                            onClick={handleExecute}
+                            disabled={isExecuting}
+                            className="p-2 bg-green-600/80 hover:bg-green-600 text-white rounded-lg backdrop-blur-sm transition-all disabled:opacity-50"
+                            title="Execute code"
+                        >
+                            <Play size={16} />
+                        </button>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+};
+
+interface CodeToggleProps {
+    scratchCode: string;
+    apiCode: string;
+    scratchTitle?: string;
+    apiTitle?: string;
+    scratchDescription?: string;
+    apiDescription?: string;
+    comparison?: string;
+    onExecute?: (code: string, type: 'scratch' | 'api') => Promise<void>;
+    isExecuting?: boolean;
+}
+
+export const CodeToggle: React.FC<CodeToggleProps> = ({
+    scratchCode,
+    apiCode,
+    scratchTitle = 'From Scratch (NumPy)',
+    apiTitle = 'Using scikit-learn',
+    scratchDescription,
+    apiDescription,
+    comparison,
+    onExecute,
+    isExecuting,
+}) => {
+    const [activeTab, setActiveTab] = useState<'scratch' | 'api'>('scratch');
+
+    return (
+        <div className="space-y-4">
+            <div className="flex p-1 bg-slate-100 rounded-xl w-fit">
+                <button
+                    onClick={() => setActiveTab('scratch')}
+                    className={`px-6 py-2 rounded-lg text-sm font-semibold transition-all ${activeTab === 'scratch'
+                            ? 'bg-white text-blue-600 shadow-sm'
+                            : 'text-slate-500 hover:text-slate-700'
+                        }`}
+                >
+                    {scratchTitle}
+                </button>
+                <button
+                    onClick={() => setActiveTab('api')}
+                    className={`px-6 py-2 rounded-lg text-sm font-semibold transition-all ${activeTab === 'api'
+                            ? 'bg-white text-blue-600 shadow-sm'
+                            : 'text-slate-500 hover:text-slate-700'
+                        }`}
+                >
+                    {apiTitle}
+                </button>
+            </div>
+
+            {activeTab === 'scratch' ? (
+                <CodeBlock
+                    code={scratchCode}
+                    title={scratchTitle}
+                    description={scratchDescription}
+                    onExecute={onExecute ? (code) => onExecute(code, 'scratch') : undefined}
+                    isExecuting={isExecuting}
+                />
+            ) : (
+                <CodeBlock
+                    code={apiCode}
+                    title={apiTitle}
+                    description={apiDescription}
+                    onExecute={onExecute ? (code) => onExecute(code, 'api') : undefined}
+                    isExecuting={isExecuting}
+                />
+            )}
+
+            {comparison && (
+                <div className="p-4 bg-amber-50 border border-amber-100 rounded-xl">
+                    <div className="flex items-start space-x-3">
+                        <span className="text-lg">💡</span>
+                        <div>
+                            <p className="text-sm font-bold text-amber-900 uppercase tracking-wider mb-1">Comparison</p>
+                            <p className="text-sm text-amber-800 leading-relaxed">{comparison}</p>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
+
+export default CodeBlock;
