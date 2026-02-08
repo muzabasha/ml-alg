@@ -1,0 +1,209 @@
+{
+    "id": "knn",
+    "name": "k-Nearest Neighbors (KNN)",
+    "category": "Supervised Learning - Classification/Regression",
+    "difficulty": "Beginner",
+    "estimatedTime": "40 minutes",
+    "sections": {
+        "introduction": {
+            "title": "Introduction to k-Nearest Neighbors",
+            "plainLanguage": "KNN is the simplest ML algorithm. It doesn't learn anything during training—it just memorizes the data. When predicting, it finds the k closest examples and takes a vote (classification) or average (regression).",
+            "realWorldAnalogy": "Imagine you move to a new city and want to know if you'll like it. You ask the 5 people most similar to you (same age, interests, background). If 4 out of 5 love it, you'll probably like it too. That's KNN!",
+            "whereAndWhy": "Used for recommendation systems, pattern recognition, anomaly detection. Works well with small datasets and when decision boundaries are irregular.",
+            "learningType": "Supervised Learning (Classification or Regression)",
+            "strengths": [
+                "No training phase—just store the data",
+                "Simple to understand and implement",
+                "Works well with irregular decision boundaries",
+                "Naturally handles multi-class classification"
+            ],
+            "limitations": [
+                "Slow prediction—must compute distance to all training points",
+                "Memory intensive—stores entire dataset",
+                "Sensitive to irrelevant features and feature scaling",
+                "Struggles with high-dimensional data (curse of dimensionality)"
+            ]
+        },
+        "mathematical_model": {
+            "title": "Mathematical Formulation",
+            "introduction": "KNN uses distance metrics to find nearest neighbors.",
+            "equations": [
+                {
+                    "name": "Euclidean Distance",
+                    "latex": "d(x, x') = \\sqrt{\\sum_{i=1}^{n} (x_i - x'_i)^2}",
+                    "explanation": "Straight-line distance between two points. Most common distance metric."
+                },
+                {
+                    "name": "Manhattan Distance",
+                    "latex": "d(x, x') = \\sum_{i=1}^{n} |x_i - x'_i|",
+                    "explanation": "Sum of absolute differences. Like walking on a grid (city blocks)."
+                },
+                {
+                    "name": "Classification Prediction",
+                    "latex": "\\hat{y} = \\text{mode}(y_1, y_2, ..., y_k)",
+                    "explanation": "Predict the most common class among k nearest neighbors."
+                },
+                {
+                    "name": "Regression Prediction",
+                    "latex": "\\hat{y} = \\frac{1}{k} \\sum_{i=1}^{k} y_i",
+                    "explanation": "Predict the average value of k nearest neighbors."
+                }
+            ],
+            "keyTerms": {
+                "k": "Number of neighbors to consider. Hyperparameter to tune.",
+                "distance metric": "How we measure similarity (Euclidean, Manhattan, etc.)",
+                "neighbors": "Training examples closest to the test point"
+            },
+            "intuition": "You are the average of your k closest friends. KNN finds who your 'friends' are in the data and predicts based on them."
+        }
+    }
+},
+"sample_io": {
+    "title": "Sample Input & Output",
+    "description": "Classifying iris flowers based on petal length and width.",
+    "input": {
+        "format": "Features and class labels",
+        "table": [
+            {
+                "Petal Length": 1.4,
+                "Petal Width": 0.2,
+                "Species": "Setosa"
+            },
+            {
+                "Petal Length": 1.3,
+                "Petal Width": 0.3,
+                "Species": "Setosa"
+            },
+            {
+                "Petal Length": 4.5,
+                "Petal Width": 1.5,
+                "Species": "Versicolor"
+            },
+            {
+                "Petal Length": 4.7,
+                "Petal Width": 1.4,
+                "Species": "Versicolor"
+            },
+            {
+                "Petal Length": 6.0,
+                "Petal Width": 2.5,
+                "Species": "Virginica"
+            }
+        ]
+    },
+    "output": {
+        "testPoint": {
+            "Petal Length": 4.6,
+            "Petal Width": 1.4
+        },
+        "distances": [
+            {
+                "Neighbor": "Point 3",
+                "Distance": 0.14,
+                "Class": "Versicolor"
+            },
+            {
+                "Neighbor": "Point 4",
+                "Distance": 0.10,
+                "Class": "Versicolor"
+            },
+            {
+                "Neighbor": "Point 1",
+                "Distance": 3.35,
+                "Class": "Setosa"
+            }
+        ],
+        "prediction": "Versicolor (2 out of 3 neighbors)",
+        "confidence": 0.67
+    },
+    "visualization": "Scatter plot with training points colored by class. Test point shown with circles indicating k nearest neighbors."
+},
+"interpretation": {
+    "title": "Interpreting the Output",
+    "parameters": {
+        "k": "k=3 means we look at 3 closest neighbors. Small k → sensitive to noise. Large k → smoother boundaries.",
+        "distance": "Smaller distance = more similar. Closest neighbors have most influence."
+    },
+    "predictions": "For test point (4.6, 1.4): 2 neighbors are Versicolor, 1 is Setosa → Predict Versicolor",
+    "metrics": {
+        "confidence": "67% confidence (2/3 neighbors agree)",
+        "distance": "Closest neighbor is 0.10 units away—very similar"
+    },
+    "commonMisinterpretations": [
+        "❌ WRONG: 'k=1 is always best' → ✓ RIGHT: 'k=1 is sensitive to noise; tune k using validation'",
+        "❌ WRONG: 'All features are equally important' → ✓ RIGHT: 'Scale features or use weighted distance'",
+        "❌ WRONG: 'KNN learns patterns' → ✓ RIGHT: 'KNN memorizes data; no learning phase'"
+    ]
+},
+"implementation_scratch": {
+    "title": "Python Implementation (From Scratch)",
+    "description": "Building KNN using only NumPy.",
+    "code": "import numpy as np\nfrom collections import Counter\n\nclass KNNFromScratch:\n    def __init__(self, k=3):\n        self.k = k\n        self.X_train = None\n        self.y_train = None\n    \n    def fit(self, X, y):\n        \"\"\"Store training data\"\"\"\n        self.X_train = X\n        self.y_train = y\n        return self\n    \n    def euclidean_distance(self, x1, x2):\n        \"\"\"Calculate Euclidean distance\"\"\"\n        return np.sqrt(np.sum((x1 - x2) ** 2))\n    \n    def predict(self, X):\n        \"\"\"Predict class for each test point\"\"\"\n        predictions = [self._predict_single(x) for x in X]\n        return np.array(predictions)\n    \n    def _predict_single(self, x):\n        \"\"\"Predict class for a single point\"\"\"\n        # Compute distances to all training points\n        distances = [self.euclidean_distance(x, x_train) for x_train in self.X_train]\n        \n        # Get indices of k nearest neighbors\n        k_indices = np.argsort(distances)[:self.k]\n        \n        # Get labels of k nearest neighbors\n        k_nearest_labels = [self.y_train[i] for i in k_indices]\n        \n        # Return most common label\n        most_common = Counter(k_nearest_labels).most_common(1)\n        return most_common[0][0]\n\n# Example\nX_train = np.array([[1.4, 0.2], [1.3, 0.3], [4.5, 1.5], [4.7, 1.4], [6.0, 2.5]])\ny_train = np.array([0, 0, 1, 1, 2])\nX_test = np.array([[4.6, 1.4]])\n\nmodel = KNNFromScratch(k=3)\nmodel.fit(X_train, y_train)\npredictions = model.predict(X_test)\nprint(f'Prediction: {predictions[0]}')"
+},
+"implementation_api": {
+    "title": "Python Implementation (Using scikit-learn)",
+    "description": "Production-ready implementation.",
+    "code": "from sklearn.neighbors import KNeighborsClassifier\nfrom sklearn.metrics import accuracy_score, classification_report\nimport numpy as np\n\nX_train = np.array([[1.4, 0.2], [1.3, 0.3], [4.5, 1.5], [4.7, 1.4], [6.0, 2.5]])\ny_train = np.array([0, 0, 1, 1, 2])\nX_test = np.array([[4.6, 1.4], [1.5, 0.4]])\n\nmodel = KNeighborsClassifier(n_neighbors=3)\nmodel.fit(X_train, y_train)\n\ny_pred = model.predict(X_test)\ny_proba = model.predict_proba(X_test)\n\nprint(f'Predictions: {y_pred}')\nprint(f'Probabilities:\\n{y_proba}')",
+    "comparison": "scikit-learn uses optimized data structures (KD-trees, Ball trees) for faster neighbor search."
+},
+"evaluation": {
+    "title": "Model Evaluation",
+    "why": "Need to evaluate on test data. KNN can memorize training data perfectly (especially with k=1).",
+    "metrics": [
+        {
+            "name": "Accuracy",
+            "formula": "Accuracy = Correct Predictions / Total Predictions",
+            "interpretation": "Percentage of correct classifications.",
+            "example": "Accuracy = 0.95 → 95% of test examples classified correctly"
+        },
+        {
+            "name": "Confusion Matrix",
+            "formula": "Matrix showing true vs predicted classes",
+            "interpretation": "Shows which classes are confused with each other.",
+            "example": "High off-diagonal values indicate class confusion"
+        }
+    ]
+},
+"performance_interpretation": {
+    "title": "Interpreting Model Performance",
+    "whatIsGood": "Accuracy > 0.8 is generally good. Check confusion matrix for class-specific performance.",
+    "whenModelFails": [
+        "High-dimensional data (curse of dimensionality)",
+        "Imbalanced classes (majority class dominates)",
+        "Features not scaled (large-scale features dominate distance)"
+    ],
+    "biasVariance": {
+        "highBias": "Large k → oversmoothing → underfitting",
+        "highVariance": "Small k → sensitive to noise → overfitting"
+    },
+    "overfittingVsUnderfitting": "k=1 overfits (memorizes noise). Large k underfits (loses local patterns). Tune k using cross-validation."
+},
+"improvements": {
+    "title": "Ways to Improve Performance",
+    "featureEngineering": [
+        "Feature scaling (standardization or normalization)—CRITICAL for KNN",
+        "Feature selection—remove irrelevant features",
+        "Dimensionality reduction (PCA) for high-dimensional data"
+    ],
+    "hyperparameterTuning": [
+        "Tune k using cross-validation (try k=1,3,5,7,9,...)",
+        "Try different distance metrics (Euclidean, Manhattan, Minkowski)",
+        "Use weighted KNN (closer neighbors have more influence)"
+    ],
+    "dataPreprocessing": [
+        "Scale all features to same range",
+        "Handle missing values",
+        "Remove outliers"
+    ],
+    "algorithmSpecific": [
+        "Use KD-tree or Ball tree for faster neighbor search",
+        "Use distance weighting (1/distance)",
+        "Try locally weighted regression for regression tasks"
+    ],
+    "ensemblePossibilities": [
+        "Combine with other classifiers in voting ensemble",
+        "Use different k values and average predictions"
+    ]
+}
+}
+}

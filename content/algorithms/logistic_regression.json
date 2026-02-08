@@ -1,0 +1,228 @@
+{
+    "id": "logistic_regression",
+    "name": "Logistic Regression",
+    "category": "Supervised Learning - Classification",
+    "difficulty": "Beginner",
+    "estimatedTime": "50 minutes",
+    "sections": {
+        "introduction": {
+            "title": "Introduction to Logistic Regression",
+            "plainLanguage": "Logistic Regression is used when you need to predict yes/no, true/false, or categorical outcomes. Despite its name, it's a classification algorithm, not regression. It predicts the probability that something belongs to a particular category.",
+            "realWorldAnalogy": "Think of a spam filter: given an email's features (words, sender, links), Logistic Regression calculates the probability it's spam. If probability > 50%, classify as spam; otherwise, not spam.",
+            "whereAndWhy": "Used for binary classification: disease diagnosis (sick/healthy), customer churn (stay/leave), loan approval (approve/reject), email spam detection.",
+            "learningType": "Supervised Learning (Classification)",
+            "strengths": [
+                "Outputs probabilities, not just class labels—tells you how confident the prediction is",
+                "Simple, fast, and interpretable",
+                "Works well with linearly separable data",
+                "Less prone to overfitting than complex models"
+            ],
+            "limitations": [
+                "Assumes linear decision boundary (can't handle complex patterns)",
+                "Struggles with non-linear relationships",
+                "Requires large sample size for stable estimates",
+                "Sensitive to outliers"
+            ]
+        },
+        "mathematical_model": {
+            "title": "Mathematical Formulation",
+            "introduction": "Logistic Regression uses the sigmoid function to map any real number to a probability between 0 and 1.",
+            "equations": [
+                {
+                    "name": "Sigmoid Function",
+                    "latex": "\\sigma(z) = \\frac{1}{1 + e^{-z}}",
+                    "explanation": "Squashes any input z into range (0, 1). This gives us probabilities."
+                },
+                {
+                    "name": "Hypothesis Function",
+                    "latex": "h(x) = \\sigma(\\theta^T x) = \\frac{1}{1 + e^{-(\\theta_0 + \\theta_1 x_1 + ... + \\theta_n x_n)}}",
+                    "explanation": "Predicts probability that y=1 given input x. θ are parameters we learn."
+                },
+                {
+                    "name": "Cost Function (Log Loss)",
+                    "latex": "J(\\theta) = -\\frac{1}{m} \\sum_{i=1}^{m} [y^{(i)} \\log(h(x^{(i)})) + (1-y^{(i)}) \\log(1-h(x^{(i)}))]",
+                    "explanation": "Penalizes wrong predictions heavily. Minimizing this makes predictions more accurate."
+                },
+                {
+                    "name": "Gradient Descent Update",
+                    "latex": "\\theta_j := \\theta_j - \\alpha \\frac{1}{m} \\sum_{i=1}^{m} (h(x^{(i)}) - y^{(i)}) x_j^{(i)}",
+                    "explanation": "Same form as linear regression, but h(x) is now the sigmoid function."
+                }
+            ],
+            "keyTerms": {
+                "σ(z)": "Sigmoid function—converts any number to probability",
+                "θ": "Parameters (weights) we learn",
+                "h(x)": "Predicted probability that y=1",
+                "y": "Actual class label (0 or 1)",
+                "Log Loss": "Cost function for classification"
+            },
+            "intuition": "The sigmoid function is like a smooth step: very negative inputs → probability near 0; very positive inputs → probability near 1. The model learns weights that push correct examples toward their true class."
+        },
+        "sample_io": {
+            "title": "Sample Input & Output",
+            "description": "Predicting whether a student passes an exam based on hours studied.",
+            "input": {
+                "format": "Features and binary labels",
+                "table": [
+                    {
+                        "Hours Studied": 1,
+                        "Passed": 0
+                    },
+                    {
+                        "Hours Studied": 2,
+                        "Passed": 0
+                    },
+                    {
+                        "Hours Studied": 3,
+                        "Passed": 0
+                    },
+                    {
+                        "Hours Studied": 4,
+                        "Passed": 1
+                    },
+                    {
+                        "Hours Studied": 5,
+                        "Passed": 1
+                    },
+                    {
+                        "Hours Studied": 6,
+                        "Passed": 1
+                    }
+                ]
+            },
+            "output": {
+                "parameters": {
+                    "θ₀ (intercept)": -3.5,
+                    "θ₁ (weight)": 1.2
+                },
+                "predictions": [
+                    {
+                        "Hours": 1,
+                        "Probability": 0.05,
+                        "Predicted Class": 0,
+                        "Actual": 0
+                    },
+                    {
+                        "Hours": 3,
+                        "Probability": 0.27,
+                        "Predicted Class": 0,
+                        "Actual": 0
+                    },
+                    {
+                        "Hours": 5,
+                        "Probability": 0.82,
+                        "Predicted Class": 1,
+                        "Actual": 1
+                    }
+                ],
+                "metrics": {
+                    "Accuracy": 0.95,
+                    "Precision": 0.93,
+                    "Recall": 0.97
+                }
+            },
+            "visualization": "Scatter plot with pass/fail points. S-shaped sigmoid curve shows decision boundary."
+        },
+        "interpretation": {
+            "title": "Interpreting the Output",
+            "parameters": {
+                "intercept": "θ₀ = -3.5: baseline log-odds when hours = 0",
+                "weight": "θ₁ = 1.2: each additional hour increases log-odds of passing by 1.2"
+            },
+            "predictions": "For 4 hours: P(pass) = σ(-3.5 + 1.2×4) = σ(1.3) = 0.79 → 79% chance of passing",
+            "metrics": {
+                "Probability": "Model's confidence. Threshold at 0.5: >0.5 → class 1, <0.5 → class 0",
+                "Accuracy": "95% of predictions are correct",
+                "Precision": "93% of predicted passes are actual passes",
+                "Recall": "97% of actual passes are caught by the model"
+            },
+            "commonMisinterpretations": [
+                "❌ WRONG: 'Probability 0.6 means 60% correct' → ✓ RIGHT: '60% chance this example is class 1'",
+                "❌ WRONG: 'High accuracy means perfect model' → ✓ RIGHT: 'Check precision/recall for imbalanced data'",
+                "❌ WRONG: 'Weights show feature importance directly' → ✓ RIGHT: 'Scale features first, then compare weights'"
+            ]
+        },
+        "implementation_scratch": {
+            "title": "Python Implementation (From Scratch)",
+            "description": "Building Logistic Regression using only NumPy.",
+            "code": "import numpy as np\nimport matplotlib.pyplot as plt\n\nclass LogisticRegressionFromScratch:\n    def __init__(self, learning_rate=0.01, iterations=1000):\n        self.learning_rate = learning_rate\n        self.iterations = iterations\n        self.theta = None\n        self.cost_history = []\n    \n    def sigmoid(self, z):\n        \"\"\"Sigmoid function: maps any value to (0, 1)\"\"\"\n        return 1 / (1 + np.exp(-z))\n    \n    def fit(self, X, y):\n        \"\"\"Train the model\"\"\"\n        m, n = X.shape\n        # Add bias term (column of ones)\n        X = np.c_[np.ones(m), X]\n        # Initialize parameters\n        self.theta = np.zeros(n + 1)\n        \n        for i in range(self.iterations):\n            # Compute predictions\n            z = X @ self.theta\n            h = self.sigmoid(z)\n            \n            # Compute cost (log loss)\n            cost = (-1/m) * np.sum(y * np.log(h) + (1-y) * np.log(1-h))\n            self.cost_history.append(cost)\n            \n            # Compute gradient\n            gradient = (1/m) * X.T @ (h - y)\n            \n            # Update parameters\n            self.theta -= self.learning_rate * gradient\n        \n        return self\n    \n    def predict_proba(self, X):\n        \"\"\"Predict probabilities\"\"\"\n        m = X.shape[0]\n        X = np.c_[np.ones(m), X]\n        return self.sigmoid(X @ self.theta)\n    \n    def predict(self, X, threshold=0.5):\n        \"\"\"Predict class labels\"\"\"\n        return (self.predict_proba(X) >= threshold).astype(int)\n\n# Example usage\nX = np.array([1, 2, 3, 4, 5, 6]).reshape(-1, 1)\ny = np.array([0, 0, 0, 1, 1, 1])\n\nmodel = LogisticRegressionFromScratch(learning_rate=0.1, iterations=1000)\nmodel.fit(X, y)\n\nprobs = model.predict_proba(X)\npreds = model.predict(X)\n\nprint('Predictions:')\nfor i in range(len(X)):\n    print(f'X={X[i][0]}: P(y=1)={probs[i]:.2f}, Predicted={preds[i]}, Actual={y[i]}')"
+        },
+        "implementation_api": {
+            "title": "Python Implementation (Using scikit-learn)",
+            "description": "Production-ready implementation.",
+            "code": "from sklearn.linear_model import LogisticRegression\nfrom sklearn.metrics import accuracy_score, precision_score, recall_score, confusion_matrix\nimport numpy as np\n\nX = np.array([1, 2, 3, 4, 5, 6]).reshape(-1, 1)\ny = np.array([0, 0, 0, 1, 1, 1])\n\nmodel = LogisticRegression()\nmodel.fit(X, y)\n\ny_pred = model.predict(X)\ny_proba = model.predict_proba(X)[:, 1]\n\nprint(f'Accuracy: {accuracy_score(y, y_pred):.2f}')\nprint(f'Precision: {precision_score(y, y_pred):.2f}')\nprint(f'Recall: {recall_score(y, y_pred):.2f}')\nprint(f'\\nConfusion Matrix:\\n{confusion_matrix(y, y_pred)}')",
+            "comparison": "scikit-learn handles numerical stability, regularization, and multi-class classification automatically."
+        },
+        "evaluation": {
+            "title": "Model Evaluation",
+            "why": "Accuracy alone is misleading for imbalanced datasets. Need precision, recall, and F1-score.",
+            "metrics": [
+                {
+                    "name": "Accuracy",
+                    "formula": "Accuracy = (TP + TN) / (TP + TN + FP + FN)",
+                    "interpretation": "Percentage of correct predictions. Misleading if classes are imbalanced.",
+                    "example": "95% accuracy—but if 95% of data is class 0, predicting all 0s gives 95% accuracy!"
+                },
+                {
+                    "name": "Precision",
+                    "formula": "Precision = TP / (TP + FP)",
+                    "interpretation": "Of all predicted positives, how many are actually positive?",
+                    "example": "Precision = 0.9 → 90% of predicted spam emails are actually spam"
+                },
+                {
+                    "name": "Recall (Sensitivity)",
+                    "formula": "Recall = TP / (TP + FN)",
+                    "interpretation": "Of all actual positives, how many did we catch?",
+                    "example": "Recall = 0.8 → We caught 80% of actual spam emails"
+                },
+                {
+                    "name": "F1-Score",
+                    "formula": "F1 = 2 × (Precision × Recall) / (Precision + Recall)",
+                    "interpretation": "Harmonic mean of precision and recall. Balances both.",
+                    "example": "F1 = 0.85 → Good balance between precision and recall"
+                }
+            ]
+        },
+        "performance_interpretation": {
+            "title": "Interpreting Model Performance",
+            "whatIsGood": "Depends on use case. Medical diagnosis: prioritize recall (catch all diseases). Spam filter: balance precision and recall.",
+            "whenModelFails": [
+                "Non-linear decision boundaries",
+                "Highly imbalanced classes",
+                "Features not scaled properly"
+            ],
+            "biasVariance": {
+                "highBias": "Underfitting—model too simple. Add polynomial features.",
+                "highVariance": "Overfitting—model too complex. Use regularization (L1/L2)."
+            },
+            "overfittingVsUnderfitting": "Logistic Regression rarely overfits with few features, but can underfit complex patterns."
+        },
+        "improvements": {
+            "title": "Ways to Improve Performance",
+            "featureEngineering": [
+                "Add polynomial features for non-linear boundaries",
+                "Create interaction terms between features",
+                "Feature scaling (standardization or normalization)"
+            ],
+            "hyperparameterTuning": [
+                "Regularization strength (C parameter in sklearn)",
+                "Solver choice (liblinear, lbfgs, saga)",
+                "Class weights for imbalanced data"
+            ],
+            "dataPreprocessing": [
+                "Handle class imbalance (SMOTE, undersampling, class weights)",
+                "Remove correlated features",
+                "Handle missing values"
+            ],
+            "algorithmSpecific": [
+                "Use L1 regularization (Lasso) for feature selection",
+                "Use L2 regularization (Ridge) to prevent overfitting",
+                "Adjust decision threshold based on cost of false positives vs false negatives"
+            ],
+            "ensemblePossibilities": [
+                "Combine with other classifiers in voting ensemble",
+                "Use as base learner in stacking"
+            ]
+        }
+    }
+}

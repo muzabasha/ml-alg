@@ -1,0 +1,255 @@
+{
+    "id": "svm",
+    "name": "Support Vector Machine (SVM)",
+    "category": "Supervised Learning - Classification",
+    "difficulty": "Advanced",
+    "estimatedTime": "60 minutes",
+    "sections": {
+        "introduction": {
+            "title": "Introduction to Support Vector Machines",
+            "plainLanguage": "SVM finds the best boundary (hyperplane) that separates different classes with maximum margin. It's like drawing a line between two groups of points, but making sure the line is as far as possible from both groups.",
+            "realWorldAnalogy": "Imagine you're a referee separating two arguing teams. You don't just stand anywhere—you position yourself exactly in the middle, maximizing distance from both sides. That's what SVM does with data.",
+            "whereAndWhy": "Used for text classification, image recognition, bioinformatics. Excellent for high-dimensional data and when classes are clearly separable.",
+            "learningType": "Supervised Learning (Classification, can also do Regression)",
+            "strengths": [
+                "Effective in high-dimensional spaces",
+                "Memory efficient (uses subset of training points)",
+                "Versatile—different kernel functions for different decision boundaries",
+                "Works well with clear margin of separation"
+            ],
+            "limitations": [
+                "Slow to train on large datasets",
+                "Sensitive to feature scaling",
+                "Difficult to interpret (especially with non-linear kernels)",
+                "Requires careful tuning of hyperparameters"
+            ]
+        },
+        "mathematical_model": {
+            "title": "Mathematical Formulation",
+            "introduction": "SVM maximizes the margin between classes while minimizing classification errors.",
+            "equations": [
+                {
+                    "name": "Linear Decision Boundary",
+                    "latex": "f(x) = w^T x + b",
+                    "explanation": "w is weight vector, b is bias. Points where f(x)=0 form the decision boundary."
+                },
+                {
+                    "name": "Classification Rule",
+                    "latex": "y = \\text{sign}(w^T x + b)",
+                    "explanation": "Predict class +1 if f(x) > 0, class -1 if f(x) < 0."
+                },
+                {
+                    "name": "Margin",
+                    "latex": "\\text{margin} = \\frac{2}{||w||}",
+                    "explanation": "Distance between decision boundary and nearest points. SVM maximizes this."
+                },
+                {
+                    "name": "Primal Optimization Problem",
+                    "latex": "\\min_{w,b} \\frac{1}{2}||w||^2 \\text{ subject to } y_i(w^T x_i + b) \\geq 1",
+                    "explanation": "Minimize ||w|| (maximize margin) while correctly classifying all points."
+                },
+                {
+                    "name": "Soft Margin (with slack)",
+                    "latex": "\\min_{w,b,\\xi} \\frac{1}{2}||w||^2 + C\\sum_{i=1}^{n}\\xi_i",
+                    "explanation": "C controls trade-off between margin size and misclassification. ξ are slack variables."
+                },
+                {
+                    "name": "Kernel Trick",
+                    "latex": "K(x_i, x_j) = \\phi(x_i)^T \\phi(x_j)",
+                    "explanation": "Compute dot products in high-dimensional space without explicit transformation."
+                }
+            ],
+            "keyTerms": {
+                "Support Vectors": "Training points closest to decision boundary. Only these matter!",
+                "Margin": "Distance from decision boundary to nearest point",
+                "Hyperplane": "Decision boundary (line in 2D, plane in 3D, hyperplane in higher dimensions)",
+                "Kernel": "Function that computes similarity in transformed space",
+                "C parameter": "Regularization—controls margin vs misclassification trade-off"
+            },
+            "intuition": "SVM finds the widest 'street' separating two neighborhoods. Support vectors are the houses on the edge of the street. Everything else doesn't matter."
+        }
+    }
+},
+"sample_io": {
+    "title": "Sample Input & Output",
+    "description": "Binary classification of two linearly separable classes.",
+    "input": {
+        "format": "2D points with class labels",
+        "table": [
+            {
+                "X1": 1,
+                "X2": 2,
+                "Class": -1
+            },
+            {
+                "X1": 2,
+                "X2": 3,
+                "Class": -1
+            },
+            {
+                "X1": 3,
+                "X2": 3,
+                "Class": -1
+            },
+            {
+                "X1": 5,
+                "X2": 5,
+                "Class": 1
+            },
+            {
+                "X1": 6,
+                "X2": 5,
+                "Class": 1
+            },
+            {
+                "X1": 7,
+                "X2": 6,
+                "Class": 1
+            }
+        ]
+    },
+    "output": {
+        "parameters": {
+            "w": [
+                0.8,
+                0.6
+            ],
+            "b": -4.0,
+            "support_vectors": [
+                [
+                    3,
+                    3
+                ],
+                [
+                    5,
+                    5
+                ]
+            ],
+            "n_support_vectors": 2
+        },
+        "decision_boundary": "0.8*X1 + 0.6*X2 - 4.0 = 0",
+        "margin": 1.25,
+        "predictions": [
+            {
+                "Point": [
+                    1,
+                    2
+                ],
+                "f(x)": -1.6,
+                "Predicted": -1,
+                "Actual": -1
+            },
+            {
+                "Point": [
+                    7,
+                    6
+                ],
+                "f(x)": 5.2,
+                "Predicted": 1,
+                "Actual": 1
+            }
+        ]
+    },
+    "visualization": "Scatter plot with decision boundary (solid line), margin boundaries (dashed lines), and support vectors highlighted."
+},
+"interpretation": {
+    "title": "Interpreting the Output",
+    "parameters": {
+        "w (weights)": "Normal vector to decision boundary. Direction of maximum separation.",
+        "b (bias)": "Offset of decision boundary from origin.",
+        "support_vectors": "Critical points that define the boundary. Remove any other point → boundary unchanged!",
+        "margin": "Width of the 'street' between classes. Larger = better generalization."
+    },
+    "predictions": "f(x) > 0 → class +1, f(x) < 0 → class -1. Distance from boundary = |f(x)|/||w||",
+    "metrics": {
+        "n_support_vectors": "Fewer support vectors = simpler model = better generalization",
+        "margin": "Larger margin = more confident predictions = better generalization"
+    },
+    "commonMisinterpretations": [
+        "❌ WRONG: 'All training points matter' → ✓ RIGHT: 'Only support vectors matter'",
+        "❌ WRONG: 'SVM always finds perfect separation' → ✓ RIGHT: 'Soft margin allows misclassification'",
+        "❌ WRONG: 'Larger C is always better' → ✓ RIGHT: 'Large C → overfitting; small C → underfitting'"
+    ]
+},
+"implementation_scratch": {
+    "title": "Python Implementation (From Scratch)",
+    "description": "Simplified SVM using gradient descent (not full SMO algorithm).",
+    "code": "import numpy as np\n\nclass SVMFromScratch:\n    def __init__(self, learning_rate=0.001, lambda_param=0.01, n_iters=1000):\n        self.lr = learning_rate\n        self.lambda_param = lambda_param  # Regularization\n        self.n_iters = n_iters\n        self.w = None\n        self.b = None\n    \n    def fit(self, X, y):\n        \"\"\"Train SVM using gradient descent\"\"\"\n        n_samples, n_features = X.shape\n        \n        # Convert labels to -1 and 1\n        y_ = np.where(y <= 0, -1, 1)\n        \n        # Initialize weights and bias\n        self.w = np.zeros(n_features)\n        self.b = 0\n        \n        # Gradient descent\n        for _ in range(self.n_iters):\n            for idx, x_i in enumerate(X):\n                # Check if point satisfies margin condition\n                condition = y_[idx] * (np.dot(x_i, self.w) - self.b) >= 1\n                \n                if condition:\n                    # Point is correctly classified and outside margin\n                    # Only regularization term\n                    self.w -= self.lr * (2 * self.lambda_param * self.w)\n                else:\n                    # Point violates margin\n                    # Update with hinge loss gradient\n                    self.w -= self.lr * (2 * self.lambda_param * self.w - np.dot(x_i, y_[idx]))\n                    self.b -= self.lr * y_[idx]\n        \n        return self\n    \n    def predict(self, X):\n        \"\"\"Predict class labels\"\"\"\n        linear_output = np.dot(X, self.w) - self.b\n        return np.sign(linear_output)\n    \n    def decision_function(self, X):\n        \"\"\"Get distance from decision boundary\"\"\"\n        return np.dot(X, self.w) - self.b\n\n# Example\nX = np.array([[1, 2], [2, 3], [3, 3], [5, 5], [6, 5], [7, 6]])\ny = np.array([-1, -1, -1, 1, 1, 1])\n\nmodel = SVMFromScratch(learning_rate=0.001, lambda_param=0.01, n_iters=1000)\nmodel.fit(X, y)\n\npredictions = model.predict(X)\nprint(f'Weights: {model.w}')\nprint(f'Bias: {model.b}')\nprint(f'Predictions: {predictions}')\nprint(f'Actual: {y}')"
+},
+"implementation_api": {
+    "title": "Python Implementation (Using scikit-learn)",
+    "description": "Production-ready SVM with different kernels.",
+    "code": "from sklearn.svm import SVC\nfrom sklearn.preprocessing import StandardScaler\nfrom sklearn.metrics import accuracy_score, classification_report\nimport numpy as np\n\nX = np.array([[1, 2], [2, 3], [3, 3], [5, 5], [6, 5], [7, 6]])\ny = np.array([0, 0, 0, 1, 1, 1])\n\n# Scale features (IMPORTANT for SVM!)\nscaler = StandardScaler()\nX_scaled = scaler.fit_transform(X)\n\n# Linear SVM\nmodel_linear = SVC(kernel='linear', C=1.0)\nmodel_linear.fit(X_scaled, y)\n\nprint('Linear SVM:')\nprint(f'Support Vectors: {model_linear.support_vectors_}')\nprint(f'Number of Support Vectors: {model_linear.n_support_}')\nprint(f'Accuracy: {accuracy_score(y, model_linear.predict(X_scaled)):.2f}')\n\n# RBF (Radial Basis Function) kernel for non-linear boundaries\nmodel_rbf = SVC(kernel='rbf', C=1.0, gamma='scale')\nmodel_rbf.fit(X_scaled, y)\n\nprint('\\nRBF SVM:')\nprint(f'Number of Support Vectors: {model_rbf.n_support_}')\nprint(f'Accuracy: {accuracy_score(y, model_rbf.predict(X_scaled)):.2f}')\n\n# Polynomial kernel\nmodel_poly = SVC(kernel='poly', degree=3, C=1.0)\nmodel_poly.fit(X_scaled, y)\n\nprint('\\nPolynomial SVM:')\nprint(f'Number of Support Vectors: {model_poly.n_support_}')\nprint(f'Accuracy: {accuracy_score(y, model_poly.predict(X_scaled)):.2f}')",
+    "comparison": "scikit-learn uses optimized SMO algorithm, supports multiple kernels, and handles multi-class classification automatically."
+},
+"evaluation": {
+    "title": "Model Evaluation",
+    "why": "SVM can overfit with wrong kernel or C value. Must evaluate generalization performance.",
+    "metrics": [
+        {
+            "name": "Accuracy",
+            "formula": "Accuracy = Correct / Total",
+            "interpretation": "Percentage of correct predictions.",
+            "example": "Accuracy = 0.95 → 95% correct"
+        },
+        {
+            "name": "Number of Support Vectors",
+            "formula": "Count of support vectors",
+            "interpretation": "Fewer = simpler model = better generalization.",
+            "example": "10 support vectors out of 1000 samples → very efficient"
+        },
+        {
+            "name": "Margin Width",
+            "formula": "2 / ||w||",
+            "interpretation": "Larger margin = more confident predictions.",
+            "example": "Margin = 2.5 → wide separation between classes"
+        }
+    ]
+},
+"performance_interpretation": {
+    "title": "Interpreting Model Performance",
+    "whatIsGood": "High accuracy with few support vectors. Training and test accuracy should be similar.",
+    "whenModelFails": [
+        "Non-separable data with linear kernel",
+        "Features not scaled properly",
+        "Wrong kernel choice",
+        "C too large (overfitting) or too small (underfitting)"
+    ],
+    "biasVariance": {
+        "highBias": "Linear kernel on non-linear data, or C too small → underfitting",
+        "highVariance": "Complex kernel (high-degree polynomial) or C too large → overfitting"
+    },
+    "overfittingVsUnderfitting": "Large C → small margin → overfitting. Small C → large margin → underfitting. Tune C using cross-validation."
+},
+"improvements": {
+    "title": "Ways to Improve Performance",
+    "featureEngineering": [
+        "Feature scaling (CRITICAL!)—use StandardScaler or MinMaxScaler",
+        "Remove irrelevant features",
+        "Create polynomial features for non-linear patterns"
+    ],
+    "hyperparameterTuning": [
+        "C parameter: Try [0.1, 1, 10, 100] using grid search",
+        "Kernel: Try linear, rbf, poly, sigmoid",
+        "Gamma (for RBF): Try 'scale', 'auto', or [0.001, 0.01, 0.1, 1]",
+        "Degree (for poly): Try [2, 3, 4]"
+    ],
+    "dataPreprocessing": [
+        "Scale all features to same range (MUST DO!)",
+        "Handle class imbalance with class_weight='balanced'",
+        "Remove outliers (they can become support vectors)"
+    ],
+    "algorithmSpecific": [
+        "Use linear kernel for high-dimensional data (text, images)",
+        "Use RBF kernel for low-dimensional non-linear data",
+        "Use probability=True to get probability estimates",
+        "Use cache_size parameter for large datasets"
+    ],
+    "ensemblePossibilities": [
+        "Combine multiple SVMs with different kernels",
+        "Use SVM as base learner in ensemble methods",
+        "One-vs-Rest for multi-class classification"
+    ]
+}
+}
+}

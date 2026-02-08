@@ -1,0 +1,209 @@
+{
+    "id": "linear_regression",
+    "name": "Linear Regression",
+    "category": "Supervised Learning - Regression",
+    "difficulty": "Beginner",
+    "estimatedTime": "45 minutes",
+    "sections": {
+        "introduction": {
+            "title": "Introduction to Linear Regression",
+            "plainLanguage": "Linear Regression is the simplest machine learning algorithm. It finds the best-fitting straight line through your data points. Imagine you're trying to predict house prices based on their size—Linear Regression draws a line that best represents the relationship between size and price.",
+            "realWorldAnalogy": "Think of it like a weather forecast: if you know the temperature has been rising by 2 degrees per day, you can predict tomorrow's temperature by adding 2 to today's. Linear Regression does exactly this—it finds the 'rate of change' and uses it to make predictions.",
+            "whereAndWhy": "Used when you need to predict continuous values (prices, temperatures, stock prices). It's the foundation for understanding more complex algorithms.",
+            "learningType": "Supervised Learning (Regression)",
+            "strengths": [
+                "Simple and interpretable—you can easily explain why the model made a prediction",
+                "Fast to train and predict",
+                "Works well when the relationship between variables is actually linear",
+                "Requires little computational power"
+            ],
+            "limitations": [
+                "Assumes a linear relationship (real-world data is often non-linear)",
+                "Sensitive to outliers—one extreme value can skew the entire line",
+                "Struggles with multiple independent variables that interact with each other",
+                "Cannot capture complex patterns"
+            ]
+        },
+        "mathematical_model": {
+            "title": "Mathematical Formulation",
+            "introduction": "Linear Regression finds the line that minimizes the distance between predicted and actual values.",
+            "equations": [
+                {
+                    "name": "Hypothesis Function",
+                    "latex": "h(x) = \\theta_0 + \\theta_1 x",
+                    "explanation": "This is the equation of a line. θ₀ is the y-intercept (where the line crosses the y-axis), θ₁ is the slope (how steep the line is), and x is the input variable."
+                },
+                {
+                    "name": "Cost Function (Mean Squared Error)",
+                    "latex": "J(\\theta_0, \\theta_1) = \\frac{1}{2m} \\sum_{i=1}^{m} (h(x^{(i)}) - y^{(i)})^2",
+                    "explanation": "This measures how wrong our predictions are. m is the number of training examples. We square the errors to penalize large mistakes more heavily. The goal is to minimize this cost."
+                },
+                {
+                    "name": "Gradient Descent Update Rule",
+                    "latex": "\\theta_j := \\theta_j - \\alpha \\frac{\\partial J}{\\partial \\theta_j}",
+                    "explanation": "This is how we improve our parameters. α (alpha) is the learning rate—how big a step we take. We repeatedly update θ until the cost stops decreasing."
+                }
+            ],
+            "keyTerms": {
+                "θ (theta)": "Parameters we're trying to learn (slope and intercept)",
+                "m": "Number of training examples",
+                "x": "Input feature (independent variable)",
+                "y": "Actual output (dependent variable)",
+                "h(x)": "Predicted output",
+                "α (alpha)": "Learning rate—controls how fast we learn"
+            },
+            "intuition": "Imagine you're standing on a hill in the fog. You can't see the bottom, but you can feel which direction is downhill. Gradient descent is like taking small steps downhill until you reach the valley (minimum cost)."
+        },
+        "sample_io": {
+            "title": "Sample Input & Output",
+            "description": "Let's predict house prices based on square footage.",
+            "input": {
+                "format": "Tabular data with features and target",
+                "table": [
+                    {
+                        "Square Feet": 1000,
+                        "Price ($)": 150000
+                    },
+                    {
+                        "Square Feet": 1500,
+                        "Price ($)": 200000
+                    },
+                    {
+                        "Square Feet": 2000,
+                        "Price ($)": 280000
+                    },
+                    {
+                        "Square Feet": 2500,
+                        "Price ($)": 350000
+                    },
+                    {
+                        "Square Feet": 3000,
+                        "Price ($)": 420000
+                    }
+                ]
+            },
+            "output": {
+                "parameters": {
+                    "θ₀ (intercept)": 50000,
+                    "θ₁ (slope)": 120
+                },
+                "predictions": [
+                    {
+                        "Square Feet": 1000,
+                        "Actual Price": 150000,
+                        "Predicted Price": 170000,
+                        "Error": -20000
+                    },
+                    {
+                        "Square Feet": 2000,
+                        "Actual Price": 280000,
+                        "Predicted Price": 290000,
+                        "Error": -10000
+                    }
+                ],
+                "metrics": {
+                    "MSE": 150000000,
+                    "RMSE": 12247.45,
+                    "R²": 0.98
+                }
+            },
+            "visualization": "A scatter plot with data points and a best-fit line drawn through them. The line shows the linear relationship discovered by the algorithm."
+        },
+        "interpretation": {
+            "title": "Interpreting the Output",
+            "parameters": {
+                "intercept": "θ₀ = 50,000 means: if a house has 0 square feet, the model predicts a base price of $50,000 (this is often not realistic for extreme values).",
+                "slope": "θ₁ = 120 means: for every additional square foot, the price increases by $120 on average."
+            },
+            "predictions": "For a 2,500 sq ft house: Price = 50,000 + 120 × 2,500 = $350,000",
+            "metrics": {
+                "MSE": "Average squared error. Lower is better. 150M means predictions are off by ~$12,247 on average.",
+                "R²": "0.98 means the model explains 98% of the variance in prices. Very good fit!"
+            },
+            "commonMisinterpretations": [
+                "❌ WRONG: 'The model is 98% accurate.' → ✓ RIGHT: 'The model explains 98% of the price variation.'",
+                "❌ WRONG: 'A house with 0 sq ft costs $50,000.' → ✓ RIGHT: 'The intercept is a mathematical artifact; don't extrapolate beyond your data range.'",
+                "❌ WRONG: 'The slope means all houses follow this exact pattern.' → ✓ RIGHT: 'The slope is an average trend; individual houses vary.'"
+            ]
+        },
+        "implementation_scratch": {
+            "title": "Python Implementation (From Scratch)",
+            "description": "Building Linear Regression using only NumPy—no libraries.",
+            "code": "import numpy as np\nimport matplotlib.pyplot as plt\n\nclass LinearRegressionFromScratch:\n    \"\"\"Linear Regression implemented from scratch using NumPy.\"\"\"\n    \n    def __init__(self, learning_rate=0.01, iterations=1000):\n        # learning_rate: controls how big each step is during training\n        # iterations: how many times we update our parameters\n        self.learning_rate = learning_rate\n        self.iterations = iterations\n        self.theta0 = 0  # intercept (y-intercept of the line)\n        self.theta1 = 0  # slope (steepness of the line)\n        self.cost_history = []  # track cost over iterations\n    \n    def fit(self, X, y):\n        \"\"\"Train the model on data X and labels y.\"\"\"\n        m = len(X)  # number of training examples\n        \n        # Repeat the learning process for specified iterations\n        for iteration in range(self.iterations):\n            # Step 1: Make predictions using current parameters\n            # y_pred = theta0 + theta1 * X\n            y_pred = self.theta0 + self.theta1 * X\n            \n            # Step 2: Calculate errors (difference between predicted and actual)\n            errors = y_pred - y\n            \n            # Step 3: Calculate cost (Mean Squared Error)\n            # Cost = (1/2m) * sum(errors²)\n            cost = (1 / (2 * m)) * np.sum(errors ** 2)\n            self.cost_history.append(cost)\n            \n            # Step 4: Calculate gradients (direction and magnitude of change)\n            # Gradient for theta0 = (1/m) * sum(errors)\n            gradient_theta0 = (1 / m) * np.sum(errors)\n            # Gradient for theta1 = (1/m) * sum(errors * X)\n            gradient_theta1 = (1 / m) * np.sum(errors * X)\n            \n            # Step 5: Update parameters using gradients\n            # Move in opposite direction of gradient to minimize cost\n            self.theta0 -= self.learning_rate * gradient_theta0\n            self.theta1 -= self.learning_rate * gradient_theta1\n        \n        return self\n    \n    def predict(self, X):\n        \"\"\"Make predictions on new data.\"\"\"\n        # Use learned parameters to predict: y = theta0 + theta1 * X\n        return self.theta0 + self.theta1 * X\n    \n    def get_parameters(self):\n        \"\"\"Return learned parameters.\"\"\"\n        return {'intercept': self.theta0, 'slope': self.theta1}\n\n# Example usage\nif __name__ == '__main__':\n    # Sample data: house sizes and prices\n    X = np.array([1000, 1500, 2000, 2500, 3000])  # square feet\n    y = np.array([150000, 200000, 280000, 350000, 420000])  # prices\n    \n    # Create and train model\n    model = LinearRegressionFromScratch(learning_rate=0.00001, iterations=1000)\n    model.fit(X, y)\n    \n    # Make predictions\n    predictions = model.predict(X)\n    \n    # Print results\n    print('Learned Parameters:')\n    params = model.get_parameters()\n    print(f'  Intercept (θ₀): {params[\"intercept\"]:.2f}')\n    print(f'  Slope (θ₁): {params[\"slope\"]:.2f}')\n    print(f'\\nPredictions vs Actual:')\n    for i in range(len(X)):\n        print(f'  X={X[i]}: Predicted={predictions[i]:.0f}, Actual={y[i]}')\n    \n    # Visualize\n    plt.scatter(X, y, color='blue', label='Actual data')\n    plt.plot(X, predictions, color='red', label='Fitted line')\n    plt.xlabel('Square Feet')\n    plt.ylabel('Price ($)')\n    plt.legend()\n    plt.show()",
+            "explanation": "This implementation shows exactly how Linear Regression works step-by-step. The fit() method repeatedly adjusts parameters to minimize error. The predict() method uses learned parameters to make predictions on new data."
+        },
+        "implementation_api": {
+            "title": "Python Implementation (Using scikit-learn)",
+            "description": "Using industry-standard libraries for production-ready code.",
+            "code": "import numpy as np\nimport pandas as pd\nfrom sklearn.linear_model import LinearRegression\nfrom sklearn.metrics import mean_squared_error, r2_score\nimport matplotlib.pyplot as plt\n\n# Sample data\nX = np.array([1000, 1500, 2000, 2500, 3000]).reshape(-1, 1)  # reshape for sklearn\ny = np.array([150000, 200000, 280000, 350000, 420000])\n\n# Create and train model\nmodel = LinearRegression()\nmodel.fit(X, y)\n\n# Make predictions\ny_pred = model.predict(X)\n\n# Extract parameters\nintercept = model.intercept_\nslope = model.coef_[0]\n\nprint(f'Intercept: {intercept:.2f}')\nprint(f'Slope: {slope:.2f}')\nprint(f'\\nPredictions:')\nfor i in range(len(X)):\n    print(f'  X={X[i][0]}: Predicted={y_pred[i]:.0f}, Actual={y[i]}')\n\n# Evaluate model\nmse = mean_squared_error(y, y_pred)\nrmse = np.sqrt(mse)\nr2 = r2_score(y, y_pred)\n\nprint(f'\\nModel Evaluation:')\nprint(f'  MSE: {mse:.2f}')\nprint(f'  RMSE: {rmse:.2f}')\nprint(f'  R² Score: {r2:.4f}')\n\n# Visualize\nplt.scatter(X, y, color='blue', label='Actual data')\nplt.plot(X, y_pred, color='red', label='Fitted line')\nplt.xlabel('Square Feet')\nplt.ylabel('Price ($)')\nplt.legend()\nplt.show()",
+            "comparison": "The scikit-learn version is much shorter and optimized. It handles numerical stability and edge cases automatically. Use this in production; use the from-scratch version to understand the algorithm."
+        },
+        "evaluation": {
+            "title": "Model Evaluation",
+            "why": "We need to measure how well our model performs. A model that looks good on training data might fail on new data (overfitting). Evaluation metrics tell us the true story.",
+            "metrics": [
+                {
+                    "name": "Mean Squared Error (MSE)",
+                    "formula": "MSE = (1/m) × Σ(ŷᵢ - yᵢ)²",
+                    "interpretation": "Average of squared errors. Penalizes large mistakes heavily. Lower is better.",
+                    "example": "MSE = 150,000,000 → RMSE = $12,247 average error"
+                },
+                {
+                    "name": "Root Mean Squared Error (RMSE)",
+                    "formula": "RMSE = √MSE",
+                    "interpretation": "Same as MSE but in original units (dollars). Easier to interpret.",
+                    "example": "RMSE = $12,247 means predictions are off by ~$12K on average"
+                },
+                {
+                    "name": "R² Score (Coefficient of Determination)",
+                    "formula": "R² = 1 - (SS_res / SS_tot)",
+                    "interpretation": "Percentage of variance explained. Range: 0 to 1. Higher is better.",
+                    "example": "R² = 0.98 means the model explains 98% of price variation"
+                }
+            ],
+            "sampleOutput": {
+                "MSE": 150000000,
+                "RMSE": 12247.45,
+                "R²": 0.98
+            }
+        },
+        "performance_interpretation": {
+            "title": "Interpreting Model Performance",
+            "whatIsGood": "For house prices: R² > 0.8 is generally good. RMSE should be small relative to the price range.",
+            "whenModelFails": [
+                "Non-linear relationships: If price doesn't increase linearly with size, the model will underfit.",
+                "Missing features: If we ignore location, the model can't capture price differences.",
+                "Outliers: One mansion priced unusually high can skew the line."
+            ],
+            "biasVariance": {
+                "highBias": "Model is too simple (underfitting). Predictions are consistently wrong. Solution: use a more complex model.",
+                "highVariance": "Model is too complex (overfitting). Fits training data perfectly but fails on new data. Solution: use more data or regularization."
+            },
+            "overfittingVsUnderfitting": "Linear Regression rarely overfits (it's too simple), but it often underfits when relationships are non-linear."
+        },
+        "improvements": {
+            "title": "Ways to Improve Model Performance",
+            "featureEngineering": [
+                "Add polynomial features: Instead of just size, use size², size³ to capture non-linear relationships",
+                "Add interaction terms: size × location to capture how location affects price differently for different sizes",
+                "Normalize features: Scale all features to similar ranges for better learning"
+            ],
+            "hyperparameterTuning": [
+                "Learning rate: Too high → overshoots; too low → slow learning",
+                "Iterations: More iterations → better fit (but diminishing returns)"
+            ],
+            "dataPreprocessing": [
+                "Remove outliers: Extreme values skew the line",
+                "Handle missing values: Impute or remove incomplete records",
+                "Feature scaling: Normalize features to 0-1 range"
+            ],
+            "algorithmSpecific": [
+                "Add regularization (Ridge/Lasso): Penalizes large coefficients to prevent overfitting",
+                "Use polynomial regression: Fit a curve instead of a line"
+            ],
+            "ensemblePossibilities": [
+                "Combine with other models: Average predictions from Linear Regression and other algorithms"
+            ]
+        }
+    }
+}

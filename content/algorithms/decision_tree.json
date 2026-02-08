@@ -1,0 +1,242 @@
+{
+    "id": "decision_tree",
+    "name": "Decision Tree",
+    "category": "Supervised Learning - Classification/Regression",
+    "difficulty": "Intermediate",
+    "estimatedTime": "55 minutes",
+    "sections": {
+        "introduction": {
+            "title": "Introduction to Decision Trees",
+            "plainLanguage": "A Decision Tree makes predictions by asking a series of yes/no questions about the data. It's like playing '20 Questions'—each answer narrows down the possibilities until you reach a conclusion.",
+            "realWorldAnalogy": "Imagine a doctor diagnosing a patient: 'Is temperature > 100°F?' → Yes → 'Is there a cough?' → Yes → 'Likely flu'. Decision Trees work exactly like this flowchart of questions.",
+            "whereAndWhy": "Used for classification (spam detection, medical diagnosis) and regression (price prediction). Popular because they're interpretable—you can see exactly why a prediction was made.",
+            "learningType": "Supervised Learning (Classification or Regression)",
+            "strengths": [
+                "Highly interpretable—can visualize the decision process",
+                "Handles both numerical and categorical data",
+                "No need for feature scaling",
+                "Captures non-linear relationships automatically",
+                "Can handle missing values"
+            ],
+            "limitations": [
+                "Prone to overfitting—can memorize training data",
+                "Unstable—small data changes can drastically change the tree",
+                "Biased toward features with more levels",
+                "Can create overly complex trees"
+            ]
+        },
+        "mathematical_model": {
+            "title": "Mathematical Formulation",
+            "introduction": "Decision Trees split data to maximize information gain or minimize impurity.",
+            "equations": [
+                {
+                    "name": "Gini Impurity",
+                    "latex": "Gini = 1 - \\sum_{i=1}^{C} p_i^2",
+                    "explanation": "Measures how mixed the classes are. 0 = pure (all same class), 0.5 = maximum impurity (50-50 split)."
+                },
+                {
+                    "name": "Entropy",
+                    "latex": "Entropy = -\\sum_{i=1}^{C} p_i \\log_2(p_i)",
+                    "explanation": "Another impurity measure. 0 = pure, higher = more mixed. Used in ID3 and C4.5 algorithms."
+                },
+                {
+                    "name": "Information Gain",
+                    "latex": "IG = Entropy(parent) - \\sum \\frac{N_{child}}{N_{parent}} Entropy(child)",
+                    "explanation": "How much uncertainty is reduced by splitting. Higher = better split."
+                },
+                {
+                    "name": "MSE for Regression",
+                    "latex": "MSE = \\frac{1}{N} \\sum_{i=1}^{N} (y_i - \\bar{y})^2",
+                    "explanation": "For regression trees, minimize mean squared error at each split."
+                }
+            ],
+            "keyTerms": {
+                "Node": "Decision point in the tree",
+                "Leaf": "Terminal node with prediction",
+                "Split": "Question that divides data",
+                "Impurity": "How mixed the classes are",
+                "Depth": "Number of questions from root to leaf"
+            },
+            "intuition": "At each step, find the question that best separates the classes. Keep splitting until nodes are pure or reach stopping criteria."
+        }
+    }
+},
+"sample_io": {
+    "title": "Sample Input & Output",
+    "description": "Classifying whether to play tennis based on weather conditions.",
+    "input": {
+        "format": "Features and class labels",
+        "table": [
+            {
+                "Outlook": "Sunny",
+                "Temperature": "Hot",
+                "Humidity": "High",
+                "Wind": "Weak",
+                "Play": "No"
+            },
+            {
+                "Outlook": "Sunny",
+                "Temperature": "Hot",
+                "Humidity": "High",
+                "Wind": "Strong",
+                "Play": "No"
+            },
+            {
+                "Outlook": "Overcast",
+                "Temperature": "Hot",
+                "Humidity": "High",
+                "Wind": "Weak",
+                "Play": "Yes"
+            },
+            {
+                "Outlook": "Rain",
+                "Temperature": "Mild",
+                "Humidity": "High",
+                "Wind": "Weak",
+                "Play": "Yes"
+            },
+            {
+                "Outlook": "Rain",
+                "Temperature": "Cool",
+                "Humidity": "Normal",
+                "Wind": "Weak",
+                "Play": "Yes"
+            }
+        ]
+    },
+    "output": {
+        "tree_structure": {
+            "root": "Outlook",
+            "branches": {
+                "Sunny": {
+                    "split": "Humidity",
+                    "High": "No",
+                    "Normal": "Yes"
+                },
+                "Overcast": "Yes",
+                "Rain": {
+                    "split": "Wind",
+                    "Weak": "Yes",
+                    "Strong": "No"
+                }
+            }
+        },
+        "predictions": [
+            {
+                "Input": "Sunny, Hot, High, Weak",
+                "Path": "Outlook=Sunny → Humidity=High",
+                "Prediction": "No"
+            },
+            {
+                "Input": "Overcast, Hot, High, Weak",
+                "Path": "Outlook=Overcast",
+                "Prediction": "Yes"
+            }
+        ],
+        "metrics": {
+            "Accuracy": 0.95,
+            "Tree Depth": 3,
+            "Number of Leaves": 5
+        }
+    },
+    "visualization": "Tree diagram showing root node, internal nodes (decisions), and leaf nodes (predictions)."
+},
+"interpretation": {
+    "title": "Interpreting the Output",
+    "parameters": {
+        "root_node": "Most important feature for splitting (highest information gain)",
+        "branches": "Decision rules at each node",
+        "leaves": "Final predictions"
+    },
+    "predictions": "Follow the path from root to leaf: Outlook=Sunny → Humidity=High → Predict 'No'",
+    "metrics": {
+        "Tree Depth": "3 means maximum 3 questions to reach a prediction",
+        "Number of Leaves": "5 different outcomes possible",
+        "Feature Importance": "Features closer to root are more important"
+    },
+    "commonMisinterpretations": [
+        "❌ WRONG: 'Deeper trees are always better' → ✓ RIGHT: 'Deeper trees overfit; use pruning'",
+        "❌ WRONG: 'All paths have same length' → ✓ RIGHT: 'Some branches terminate early if pure'",
+        "❌ WRONG: 'Order of features doesn't matter' → ✓ RIGHT: 'Root features are most discriminative'"
+    ]
+},
+"implementation_scratch": {
+    "title": "Python Implementation (From Scratch)",
+    "description": "Building a simple Decision Tree classifier using NumPy.",
+    "code": "import numpy as np\nfrom collections import Counter\n\nclass Node:\n    def __init__(self, feature=None, threshold=None, left=None, right=None, value=None):\n        self.feature = feature      # Feature index to split on\n        self.threshold = threshold  # Threshold value for split\n        self.left = left           # Left child node\n        self.right = right         # Right child node\n        self.value = value         # Prediction value (for leaf nodes)\n\nclass DecisionTreeFromScratch:\n    def __init__(self, max_depth=10, min_samples_split=2):\n        self.max_depth = max_depth\n        self.min_samples_split = min_samples_split\n        self.root = None\n    \n    def gini_impurity(self, y):\n        \"\"\"Calculate Gini impurity\"\"\"\n        counter = Counter(y)\n        impurity = 1.0\n        for count in counter.values():\n            prob = count / len(y)\n            impurity -= prob ** 2\n        return impurity\n    \n    def split(self, X, y, feature, threshold):\n        \"\"\"Split dataset based on feature and threshold\"\"\"\n        left_mask = X[:, feature] <= threshold\n        right_mask = ~left_mask\n        return X[left_mask], X[right_mask], y[left_mask], y[right_mask]\n    \n    def best_split(self, X, y):\n        \"\"\"Find best feature and threshold to split on\"\"\"\n        best_gain = -1\n        best_feature = None\n        best_threshold = None\n        \n        parent_impurity = self.gini_impurity(y)\n        n_samples = len(y)\n        \n        # Try each feature\n        for feature in range(X.shape[1]):\n            thresholds = np.unique(X[:, feature])\n            \n            # Try each threshold\n            for threshold in thresholds:\n                X_left, X_right, y_left, y_right = self.split(X, y, feature, threshold)\n                \n                if len(y_left) == 0 or len(y_right) == 0:\n                    continue\n                \n                # Calculate weighted impurity\n                n_left, n_right = len(y_left), len(y_right)\n                weighted_impurity = (n_left/n_samples) * self.gini_impurity(y_left) + \\\n                                   (n_right/n_samples) * self.gini_impurity(y_right)\n                \n                # Calculate information gain\n                gain = parent_impurity - weighted_impurity\n                \n                if gain > best_gain:\n                    best_gain = gain\n                    best_feature = feature\n                    best_threshold = threshold\n        \n        return best_feature, best_threshold\n    \n    def build_tree(self, X, y, depth=0):\n        \"\"\"Recursively build the decision tree\"\"\"\n        n_samples, n_features = X.shape\n        n_classes = len(np.unique(y))\n        \n        # Stopping criteria\n        if depth >= self.max_depth or n_samples < self.min_samples_split or n_classes == 1:\n            leaf_value = Counter(y).most_common(1)[0][0]\n            return Node(value=leaf_value)\n        \n        # Find best split\n        feature, threshold = self.best_split(X, y)\n        \n        if feature is None:\n            leaf_value = Counter(y).most_common(1)[0][0]\n            return Node(value=leaf_value)\n        \n        # Split and recurse\n        X_left, X_right, y_left, y_right = self.split(X, y, feature, threshold)\n        left_child = self.build_tree(X_left, y_left, depth + 1)\n        right_child = self.build_tree(X_right, y_right, depth + 1)\n        \n        return Node(feature=feature, threshold=threshold, left=left_child, right=right_child)\n    \n    def fit(self, X, y):\n        \"\"\"Train the decision tree\"\"\"\n        self.root = self.build_tree(X, y)\n        return self\n    \n    def predict_single(self, x, node):\n        \"\"\"Predict single sample\"\"\"\n        if node.value is not None:\n            return node.value\n        \n        if x[node.feature] <= node.threshold:\n            return self.predict_single(x, node.left)\n        else:\n            return self.predict_single(x, node.right)\n    \n    def predict(self, X):\n        \"\"\"Predict multiple samples\"\"\"\n        return np.array([self.predict_single(x, self.root) for x in X])\n\n# Example\nX = np.array([[2.5, 1], [3.5, 2], [1.5, 1], [4.5, 3], [2, 2]])\ny = np.array([0, 0, 1, 0, 1])\n\nmodel = DecisionTreeFromScratch(max_depth=3)\nmodel.fit(X, y)\npredictions = model.predict(X)\nprint(f'Predictions: {predictions}')\nprint(f'Actual: {y}')"
+},
+"implementation_api": {
+    "title": "Python Implementation (Using scikit-learn)",
+    "description": "Production-ready implementation with visualization.",
+    "code": "from sklearn.tree import DecisionTreeClassifier, plot_tree\nfrom sklearn.metrics import accuracy_score, classification_report\nimport matplotlib.pyplot as plt\nimport numpy as np\n\nX = np.array([[2.5, 1], [3.5, 2], [1.5, 1], [4.5, 3], [2, 2]])\ny = np.array([0, 0, 1, 0, 1])\n\n# Create and train model\nmodel = DecisionTreeClassifier(max_depth=3, random_state=42)\nmodel.fit(X, y)\n\n# Make predictions\ny_pred = model.predict(X)\n\nprint(f'Accuracy: {accuracy_score(y, y_pred):.2f}')\nprint(f'Tree Depth: {model.get_depth()}')\nprint(f'Number of Leaves: {model.get_n_leaves()}')\n\n# Feature importance\nprint(f'Feature Importance: {model.feature_importances_}')\n\n# Visualize tree\nplt.figure(figsize=(12, 8))\nplot_tree(model, filled=True, feature_names=['Feature 1', 'Feature 2'], class_names=['Class 0', 'Class 1'])\nplt.show()",
+    "comparison": "scikit-learn provides optimized splitting algorithms, pruning, and beautiful visualization tools."
+},
+"evaluation": {
+    "title": "Model Evaluation",
+    "why": "Decision Trees easily overfit. Must evaluate on unseen data and check tree complexity.",
+    "metrics": [
+        {
+            "name": "Accuracy",
+            "formula": "Accuracy = Correct / Total",
+            "interpretation": "Percentage of correct predictions.",
+            "example": "Training accuracy 100%, test accuracy 70% → Overfitting!"
+        },
+        {
+            "name": "Tree Depth",
+            "formula": "Maximum path length from root to leaf",
+            "interpretation": "Deeper trees are more complex and prone to overfitting.",
+            "example": "Depth = 10 might be too deep; try pruning"
+        },
+        {
+            "name": "Number of Leaves",
+            "formula": "Count of terminal nodes",
+            "interpretation": "More leaves = more specific rules = higher overfitting risk.",
+            "example": "100 leaves for 200 samples → likely overfitting"
+        }
+    ]
+},
+"performance_interpretation": {
+    "title": "Interpreting Model Performance",
+    "whatIsGood": "Training and test accuracy should be similar. Tree depth should be reasonable (typically < 10).",
+    "whenModelFails": [
+        "Overfitting: Perfect training accuracy but poor test accuracy",
+        "Unstable: Small data changes cause completely different trees",
+        "Biased: Favors features with many unique values"
+    ],
+    "biasVariance": {
+        "highBias": "Shallow tree (max_depth too small) → underfitting",
+        "highVariance": "Deep tree (no max_depth limit) → overfitting"
+    },
+    "overfittingVsUnderfitting": "Decision Trees naturally overfit. Use max_depth, min_samples_split, or pruning to control complexity."
+},
+"improvements": {
+    "title": "Ways to Improve Performance",
+    "featureEngineering": [
+        "Create interaction features (though trees do this automatically)",
+        "Remove irrelevant features to reduce noise",
+        "Bin continuous features for more stable splits"
+    ],
+    "hyperparameterTuning": [
+        "max_depth: Limit tree depth (try 3, 5, 7, 10)",
+        "min_samples_split: Minimum samples required to split (try 2, 5, 10)",
+        "min_samples_leaf: Minimum samples in leaf node",
+        "max_features: Number of features to consider for each split"
+    ],
+    "dataPreprocessing": [
+        "Handle missing values (trees can handle them, but explicit handling is better)",
+        "Balance classes using class_weight parameter",
+        "Remove outliers (though trees are robust to them)"
+    ],
+    "algorithmSpecific": [
+        "Use cost-complexity pruning (ccp_alpha parameter)",
+        "Try different splitting criteria (gini vs entropy)",
+        "Use Random Forest instead (ensemble of trees)"
+    ],
+    "ensemblePossibilities": [
+        "Random Forest: Average multiple trees",
+        "Gradient Boosting: Sequentially improve trees",
+        "AdaBoost: Weight misclassified examples more"
+    ]
+}
+}
+}
