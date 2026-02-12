@@ -40,6 +40,18 @@ const MLPlayground = dynamic(() => import('../../components/MLPlayground'), {
     )
 });
 
+// Dynamic import for Transformer Playground
+const TransformerPlayground = dynamic(() => import('../../components/TransformerPlayground'), {
+    ssr: false,
+    loading: () => (
+        <div className="my-8 p-6 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl shadow-2xl border-2 border-purple-200">
+            <div className="flex items-center justify-center h-96">
+                <span className="text-purple-600 animate-pulse text-lg">Loading Transformer Playground...</span>
+            </div>
+        </div>
+    )
+});
+
 // Type definition for KaTeX
 interface KaTeXStatic {
     renderToString(tex: string, options?: any): string;
@@ -514,6 +526,16 @@ const AlgorithmPage: React.FC = () => {
                                 {showPlayground ? 'Hide' : 'Show'} Interactive Playground
                             </button>
                         )}
+                        {/* Show playground button for Transformer */}
+                        {algorithmData.id === 'transformer' && (
+                            <button
+                                onClick={() => setShowPlayground(!showPlayground)}
+                                className="px-4 py-2 bg-white text-purple-600 rounded-full text-sm font-semibold hover:bg-opacity-90 transition flex items-center gap-2"
+                            >
+                                <span>🤖</span>
+                                {showPlayground ? 'Hide' : 'Show'} Attention Playground
+                            </button>
+                        )}
                         {/* Show playground button for ML algorithms */}
                         {(algorithmData.id === 'linear_regression' || algorithmData.id === 'logistic_regression' ||
                             algorithmData.id === 'knn' || algorithmData.id === 'kmeans' || algorithmData.id === 'naive_bayes' ||
@@ -532,6 +554,11 @@ const AlgorithmPage: React.FC = () => {
                 {/* Neural Network Playground */}
                 {showPlayground && (algorithmData.id === 'ann' || algorithmData.id === 'cnn' || algorithmData.id === 'rnn') && (
                     <NeuralNetworkPlayground />
+                )}
+
+                {/* Transformer Playground */}
+                {showPlayground && algorithmData.id === 'transformer' && (
+                    <TransformerPlayground />
                 )}
 
                 {/* ML Playground */}
