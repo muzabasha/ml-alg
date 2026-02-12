@@ -1,10 +1,80 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
+import 'katex/dist/katex.min.css';
 
-// Enhanced content renderer with section-specific styling
+// Type definition for KaTeX
+interface KaTeXStatic {
+    renderToString(tex: string, options?: any): string;
+}
+
+// LaTeX renderer component
+const LaTeXRenderer = ({ latex }: { latex: string }) => {
+    const [rendered, setRendered] = useState<string>('');
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        const renderLatex = async () => {
+            try {
+                setLoading(true);
+                setError(null);
+
+                // Dynamic import with proper typing
+                const katexModule = await import('katex' as any);
+                const katex: KaTeXStatic = katexModule.default || katexModule;
+
+                const html = katex.renderToString(latex, {
+                    throwOnError: false,
+                    displayMode: true,
+                    output: 'html',
+                    strict: false
+                });
+
+                setRendered(html);
+                setLoading(false);
+            } catch (err) {
+                console.error('LaTeX rendering error:', err);
+                setError('Failed to render equation');
+                setLoading(false);
+                // Fallback: show formatted LaTeX code
+                setRendered(`<code class="text-purple-900">${latex}</code>`);
+            }
+        };
+        renderLatex();
+    }, [latex]);
+
+    if (loading) {
+        return (
+            <div className="my-6 p-6 bg-purple-50 rounded-xl border-2 border-purple-200 overflow-x-auto">
+                <div className="flex items-center justify-center text-purple-600">
+                    <span className="animate-pulse">Rendering equation...</span>
+                </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="my-6 p-6 bg-yellow-50 rounded-xl border-2 border-yellow-200 overflow-x-auto">
+                <div className="text-yellow-800">
+                    <p className="font-semibold mb-2">⚠️ Equation Display</p>
+                    <code className="text-sm">{latex}</code>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div
+            className="my-6 p-6 bg-purple-50 rounded-xl border-2 border-purple-200 overflow-x-auto"
+            dangerouslySetInnerHTML={{ __html: rendered }}
+        />
+    );
+};
+
+// Enhanced content renderer with section-specific styling and LaTeX support
 const SectionRenderer = ({ sectionKey, content }: { sectionKey: string; content: any }) => {
-    // Section-specific styling configurations
     const sectionStyles: Record<string, { bg: string; border: string; icon: string; accent: string }> = {
         introduction: {
             bg: 'bg-gradient-to-br from-blue-50 to-indigo-50',
@@ -136,7 +206,7 @@ const SectionRenderer = ({ sectionKey, content }: { sectionKey: string; content:
             return (
                 <div className="space-y-4">
                     {data.map((item, idx) => (
-                        <div key={idx} className={`${style.bg} p-4 rounded-lg ${style.border} shadow-sm`}>
+                        <div key={idx} className={`${style.bg} p-6 rounded-lg ${style.border} shadow-sm`}>
                             {renderContent(item, depth + 1)}
                         </div>
                     ))}
@@ -150,6 +220,49 @@ const SectionRenderer = ({ sectionKey, content }: { sectionKey: string; content:
                     {Object.entries(data).map(([key, value]: [string, any]) => {
                         const formattedKey = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
 
+                        // Special handling for LaTeX equations
+                        if (key === 'latex') {
+                            return (
+                                <div key={key} className="my-4">
+                                    <LaTeXRenderer latex={String(value)} />
+                                </div>
+                            );
+                        }
+
+                        // Special handling for equations array
+                        if (key === 'equations' && Array.isArray(value)) {
+                            return (
+                                <div key={key} className="my-6">
+                                    <h5 className={`font-bold ${style.accent} mb-4 text-lg flex items-center gap-2`}>
+                                        <span>📐</span> {formattedKey}
+                                    </h5>
+                                    <div className="space-y-6">
+                                        {value.map((eq: any, eqIdx: number) => (
+                                            <div key={eqIdx} className="bg-white p-6 rounded-xl shadow-md border-2 border-purple-100">
+                                                {eq.name && (
+                                                    <h6 className="text-lg font-bold text-purple-700 mb-3 flex items-center gap-2">
+                                                        <span>📌</span> {eq.name}
+                                                    </h6>
+                                                )}
+                                                {eq.latex && <LaTeXRenderer latex={eq.latex} />}
+                                                {eq.formula && !eq.latex && (
+                                                    <div className="font-mono bg-purple-50 px-4 py-3 rounded-lg text-purple-900 border border-purple-200 my-3">
+                                                        {eq.formula}
+                                                    </div>
+                                                )}
+                                                {eq.explanation && (
+                                                    <p className="text-gray-700 mt-4 leading-relaxed bg-gray-50 p-4 rounded-lg border-l-4 border-purple-400">
+                                                        <span className="font-semibold text-purple-700">Explanation: </span>
+                                                        {eq.explanation}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            );
+                        }
+
                         if (key === 'code' || key === 'implementation') {
                             return (
                                 <div key={key} className="my-6">
@@ -161,20 +274,45 @@ const SectionRenderer = ({ sectionKey, content }: { sectionKey: string; content:
                             );
                         }
 
-                        if (key === 'equations' || key === 'metrics') {
+                        if (key === 'metrics' && Array.isArray(value)) {
                             return (
                                 <div key={key} className="my-6">
                                     <h5 className={`font-bold ${style.accent} mb-4 text-lg flex items-center gap-2`}>
-                                        <span>📐</span> {formattedKey}
+                                        <span>📊</span> {formattedKey}
                                     </h5>
                                     <div className="grid gap-4">
-                                        {renderContent(value, depth + 1)}
+                                        {value.map((metric: any, mIdx: number) => (
+                                            <div key={mIdx} className="bg-white p-5 rounded-xl shadow-md border-2 border-red-100">
+                                                {metric.name && (
+                                                    <h6 className="text-lg font-bold text-red-700 mb-2">
+                                                        {metric.name}
+                                                    </h6>
+                                                )}
+                                                {metric.formula && (
+                                                    <div className="font-mono bg-red-50 px-3 py-2 rounded text-red-900 border border-red-200 my-2 text-sm">
+                                                        {metric.formula}
+                                                    </div>
+                                                )}
+                                                {metric.interpretation && (
+                                                    <p className="text-gray-700 mt-2 text-sm">
+                                                        <span className="font-semibold">Interpretation: </span>
+                                                        {metric.interpretation}
+                                                    </p>
+                                                )}
+                                                {metric.example && (
+                                                    <p className="text-gray-600 mt-2 text-sm italic">
+                                                        <span className="font-semibold">Example: </span>
+                                                        {metric.example}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        ))}
                                     </div>
                                 </div>
                             );
                         }
 
-                        if (key === 'name' || key === 'formula' || key === 'latex') {
+                        if (key === 'name' || key === 'formula') {
                             return (
                                 <div key={key} className="mb-2">
                                     <span className="font-semibold text-gray-900">{formattedKey}: </span>
@@ -223,9 +361,9 @@ const AlgorithmPage: React.FC = () => {
 
     useEffect(() => {
         if (mounted && router.query.id) {
-            const id = router.query.id as string;
+            const algorithmId = router.query.id as string;
 
-            fetch(`/data/${id}.json`)
+            fetch(`/data/${algorithmId}.json`)
                 .then(res => res.json())
                 .then(data => {
                     setAlgorithmData(data);
@@ -308,8 +446,8 @@ const AlgorithmPage: React.FC = () => {
                             {algorithmData.category}
                         </span>
                         <span className={`px-4 py-2 rounded-full text-sm font-semibold ${algorithmData.difficulty === 'Beginner' ? 'bg-green-500' :
-                                algorithmData.difficulty === 'Intermediate' ? 'bg-yellow-500' :
-                                    'bg-red-500'
+                            algorithmData.difficulty === 'Intermediate' ? 'bg-yellow-500' :
+                                'bg-red-500'
                             }`}>
                             {algorithmData.difficulty}
                         </span>
@@ -331,8 +469,8 @@ const AlgorithmPage: React.FC = () => {
                                         key={key}
                                         onClick={() => setActiveSection(key)}
                                         className={`w-full text-left px-4 py-3 rounded-lg text-sm transition-all duration-200 ${activeSection === key
-                                                ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-semibold shadow-md transform scale-105'
-                                                : 'text-gray-700 hover:bg-gray-100 hover:shadow-sm'
+                                            ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-semibold shadow-md transform scale-105'
+                                            : 'text-gray-700 hover:bg-gray-100 hover:shadow-sm'
                                             }`}
                                     >
                                         <span className="font-semibold">{index + 1}.</span> {sections[key].title || key.replace(/_/g, ' ')}

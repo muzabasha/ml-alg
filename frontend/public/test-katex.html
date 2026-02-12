@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KaTeX Test</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        .equation-box {
+            background: white;
+            padding: 30px;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #6366f1;
+            text-align: center;
+        }
+
+        h2 {
+            color: #8b5cf6;
+            margin-top: 30px;
+        }
+
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .success {
+            background: #d1fae5;
+            border: 2px solid #10b981;
+            color: #065f46;
+        }
+
+        .error {
+            background: #fee2e2;
+            border: 2px solid #ef4444;
+            color: #991b1b;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🧪 KaTeX Rendering Test</h1>
+
+    <div id="status" class="status">
+        <strong>Status:</strong> Testing KaTeX...
+    </div>
+
+    <h2>Test 1: Simple Equation</h2>
+    <div class="equation-box">
+        <p>Inline equation: <span id="eq1">y = mx + b</span></p>
+    </div>
+
+    <h2>Test 2: Linear Regression Cost Function</h2>
+    <div class="equation-box">
+        <div id="eq2">J(\theta_0, \theta_1) = \frac{1}{2m} \sum_{i=1}^{m} (h(x^{(i)}) - y^{(i)})^2</div>
+    </div>
+
+    <h2>Test 3: Gradient Descent</h2>
+    <div class="equation-box">
+        <div id="eq3">\theta_j := \theta_j - \alpha \frac{\partial J}{\partial \theta_j}</div>
+    </div>
+
+    <h2>Test 4: Neural Network Activation</h2>
+    <div class="equation-box">
+        <div id="eq4">a = \max(0, z) = \max(0, \sum_{i=1}^{n} w_i x_i + b)</div>
+    </div>
+
+    <h2>Test 5: Softmax Function</h2>
+    <div class="equation-box">
+        <div id="eq5">\hat{y}_j = \frac{e^{z_j}}{\sum_{k=1}^{K} e^{z_k}}</div>
+    </div>
+
+    <script>
+        window.addEventListener('load', function () {
+            try {
+                // Test if KaTeX is loaded
+                if (typeof katex === 'undefined') {
+                    document.getElementById('status').className = 'status error';
+                    document.getElementById('status').innerHTML = '<strong>❌ ERROR:</strong> KaTeX library not loaded!';
+                    return;
+                }
+
+                // Render equations
+                katex.render('y = mx + b', document.getElementById('eq1'), {
+                    throwOnError: false,
+                    displayMode: false
+                });
+
+                katex.render('J(\\theta_0, \\theta_1) = \\frac{1}{2m} \\sum_{i=1}^{m} (h(x^{(i)}) - y^{(i)})^2',
+                    document.getElementById('eq2'), {
+                    throwOnError: false,
+                    displayMode: true
+                });
+
+                katex.render('\\theta_j := \\theta_j - \\alpha \\frac{\\partial J}{\\partial \\theta_j}',
+                    document.getElementById('eq3'), {
+                    throwOnError: false,
+                    displayMode: true
+                });
+
+                katex.render('a = \\max(0, z) = \\max(0, \\sum_{i=1}^{n} w_i x_i + b)',
+                    document.getElementById('eq4'), {
+                    throwOnError: false,
+                    displayMode: true
+                });
+
+                katex.render('\\hat{y}_j = \\frac{e^{z_j}}{\\sum_{k=1}^{K} e^{z_k}}',
+                    document.getElementById('eq5'), {
+                    throwOnError: false,
+                    displayMode: true
+                });
+
+                // Success!
+                document.getElementById('status').className = 'status success';
+                document.getElementById('status').innerHTML = '<strong>✅ SUCCESS:</strong> KaTeX is working! All equations rendered correctly.';
+
+            } catch (error) {
+                document.getElementById('status').className = 'status error';
+                document.getElementById('status').innerHTML = '<strong>❌ ERROR:</strong> ' + error.message;
+                console.error('KaTeX error:', error);
+            }
+        });
+    </script>
+
+    <div style="margin-top: 50px; padding: 20px; background: #e0e7ff; border-radius: 8px;">
+        <h3>✅ What You Should See:</h3>
+        <ul>
+            <li>Green "SUCCESS" message at the top</li>
+            <li>Beautiful mathematical equations with proper symbols</li>
+            <li>Greek letters (θ, α) rendered correctly</li>
+            <li>Fractions displayed as actual fractions</li>
+            <li>Summation symbols (Σ) with proper limits</li>
+        </ul>
+
+        <h3>❌ If You See Raw LaTeX Text:</h3>
+        <ul>
+            <li>KaTeX library failed to load</li>
+            <li>Check your internet connection (using CDN)</li>
+            <li>Check browser console (F12) for errors</li>
+            <li>Try refreshing the page</li>
+        </ul>
+
+        <h3>🔧 Next Steps:</h3>
+        <ol>
+            <li>If this test works, KaTeX is functional</li>
+            <li>Run <code>INSTALL_LATEX.bat</code> to install KaTeX locally</li>
+            <li>Run <code>TEST_EQUATIONS.bat</code> to test in your app</li>
+            <li>Check browser console for any import errors</li>
+        </ol>
+    </div>
+</body>
+
+</html>
