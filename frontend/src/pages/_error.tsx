@@ -1,11 +1,12 @@
 import React from 'react';
 import Link from 'next/link';
+import { NextPageContext } from 'next';
 
 interface ErrorProps {
     statusCode?: number;
 }
 
-const Error: React.FC<ErrorProps> = ({ statusCode }) => {
+const Error = ({ statusCode }: ErrorProps) => {
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex items-center justify-center px-4">
             <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
@@ -35,7 +36,7 @@ const Error: React.FC<ErrorProps> = ({ statusCode }) => {
     );
 };
 
-Error.getInitialProps = ({ res, err }) => {
+Error.getInitialProps = ({ res, err }: NextPageContext) => {
     const statusCode = res ? res.statusCode : err ? err.statusCode : 404;
     return { statusCode };
 };

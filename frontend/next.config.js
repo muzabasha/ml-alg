@@ -6,10 +6,6 @@ const nextConfig = {
     images: {
         unoptimized: true,
     },
-    // Remove standalone output for Vercel (causes issues)
-    // output: 'standalone',
-    // Disable telemetry
-    telemetry: false,
     // Configure webpack for better error handling
     webpack: (config, { isServer }) => {
         if (!isServer) {
