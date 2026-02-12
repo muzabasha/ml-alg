@@ -280,7 +280,7 @@ print(f"Classes: {data.target_names}")`}</code>
                                                 <div className="flex justify-between items-center">
                                                     <div>
                                                         <div className="font-bold text-gray-900">
-                                                            {feat1.replace(/_/g, ' ')} ↔ {feat2.replace(/_/g, ' ')}
+                                                            {String(feat1).replace(/_/g, ' ')} ↔ {String(feat2).replace(/_/g, ' ')}
                                                         </div>
                                                         <div className={`text-sm text-${color}-700 mt-1`}>
                                                             {type} Correlation: {Number(corr).toFixed(3)}
