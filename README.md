@@ -1,237 +1,214 @@
-# Machine Learning Algorithms: Learn, Visualize, Implement & Interpret
+# 🎓 ML Learning Platform
 
-An interactive web-based learning platform for undergraduate and postgraduate engineering students to master Machine Learning algorithms through structured, hands-on learning.
+A comprehensive, interactive machine learning education platform featuring 11 algorithms, 3 interactive playgrounds, and real-world dataset exploration.
 
-## 🎯 Platform Objectives
+## 🌟 Features
 
-This platform prioritizes:
-- **Conceptual Clarity**: Plain-language explanations with real-world analogies
-- **Mathematical Understanding**: LaTeX formulations with intuitive interpretations
-- **Interpretability**: Learn to read and understand model outputs
-- **Practical Coding Skills**: Implement algorithms from scratch and with industry-standard libraries
-- **Model Evaluation**: Understand metrics and improve model performance
+### 📚 11 Complete ML Algorithms
+- **Classical ML**: Linear Regression, Logistic Regression, KNN, K-Means, Naive Bayes, Decision Tree, SVM
+- **Deep Learning**: ANN, CNN, RNN, Transformer
 
-## 📚 Algorithms Covered
+Each algorithm includes:
+- Comprehensive theory and explanations
+- Mathematical models with LaTeX rendering
+- Real-world applications and use cases
+- From-scratch and library implementations
+- Sample inputs/outputs with visualizations
+- Evaluation metrics and best practices
 
-### Classical Machine Learning
+### 🎮 3 Interactive Playgrounds
 
-#### Regression
-- ✅ **Linear Regression** - Predict continuous values
+#### ML Playground
+- Interactive learning for 7 classical algorithms
+- Click to add data points
+- Real-time model training
+- Decision boundary visualization
+- Adjustable hyperparameters
 
-#### Classification
-- ✅ **Logistic Regression** - Binary and multi-class classification
-- ✅ **k-Nearest Neighbors (KNN)** - Instance-based learning
-- ✅ **Decision Tree** - Interpretable tree-based decisions
-- ✅ **Support Vector Machine (SVM)** - Maximum margin classification
+#### Neural Network Playground
+- Design custom network architectures
+- Add/remove layers and neurons
+- 4 built-in datasets (Circle, XOR, Spiral, Gaussian)
+- Real-time training visualization
+- Loss and accuracy tracking
 
-### Deep Learning
+#### Transformer Playground
+- Interactive attention mechanism visualization
+- Click tokens to see attention patterns
+- Multi-head attention display
+- Adjustable parameters (heads, layers, temperature)
+- Custom text input support
 
-#### Neural Networks
-- ✅ **Artificial Neural Network (ANN)** - Fully connected deep learning
-- ✅ **Convolutional Neural Network (CNN)** - Computer vision and image processing
-- ✅ **Recurrent Neural Network (RNN)** - Sequential data and time series
-- ✅ **Transformer Network** - Attention-based architecture for NLP
+### 📊 Dataset Explorer
+- **Iris Flower Dataset**: 150 samples, 4 features, 3 classes
+- **Wine Quality Dataset**: 178 samples, 13 features, 3 classes
 
-## 🧱 Content Structure (For Each Algorithm)
-
-Every algorithm follows this 9-section structure:
-
-1. **Introduction**
-   - Plain-language explanation
-   - Real-world analogy
-   - Use cases and applications
-   - Strengths and limitations
-
-2. **Mathematical Model**
-   - Formal mathematical formulation (LaTeX)
-   - Key terms and definitions
-   - Intuitive explanation of the math
-
-3. **Sample Input & Output**
-   - Realistic sample data
-   - Expected output with visualization
-   - Step-by-step walkthrough
-
-4. **Interpretation of Output**
-   - What each output value means
-   - How to read model results
-   - Common misinterpretations to avoid
-
-5. **Python Implementation - From Scratch**
-   - Pure NumPy implementation
-   - Heavily commented code
-   - Understanding algorithm internals
-
-6. **Python Implementation - With API**
-   - scikit-learn implementation
-   - Production-ready code
-   - Comparison with from-scratch approach
-
-7. **Model Evaluation**
-   - Relevant metrics explained
-   - Why evaluation is required
-   - Sample evaluation output
-
-8. **Performance Interpretation**
-   - What "good" performance means
-   - When the model fails
-   - Bias-variance tradeoff
-   - Overfitting vs underfitting
-
-9. **Ways to Improve Performance**
-   - Feature engineering techniques
-   - Hyperparameter tuning
-   - Data preprocessing
-   - Algorithm-specific improvements
-   - Ensemble possibilities
+Features:
+- Descriptive statistics
+- Feature correlations
+- Complete Python code examples
+- Best practices and tips
 
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js 16+
-- npm
+- Node.js 18+ and npm
+- Python 3.8+ (for backend, optional)
 
-### Simple Setup (Windows)
-1. Double-click `SMART_START.bat` to launch the application
-2. Visit `http://localhost:3000` in your browser
+### Installation
 
-### Manual Setup
 ```bash
+# Clone the repository
+git clone https://github.com/muzabasha/ml-alg.git
+cd ml-alg
+
+# Install frontend dependencies
 cd frontend
 npm install
+
+# Start development server
 npm run dev
 ```
 
-Frontend will run on `http://localhost:3000`
+Visit `http://localhost:3000` to see the platform.
 
-### Pages
-- Home: `http://localhost:3000`
-- Instructor Profile: `http://localhost:3000/instructor`
-- Algorithms:
-  - `http://localhost:3000/algorithm/linear_regression`
-  - `http://localhost:3000/algorithm/logistic_regression`
-  - `http://localhost:3000/algorithm/knn`
-  - `http://localhost:3000/algorithm/decision_tree`
-  - `http://localhost:3000/algorithm/svm`
-  - `http://localhost:3000/algorithm/ann`
-  - `http://localhost:3000/algorithm/cnn`
-  - `http://localhost:3000/algorithm/rnn`
-  - `http://localhost:3000/algorithm/transformer`
+### Production Build
 
-## 🏗️ Technology Stack
-
-### Frontend
-- **Framework**: Next.js 14 (React 18)
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS
-- **Math Rendering**: KaTeX
-- **Code Highlighting**: Built-in syntax highlighting
+```bash
+cd frontend
+npm run build
+npm start
+```
 
 ## 📁 Project Structure
 
 ```
 ml-alg/
-├── frontend/                 # React/Next.js application
+├── frontend/                 # Next.js frontend application
 │   ├── src/
+│   │   ├── components/      # React components
+│   │   │   ├── DataVisualization.tsx
+│   │   │   ├── MLPlayground.tsx
+│   │   │   ├── NeuralNetworkPlayground.tsx
+│   │   │   └── TransformerPlayground.tsx
 │   │   ├── pages/           # Next.js pages
-│   │   │   ├── index.tsx    # Home page
-│   │   │   ├── instructor.tsx # Instructor profile
-│   │   │   └── algorithm/[id].tsx # Dynamic algorithm pages
-│   │   └── utils/           # Helper functions
+│   │   │   ├── index.tsx    # Homepage
+│   │   │   ├── datasets.tsx # Dataset explorer
+│   │   │   ├── instructor.tsx
+│   │   │   └── algorithm/[id].tsx
+│   │   └── styles/          # Global styles
 │   ├── public/
-│   │   ├── data/            # Algorithm JSON files
-│   │   └── DP_profile.png   # Instructor photo
+│   │   └── data/            # Algorithm JSON files
 │   └── package.json
-│
-├── content/                  # Algorithm content (JSON)
-│   └── algorithms/          # Algorithm definitions
-│       ├── linear_regression.json
-│       ├── logistic_regression.json
-│       ├── knn.json
-│       ├── decision_tree.json
-│       ├── svm.json
-│       ├── ann.json
-│       ├── cnn.json
-│       ├── rnn.json
-│       └── transformer.json
-│
-├── backend/                  # FastAPI server (optional)
+├── backend/                 # FastAPI backend (optional)
 │   ├── app/
-│   │   └── main.py          # FastAPI app
+│   │   └── main.py
 │   └── requirements.txt
-│
-└── SMART_START.bat          # Easy launcher for Windows
+└── content/                 # Algorithm content
+    └── algorithms/          # Algorithm JSON files
 ```
 
-## 🎨 Features
+## 🛠️ Technology Stack
 
-### Current Implementation
-- ✅ 9 complete algorithms (5 classical ML + 4 deep learning)
-- ✅ Professional instructor profile page
-- ✅ Dynamic routing for algorithm pages
-- ✅ Responsive design with Tailwind CSS
-- ✅ Math rendering support (KaTeX)
-- ✅ Code syntax highlighting
-- ✅ Section-based navigation
-- ✅ Previous/Next navigation buttons
-- ✅ Error pages (404, 500)
+### Frontend
+- **Framework**: Next.js 14 with TypeScript
+- **Styling**: Tailwind CSS
+- **Math Rendering**: KaTeX
+- **Charts**: Chart.js with react-chartjs-2
+- **Deployment**: Vercel
 
-### Algorithm Content Structure
-Each algorithm includes:
-1. Introduction with real-world examples
-2. Mathematical formulation
-3. Sample input/output
-4. Output interpretation
-5. Python implementation (from scratch)
-6. Python implementation (with scikit-learn)
-7. Model evaluation metrics
-8. Performance interpretation
-9. Ways to improve performance
+### Backend (Optional)
+- **Framework**: FastAPI
+- **Language**: Python 3.8+
 
-## 🎓 Learning Path
+## 📖 Usage
 
-### Beginner Track (Classical ML)
-1. Linear Regression - Start here for regression problems
-2. Logistic Regression - Introduction to classification
-3. k-Nearest Neighbors (KNN) - Instance-based learning
+### Exploring Algorithms
+1. Visit the homepage
+2. Click on any algorithm card
+3. Navigate through 9 comprehensive sections
+4. Try the interactive playground
 
-### Intermediate Track
-4. Decision Tree - Interpretable models
-5. Artificial Neural Network (ANN) - Introduction to deep learning
+### Using Playgrounds
+1. Select an algorithm with playground support
+2. Click "Open Playground" button
+3. Interact with the visualization
+4. Adjust parameters and see real-time results
 
-### Advanced Track (Deep Learning)
-6. Support Vector Machine (SVM) - Maximum margin classification
-7. Convolutional Neural Network (CNN) - Computer vision
-8. Recurrent Neural Network (RNN) - Sequential data
-9. Transformer Network - State-of-the-art NLP
+### Dataset Explorer
+1. Go to "Datasets" page
+2. Select a dataset (Iris or Wine)
+3. Explore statistics and correlations
+4. Copy Python code examples
 
-## 🔮 Future Enhancements
+## 🎯 Educational Goals
 
-- [ ] Add more algorithms (Random Forest, Naive Bayes, PCA, etc.)
-- [ ] Interactive visualizations with Plotly
-- [ ] Live code execution sandbox
-- [ ] User progress tracking
-- [ ] Practice problems and quizzes
-- [ ] Video tutorials
-- [ ] Mobile app version
-- [ ] Multilingual support
+This platform is designed to:
+- Provide comprehensive ML algorithm education
+- Enable hands-on interactive learning
+- Bridge theory and practical implementation
+- Support both beginners and advanced learners
+- Demonstrate real-world applications
+
+## 🌐 Deployment
+
+### Vercel (Recommended)
+
+1. Fork this repository
+2. Import to Vercel
+3. Set **Root Directory** to `frontend`
+4. Deploy
+
+### Manual Deployment
+
+```bash
+cd frontend
+npm run build
+npm start
+```
+
+## 📝 Algorithm Coverage
+
+### Supervised Learning
+- Linear Regression
+- Logistic Regression
+- K-Nearest Neighbors
+- Naive Bayes
+- Decision Tree
+- Support Vector Machine
+
+### Unsupervised Learning
+- K-Means Clustering
+
+### Deep Learning
+- Artificial Neural Networks
+- Convolutional Neural Networks
+- Recurrent Neural Networks
+- Transformer Networks
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📄 License
 
-MIT License - See LICENSE file for details
+This project is open source and available under the MIT License.
 
-## 👨‍🏫 Instructor
+## 🙏 Acknowledgments
 
-**Dr. Syed Muzamil Basha**
-- Professor, Department of Computer Science & Engineering
-- REVA University, Bangalore, India
-- 65 Scopus Publications | 25+ Textbooks | 12 Awards
-- Research Areas: Machine Learning, Deep Learning, IoT, Cloud Computing
+- Built with Next.js, React, and TypeScript
+- Math rendering powered by KaTeX
+- Visualizations powered by Chart.js
+- Inspired by TensorFlow Playground
 
 ## 📧 Contact
 
-For questions or suggestions, please open an issue on GitHub.
+For questions or feedback, please open an issue on GitHub.
 
 ---
 
-**Happy Learning! 🚀**
+**Repository**: https://github.com/muzabasha/ml-alg  
+**Version**: 1.0.0  
+**Status**: Production Ready ✅
+
+🎉 **Happy Learning!** 🎉
