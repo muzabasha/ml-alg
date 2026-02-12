@@ -1,0 +1,200 @@
+{
+    "id": "transformer",
+    "name": "Transformer Network",
+    "category": "Deep Learning - Attention-Based",
+    "difficulty": "Advanced",
+    "estimatedTime": "150 minutes",
+    "sections": {
+        "introduction": {
+            "title": "Introduction to Transformer Networks",
+            "plainLanguage": "Transformers revolutionized deep learning by replacing recurrence with attention mechanisms. Instead of processing sequences step-by-step like RNNs, Transformers look at all positions simultaneously and learn which parts to focus on. This enables parallel processing and better long-range dependencies.",
+            "realWorldAnalogy": "Imagine translating a sentence. An RNN reads word-by-word like reading a book linearly. A Transformer is like having the entire sentence on a whiteboard—you can look at any word, see relationships between distant words, and understand context all at once. When translating 'bank', you can instantly check if the sentence mentions 'river' or 'money' to disambiguate.",
+            "whereAndWhy": "Transformers power modern AI: GPT (text generation), BERT (language understanding), Vision Transformers (image classification), and many more. They excel at: machine translation, text summarization, question answering, code generation, and any task requiring understanding of long-range dependencies.",
+            "learningType": "Supervised Learning (Sequence-to-Sequence)",
+            "strengths": [
+                "Parallel processing - much faster than RNNs",
+                "Captures long-range dependencies effectively",
+                "Attention mechanism is interpretable",
+                "Scales well with data and compute",
+                "State-of-the-art on most NLP tasks",
+                "Transfer learning through pre-training"
+            ],
+            "limitations": [
+                "Requires large amounts of training data",
+                "Computationally expensive (O(n²) complexity)",
+                "Memory intensive for long sequences",
+                "Needs careful hyperparameter tuning",
+                "Less effective on very small datasets",
+                "Quadratic cost with sequence length"
+            ]
+        },
+        "mathematical_model": {
+            "title": "Mathematical Formulation",
+            "introduction": "Transformers use self-attention to weigh the importance of different positions in a sequence, allowing parallel processing and long-range dependencies.",
+            "equations": [
+                {
+                    "name": "Scaled Dot-Product Attention",
+                    "latex": "\\text{Attention}(Q, K, V) = \\text{softmax}\\left(\\frac{QK^T}{\\sqrt{d_k}}\\right)V",
+                    "explanation": "Q (query), K (key), V (value) are linear projections of the input. This computes attention weights by comparing queries with keys, then uses those weights to combine values. Scaling by √d_k prevents softmax saturation."
+                },
+                {
+                    "name": "Multi-Head Attention",
+                    "latex": "\\text{MultiHead}(Q, K, V) = \\text{Concat}(\\text{head}_1, ..., \\text{head}_h)W^O",
+                    "explanation": "Multiple attention heads learn different aspects of relationships. Each head has its own Q, K, V projections. Outputs are concatenated and projected."
+                },
+                {
+                    "name": "Position-wise Feed-Forward",
+                    "latex": "\\text{FFN}(x) = \\max(0, xW_1 + b_1)W_2 + b_2",
+                    "explanation": "Two-layer fully connected network applied to each position independently. Adds non-linearity and increases model capacity."
+                },
+                {
+                    "name": "Layer Normalization",
+                    "latex": "\\text{LayerNorm}(x) = \\gamma \\frac{x - \\mu}{\\sqrt{\\sigma^2 + \\epsilon}} + \\beta",
+                    "explanation": "Normalizes activations for stable training. Applied before or after each sub-layer."
+                },
+                {
+                    "name": "Positional Encoding",
+                    "latex": "PE_{(pos, 2i)} = \\sin(pos / 10000^{2i/d}), \\quad PE_{(pos, 2i+1)} = \\cos(pos / 10000^{2i/d})",
+                    "explanation": "Injects position information since Transformers have no inherent notion of order. Uses sinusoidal functions for different frequencies."
+                }
+            ],
+            "keyTerms": {
+                "Self-Attention": "Mechanism that weighs importance of different positions in the sequence",
+                "Query (Q)": "What we're looking for",
+                "Key (K)": "What each position offers",
+                "Value (V)": "Actual content to retrieve",
+                "Multi-Head": "Multiple parallel attention mechanisms learning different patterns",
+                "Encoder": "Processes input sequence into representations",
+                "Decoder": "Generates output sequence from encoder representations",
+                "Positional Encoding": "Adds position information to embeddings"
+            },
+            "intuition": "Attention asks: 'For each word, which other words should I pay attention to?' The model learns these relationships. Multi-head attention captures different types of relationships (syntax, semantics, etc.). Positional encoding tells the model where each word is in the sequence."
+        },
+        "sample_input_output": {
+            "title": "Sample Input & Output",
+            "problem": "Machine translation: English to French",
+            "sampleInput": {
+                "description": "English sentence as token IDs",
+                "shape": "[sequence_length]",
+                "example": "'The cat sits on the mat' → [2, 45, 123, 67, 2, 89]"
+            },
+            "sampleOutput": {
+                "description": "French sentence as token IDs",
+                "shape": "[target_length]",
+                "example": "'Le chat est assis sur le tapis' → [3, 78, 234, 156, 89, 3, 201]"
+            },
+            "walkthrough": "1. Input: English sentence tokens\n2. Add positional encodings to embeddings\n3. Encoder: 6 layers of self-attention + feed-forward\n   - Each word attends to all other words\n   - Builds contextual representations\n4. Decoder: 6 layers of masked self-attention + cross-attention + feed-forward\n   - Masked attention: can only look at previous outputs\n   - Cross-attention: attends to encoder outputs\n5. Output: Probability distribution over French vocabulary\n6. Generate French words one at a time"
+        },
+        "interpretation_of_output": {
+            "title": "Interpretation of Output",
+            "whatItMeans": "For translation, output is a sequence of tokens in the target language. For classification, the [CLS] token representation is used. Attention weights show which input positions influenced each output.",
+            "howToRead": "• Attention weights: visualize as heatmap showing relationships\n• High attention: strong relationship between positions\n• Multiple heads: capture different types of relationships\n• Encoder output: contextual representation of input\n• Decoder output: probability distribution over vocabulary",
+            "commonMisinterpretations": [
+                "Attention weights are not always interpretable as 'importance'",
+                "High attention doesn't mean causal relationship",
+                "Different heads may learn redundant patterns",
+                "Model may rely on spurious correlations in training data",
+                "Generated text may be fluent but factually incorrect"
+            ],
+            "practicalTips": "Visualize attention patterns to understand model behavior. Use beam search for better generation quality. Apply temperature scaling to control randomness. For critical applications, verify factual accuracy separately."
+        },
+        "implementation_from_scratch": {
+            "title": "Python Implementation - From Scratch",
+            "description": "Building core Transformer components with NumPy (simplified)",
+            "code": "import numpy as np\n\ndef scaled_dot_product_attention(Q, K, V, mask=None):\n    \"\"\"\n    Compute scaled dot-product attention\n    Q, K, V: (batch_size, seq_len, d_k)\n    \"\"\"\n    d_k = Q.shape[-1]\n    \n    # Compute attention scores\n    scores = np.matmul(Q, K.transpose(0, 2, 1)) / np.sqrt(d_k)\n    \n    # Apply mask (for decoder)\n    if mask is not None:\n        scores = scores + (mask * -1e9)\n    \n    # Softmax to get attention weights\n    attention_weights = np.exp(scores) / np.sum(np.exp(scores), axis=-1, keepdims=True)\n    \n    # Apply attention to values\n    output = np.matmul(attention_weights, V)\n    \n    return output, attention_weights\n\nclass MultiHeadAttention:\n    def __init__(self, d_model, num_heads):\n        self.num_heads = num_heads\n        self.d_model = d_model\n        \n        assert d_model % num_heads == 0\n        self.d_k = d_model // num_heads\n        \n        # Initialize weight matrices\n        self.W_q = np.random.randn(d_model, d_model) * 0.01\n        self.W_k = np.random.randn(d_model, d_model) * 0.01\n        self.W_v = np.random.randn(d_model, d_model) * 0.01\n        self.W_o = np.random.randn(d_model, d_model) * 0.01\n    \n    def split_heads(self, x, batch_size):\n        \"\"\"Split into multiple heads\"\"\"\n        x = x.reshape(batch_size, -1, self.num_heads, self.d_k)\n        return x.transpose(0, 2, 1, 3)\n    \n    def forward(self, Q, K, V, mask=None):\n        batch_size = Q.shape[0]\n        \n        # Linear projections\n        Q = np.matmul(Q, self.W_q)\n        K = np.matmul(K, self.W_k)\n        V = np.matmul(V, self.W_v)\n        \n        # Split into multiple heads\n        Q = self.split_heads(Q, batch_size)\n        K = self.split_heads(K, batch_size)\n        V = self.split_heads(V, batch_size)\n        \n        # Apply attention\n        attention_output, attention_weights = scaled_dot_product_attention(Q, K, V, mask)\n        \n        # Concatenate heads\n        attention_output = attention_output.transpose(0, 2, 1, 3)\n        attention_output = attention_output.reshape(batch_size, -1, self.d_model)\n        \n        # Final linear projection\n        output = np.matmul(attention_output, self.W_o)\n        \n        return output, attention_weights\n\ndef positional_encoding(seq_len, d_model):\n    \"\"\"\n    Generate positional encodings\n    \"\"\"\n    position = np.arange(seq_len)[:, np.newaxis]\n    div_term = np.exp(np.arange(0, d_model, 2) * -(np.log(10000.0) / d_model))\n    \n    pos_encoding = np.zeros((seq_len, d_model))\n    pos_encoding[:, 0::2] = np.sin(position * div_term)\n    pos_encoding[:, 1::2] = np.cos(position * div_term)\n    \n    return pos_encoding\n\nclass FeedForward:\n    def __init__(self, d_model, d_ff):\n        self.W1 = np.random.randn(d_model, d_ff) * 0.01\n        self.b1 = np.zeros(d_ff)\n        self.W2 = np.random.randn(d_ff, d_model) * 0.01\n        self.b2 = np.zeros(d_model)\n    \n    def forward(self, x):\n        # First layer with ReLU\n        hidden = np.maximum(0, np.matmul(x, self.W1) + self.b1)\n        # Second layer\n        output = np.matmul(hidden, self.W2) + self.b2\n        return output\n\n# Example usage\nif __name__ == '__main__':\n    # Parameters\n    batch_size = 2\n    seq_len = 10\n    d_model = 512\n    num_heads = 8\n    \n    # Create sample input\n    x = np.random.randn(batch_size, seq_len, d_model)\n    \n    # Add positional encoding\n    pos_enc = positional_encoding(seq_len, d_model)\n    x = x + pos_enc\n    \n    # Multi-head attention\n    mha = MultiHeadAttention(d_model, num_heads)\n    output, attention_weights = mha.forward(x, x, x)\n    \n    print(f\"Input shape: {x.shape}\")\n    print(f\"Output shape: {output.shape}\")\n    print(f\"Attention weights shape: {attention_weights.shape}\")\n    \n    # Feed-forward network\n    ffn = FeedForward(d_model, d_ff=2048)\n    ffn_output = ffn.forward(output)\n    print(f\"FFN output shape: {ffn_output.shape}\")",
+            "explanation": "This shows the core mechanisms: scaled dot-product attention computes relationships, multi-head attention captures different patterns, positional encoding adds position information, and feed-forward networks add capacity."
+        },
+        "implementation_with_api": {
+            "title": "Python Implementation - With TensorFlow/Keras",
+            "description": "Building a Transformer for text classification using Keras",
+            "code": "import numpy as np\nimport tensorflow as tf\nfrom tensorflow import keras\nfrom tensorflow.keras import layers\n\nclass TransformerBlock(layers.Layer):\n    def __init__(self, embed_dim, num_heads, ff_dim, rate=0.1):\n        super(TransformerBlock, self).__init__()\n        self.att = layers.MultiHeadAttention(num_heads=num_heads, key_dim=embed_dim)\n        self.ffn = keras.Sequential([\n            layers.Dense(ff_dim, activation='relu'),\n            layers.Dense(embed_dim),\n        ])\n        self.layernorm1 = layers.LayerNormalization(epsilon=1e-6)\n        self.layernorm2 = layers.LayerNormalization(epsilon=1e-6)\n        self.dropout1 = layers.Dropout(rate)\n        self.dropout2 = layers.Dropout(rate)\n    \n    def call(self, inputs, training):\n        # Multi-head attention\n        attn_output = self.att(inputs, inputs)\n        attn_output = self.dropout1(attn_output, training=training)\n        out1 = self.layernorm1(inputs + attn_output)  # Residual connection\n        \n        # Feed-forward network\n        ffn_output = self.ffn(out1)\n        ffn_output = self.dropout2(ffn_output, training=training)\n        return self.layernorm2(out1 + ffn_output)  # Residual connection\n\nclass TokenAndPositionEmbedding(layers.Layer):\n    def __init__(self, maxlen, vocab_size, embed_dim):\n        super(TokenAndPositionEmbedding, self).__init__()\n        self.token_emb = layers.Embedding(input_dim=vocab_size, output_dim=embed_dim)\n        self.pos_emb = layers.Embedding(input_dim=maxlen, output_dim=embed_dim)\n    \n    def call(self, x):\n        maxlen = tf.shape(x)[-1]\n        positions = tf.range(start=0, limit=maxlen, delta=1)\n        positions = self.pos_emb(positions)\n        x = self.token_emb(x)\n        return x + positions\n\n# Build Transformer model for text classification\nvocab_size = 20000\nmaxlen = 200\nembed_dim = 128\nnum_heads = 4\nff_dim = 512\n\ninputs = layers.Input(shape=(maxlen,))\n\n# Embedding layer\nembedding_layer = TokenAndPositionEmbedding(maxlen, vocab_size, embed_dim)\nx = embedding_layer(inputs)\n\n# Transformer blocks\ntransformer_block = TransformerBlock(embed_dim, num_heads, ff_dim)\nx = transformer_block(x)\n\n# Global average pooling\nx = layers.GlobalAveragePooling1D()(x)\n\n# Classification head\nx = layers.Dropout(0.1)(x)\nx = layers.Dense(64, activation='relu')(x)\nx = layers.Dropout(0.1)(x)\noutputs = layers.Dense(2, activation='softmax')(x)\n\nmodel = keras.Model(inputs=inputs, outputs=outputs)\n\n# Compile model\nmodel.compile(\n    optimizer='adam',\n    loss='sparse_categorical_crossentropy',\n    metrics=['accuracy']\n)\n\nmodel.summary()\n\n# Example with IMDB dataset\nfrom tensorflow.keras.datasets import imdb\nfrom tensorflow.keras.preprocessing import sequence\n\n# Load data\n(X_train, y_train), (X_test, y_test) = imdb.load_data(num_words=vocab_size)\n\n# Pad sequences\nX_train = sequence.pad_sequences(X_train, maxlen=maxlen)\nX_test = sequence.pad_sequences(X_test, maxlen=maxlen)\n\nprint(f\"Training samples: {len(X_train)}\")\nprint(f\"Test samples: {len(X_test)}\")\n\n# Train model\nhistory = model.fit(\n    X_train, y_train,\n    batch_size=32,\n    epochs=5,\n    validation_data=(X_test, y_test)\n)\n\n# Evaluate\ntest_loss, test_acc = model.evaluate(X_test, y_test)\nprint(f'\\nTest Accuracy: {test_acc:.2%}')\n\n# Using pre-trained BERT (more powerful)\nprint(\"\\nFor production, use pre-trained models like BERT:\")\nprint(\"from transformers import TFBertForSequenceClassification\")\nprint(\"model = TFBertForSequenceClassification.from_pretrained('bert-base-uncased')\")",
+            "comparison": "Keras provides built-in MultiHeadAttention. For production, use pre-trained models (BERT, GPT, T5) from Hugging Face Transformers library. They're trained on massive datasets and transfer well to specific tasks."
+        },
+        "model_evaluation": {
+            "title": "Model Evaluation",
+            "metrics": [
+                {
+                    "name": "Accuracy",
+                    "formula": "Correct Predictions / Total",
+                    "interpretation": "Overall correctness for classification",
+                    "example": "92% accuracy on sentiment analysis"
+                },
+                {
+                    "name": "BLEU Score (Translation)",
+                    "formula": "Measures n-gram overlap with references",
+                    "interpretation": "0-100, higher is better. Standard for translation",
+                    "example": "BLEU of 35+ is competitive for translation"
+                },
+                {
+                    "name": "Perplexity (Language Modeling)",
+                    "formula": "exp(average negative log-likelihood)",
+                    "interpretation": "Lower is better. Measures prediction uncertainty",
+                    "example": "Perplexity of 20 is excellent for language modeling"
+                },
+                {
+                    "name": "F1-Score",
+                    "formula": "Harmonic mean of precision and recall",
+                    "interpretation": "Balanced metric for classification",
+                    "example": "F1 of 0.90 indicates strong performance"
+                },
+                {
+                    "name": "ROUGE (Summarization)",
+                    "formula": "Recall-oriented metric for text overlap",
+                    "interpretation": "Measures quality of generated summaries",
+                    "example": "ROUGE-L of 0.45 is good for summarization"
+                }
+            ],
+            "whyEvaluate": "Transformers can memorize training data. Evaluation ensures generalization. Different metrics capture different aspects: fluency, accuracy, relevance. Always evaluate on held-out test data."
+        },
+        "performance_interpretation": {
+            "title": "Interpretation of Model Performance",
+            "whatIsGood": "• Text classification: >90% accuracy is excellent\n• Translation: BLEU >30 is usable, >40 is very good\n• Language modeling: Perplexity <30 is good\n• Pre-trained models: Fine-tuning should improve over baseline\n• Attention patterns should be meaningful and interpretable",
+            "whenItFails": "• Overfitting: High train accuracy, low test accuracy (add dropout, regularization)\n• Underfitting: Both accuracies low (increase model size, train longer)\n• Poor generation: Repetitive or incoherent text (adjust temperature, use nucleus sampling)\n• Attention collapse: All heads learn similar patterns (increase diversity regularization)",
+            "biasVarianceTradeoff": "• High bias: Model too small, can't capture patterns (increase layers, heads, dimensions)\n• High variance: Model too large, memorizes data (add dropout, reduce size, more data)\n• Balance: Model capacity matches task complexity",
+            "overfittingVsUnderfitting": "Overfitting: Large train-test gap, perfect train accuracy\nSolutions: Dropout (0.1-0.3), label smoothing, data augmentation, early stopping\n\nUnderfitting: Both metrics poor, loss plateaus early\nSolutions: Increase model size, more layers/heads, train longer, reduce regularization"
+        },
+        "ways_to_improve": {
+            "title": "Ways to Improve Model Performance",
+            "featureEngineering": [
+                "Use pre-trained embeddings or models (BERT, GPT, T5)",
+                "Apply subword tokenization (BPE, WordPiece, SentencePiece)",
+                "Normalize text: lowercase, remove special characters",
+                "Handle long sequences with sliding windows or hierarchical models",
+                "Use domain-specific pre-training for specialized tasks"
+            ],
+            "hyperparameterTuning": [
+                "Model dimension (d_model): 512-1024 for most tasks",
+                "Number of layers: 6-12 for encoder/decoder",
+                "Number of attention heads: 8-16",
+                "Feed-forward dimension: 4× model dimension",
+                "Learning rate: 1e-4 to 1e-5 with warmup",
+                "Batch size: As large as GPU memory allows",
+                "Dropout: 0.1-0.3"
+            ],
+            "preprocessing": [
+                "Pad sequences to consistent length (or use dynamic padding)",
+                "Remove very long sequences that don't fit in memory",
+                "Balance dataset across classes",
+                "Use data augmentation: back-translation, paraphrasing",
+                "Clean noisy data and remove duplicates"
+            ],
+            "algorithmSpecific": [
+                "Use pre-trained models and fine-tune (transfer learning)",
+                "Apply learning rate warmup for stable training",
+                "Use label smoothing to prevent overconfidence",
+                "Add layer normalization before attention and FFN",
+                "Use residual connections for gradient flow",
+                "Apply gradient clipping (threshold 1.0)",
+                "Use mixed precision training for speed",
+                "Try different attention variants (sparse, local, linear)"
+            ],
+            "ensemble": [
+                "Ensemble multiple checkpoints from same training run",
+                "Train models with different random seeds",
+                "Use different model sizes and average predictions",
+                "Apply test-time augmentation for robustness",
+                "Use beam search with different beam sizes"
+            ]
+        }
+    }
+}

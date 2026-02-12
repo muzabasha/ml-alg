@@ -13,7 +13,8 @@ This platform prioritizes:
 
 ## 📚 Algorithms Covered
 
-### Supervised Learning
+### Classical Machine Learning
+
 #### Regression
 - ✅ **Linear Regression** - Predict continuous values
 
@@ -22,6 +23,14 @@ This platform prioritizes:
 - ✅ **k-Nearest Neighbors (KNN)** - Instance-based learning
 - ✅ **Decision Tree** - Interpretable tree-based decisions
 - ✅ **Support Vector Machine (SVM)** - Maximum margin classification
+
+### Deep Learning
+
+#### Neural Networks
+- ✅ **Artificial Neural Network (ANN)** - Fully connected deep learning
+- ✅ **Convolutional Neural Network (CNN)** - Computer vision and image processing
+- ✅ **Recurrent Neural Network (RNN)** - Sequential data and time series
+- ✅ **Transformer Network** - Attention-based architecture for NLP
 
 ## 🧱 Content Structure (For Each Algorithm)
 
@@ -104,6 +113,10 @@ Frontend will run on `http://localhost:3000`
   - `http://localhost:3000/algorithm/knn`
   - `http://localhost:3000/algorithm/decision_tree`
   - `http://localhost:3000/algorithm/svm`
+  - `http://localhost:3000/algorithm/ann`
+  - `http://localhost:3000/algorithm/cnn`
+  - `http://localhost:3000/algorithm/rnn`
+  - `http://localhost:3000/algorithm/transformer`
 
 ## 🏗️ Technology Stack
 
@@ -136,7 +149,11 @@ ml-alg/
 │       ├── logistic_regression.json
 │       ├── knn.json
 │       ├── decision_tree.json
-│       └── svm.json
+│       ├── svm.json
+│       ├── ann.json
+│       ├── cnn.json
+│       ├── rnn.json
+│       └── transformer.json
 │
 ├── backend/                  # FastAPI server (optional)
 │   ├── app/
@@ -149,7 +166,7 @@ ml-alg/
 ## 🎨 Features
 
 ### Current Implementation
-- ✅ 5 complete ML algorithms with full content
+- ✅ 9 complete algorithms (5 classical ML + 4 deep learning)
 - ✅ Professional instructor profile page
 - ✅ Dynamic routing for algorithm pages
 - ✅ Responsive design with Tailwind CSS
@@ -173,16 +190,20 @@ Each algorithm includes:
 
 ## 🎓 Learning Path
 
-### Beginner Track
+### Beginner Track (Classical ML)
 1. Linear Regression - Start here for regression problems
 2. Logistic Regression - Introduction to classification
+3. k-Nearest Neighbors (KNN) - Instance-based learning
 
 ### Intermediate Track
-3. k-Nearest Neighbors (KNN) - Instance-based learning
 4. Decision Tree - Interpretable models
+5. Artificial Neural Network (ANN) - Introduction to deep learning
 
-### Advanced Track
-5. Support Vector Machine (SVM) - Maximum margin classification
+### Advanced Track (Deep Learning)
+6. Support Vector Machine (SVM) - Maximum margin classification
+7. Convolutional Neural Network (CNN) - Computer vision
+8. Recurrent Neural Network (RNN) - Sequential data
+9. Transformer Network - State-of-the-art NLP
 
 ## 🔮 Future Enhancements
 

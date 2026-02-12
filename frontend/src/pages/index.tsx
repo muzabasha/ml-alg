@@ -8,6 +8,10 @@ const HomePage: React.FC = () => {
         { id: 'knn', name: 'k-Nearest Neighbors', category: 'Classification', difficulty: 'Beginner' },
         { id: 'decision_tree', name: 'Decision Tree', category: 'Classification', difficulty: 'Intermediate' },
         { id: 'svm', name: 'Support Vector Machine', category: 'Classification', difficulty: 'Advanced' },
+        { id: 'ann', name: 'Artificial Neural Network', category: 'Deep Learning', difficulty: 'Intermediate' },
+        { id: 'cnn', name: 'Convolutional Neural Network', category: 'Computer Vision', difficulty: 'Advanced' },
+        { id: 'rnn', name: 'Recurrent Neural Network', category: 'Sequential Data', difficulty: 'Advanced' },
+        { id: 'transformer', name: 'Transformer Network', category: 'Attention-Based', difficulty: 'Advanced' },
     ];
 
     return (
@@ -34,11 +38,11 @@ const HomePage: React.FC = () => {
             {/* Hero Section */}
             <section className="container mx-auto px-4 py-16 text-center">
                 <h2 className="text-5xl font-bold text-gray-900 mb-4">
-                    Learn Machine Learning Algorithms
+                    Learn Machine Learning & Deep Learning
                 </h2>
                 <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-                    Interactive platform for engineering students to master ML algorithms through
-                    structured learning with mathematical formulations, implementations, and practical examples.
+                    Master 9 essential algorithms from classical ML to modern Deep Learning.
+                    Complete with mathematical formulations, Python implementations, and practical examples.
                 </p>
                 <div className="flex justify-center gap-4">
                     <Link
@@ -71,8 +75,8 @@ const HomePage: React.FC = () => {
                             <div className="flex justify-between items-start mb-4">
                                 <h4 className="text-xl font-bold text-gray-900">{algo.name}</h4>
                                 <span className={`px-3 py-1 rounded-full text-xs font-semibold ${algo.difficulty === 'Beginner' ? 'bg-green-100 text-green-800' :
-                                        algo.difficulty === 'Intermediate' ? 'bg-yellow-100 text-yellow-800' :
-                                            'bg-red-100 text-red-800'
+                                    algo.difficulty === 'Intermediate' ? 'bg-yellow-100 text-yellow-800' :
+                                        'bg-red-100 text-red-800'
                                     }`}>
                                     {algo.difficulty}
                                 </span>

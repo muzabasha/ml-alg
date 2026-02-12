@@ -1,0 +1,188 @@
+{
+    "id": "rnn",
+    "name": "Recurrent Neural Network (RNN)",
+    "category": "Deep Learning - Sequential Data",
+    "difficulty": "Advanced",
+    "estimatedTime": "120 minutes",
+    "sections": {
+        "introduction": {
+            "title": "Introduction to Recurrent Neural Networks",
+            "plainLanguage": "RNNs are neural networks designed for sequential data where order matters. Unlike regular neural networks that process each input independently, RNNs have memory—they remember previous inputs and use that context to process current inputs.",
+            "realWorldAnalogy": "Think of reading a sentence. You don't understand each word in isolation—you remember previous words to understand the current one. 'The cat sat on the...' - you expect 'mat' or 'chair' next because you remember the context. RNNs work the same way, maintaining a hidden state that captures information from previous time steps.",
+            "whereAndWhy": "RNNs excel at sequential tasks: language modeling, machine translation, speech recognition, time series prediction, video analysis, and music generation. They're used whenever the order of data matters and past information helps predict the future.",
+            "learningType": "Supervised Learning (Sequence-to-Sequence)",
+            "strengths": [
+                "Can process variable-length sequences",
+                "Shares parameters across time steps (efficient)",
+                "Maintains memory of previous inputs",
+                "Works with temporal dependencies",
+                "Flexible input/output configurations"
+            ],
+            "limitations": [
+                "Vanishing/exploding gradient problem",
+                "Difficulty learning long-term dependencies",
+                "Sequential processing (slow, can't parallelize)",
+                "Sensitive to input order",
+                "Computationally expensive for long sequences"
+            ]
+        },
+        "mathematical_model": {
+            "title": "Mathematical Formulation",
+            "introduction": "RNNs process sequences one element at a time, updating a hidden state that captures information from previous time steps.",
+            "equations": [
+                {
+                    "name": "Hidden State Update",
+                    "latex": "h_t = \\tanh(W_{hh} h_{t-1} + W_{xh} x_t + b_h)",
+                    "explanation": "At each time step t, the hidden state h_t is computed from the previous hidden state h_{t-1} and current input x_t. This creates a recurrent connection that maintains memory."
+                },
+                {
+                    "name": "Output Computation",
+                    "latex": "y_t = W_{hy} h_t + b_y",
+                    "explanation": "The output at time t is computed from the hidden state. For classification, apply softmax to get probabilities."
+                },
+                {
+                    "name": "Loss Function (Cross-Entropy)",
+                    "latex": "L = -\\sum_{t=1}^{T} \\sum_{k=1}^{K} y_t^{(k)} \\log(\\hat{y}_t^{(k)})",
+                    "explanation": "Sum of losses across all time steps. T is sequence length, K is number of classes."
+                },
+                {
+                    "name": "Backpropagation Through Time (BPTT)",
+                    "latex": "\\frac{\\partial L}{\\partial W} = \\sum_{t=1}^{T} \\frac{\\partial L_t}{\\partial W}",
+                    "explanation": "Gradients are computed by unrolling the network through time and summing gradients from each time step."
+                }
+            ],
+            "keyTerms": {
+                "Hidden State": "Memory vector that captures information from previous time steps",
+                "Time Step": "One position in the sequence (e.g., one word, one frame)",
+                "Sequence Length": "Number of time steps in the input",
+                "Unrolling": "Expanding the recurrent network across time for visualization",
+                "BPTT": "Backpropagation Through Time - training algorithm for RNNs",
+                "Vanishing Gradient": "Gradients become very small in long sequences",
+                "LSTM/GRU": "Advanced RNN variants that solve vanishing gradient problem"
+            },
+            "intuition": "The hidden state acts as memory. At each step, the RNN reads the input, updates its memory based on what it remembers and what it just saw, and produces an output. This allows it to capture patterns that span multiple time steps."
+        },
+        "sample_input_output": {
+            "title": "Sample Input & Output",
+            "problem": "Sentiment analysis - classify movie reviews as positive or negative",
+            "sampleInput": {
+                "description": "Sequence of word embeddings (variable length)",
+                "shape": "[sequence_length, embedding_dim]",
+                "example": "Review: 'This movie was amazing!' → [[0.2, 0.5, ...], [0.1, 0.3, ...], ...]"
+            },
+            "sampleOutput": {
+                "description": "Binary classification (positive/negative)",
+                "shape": "[2]",
+                "example": "[0.15, 0.85]",
+                "interpretation": "Model predicts 'positive' sentiment with 85% confidence"
+            },
+            "walkthrough": "1. Input: Sequence of 10 words, each as 300-dim embedding\n2. RNN processes word by word, updating hidden state\n3. After word 1: hidden state captures 'This'\n4. After word 2: hidden state captures 'This movie'\n5. After word 3: hidden state captures 'This movie was'\n6. Continue until end of sequence\n7. Final hidden state summarizes entire review\n8. Dense layer maps hidden state to sentiment probabilities"
+        },
+        "interpretation_of_output": {
+            "title": "Interpretation of Output",
+            "whatItMeans": "For sequence classification, the final output represents the class. For sequence generation, each time step produces a prediction for the next element.",
+            "howToRead": "• Sequence classification: Use final hidden state for prediction\n• Sequence-to-sequence: Each time step produces an output\n• Attention weights: Show which input parts the model focuses on\n• Hidden states: Capture increasingly abstract representations",
+            "commonMisinterpretations": [
+                "RNNs don't 'understand' language - they learn statistical patterns",
+                "Long sequences may lose early information (vanishing gradient)",
+                "Order matters - shuffling input changes predictions completely",
+                "Hidden state size limits memory capacity"
+            ],
+            "practicalTips": "Use LSTM or GRU instead of vanilla RNN for better long-term memory. Visualize attention weights to understand what the model focuses on. Truncate very long sequences or use hierarchical models."
+        },
+        "implementation_from_scratch": {
+            "title": "Python Implementation - From Scratch",
+            "description": "Building a simple RNN using NumPy for character-level language modeling",
+            "code": "import numpy as np\n\nclass SimpleRNN:\n    def __init__(self, input_size, hidden_size, output_size):\n        # Initialize weights\n        self.hidden_size = hidden_size\n        \n        # Input to hidden\n        self.Wxh = np.random.randn(hidden_size, input_size) * 0.01\n        # Hidden to hidden (recurrent connection)\n        self.Whh = np.random.randn(hidden_size, hidden_size) * 0.01\n        # Hidden to output\n        self.Why = np.random.randn(output_size, hidden_size) * 0.01\n        # Biases\n        self.bh = np.zeros((hidden_size, 1))\n        self.by = np.zeros((output_size, 1))\n    \n    def forward(self, inputs, h_prev):\n        \"\"\"\n        Forward pass through RNN\n        inputs: list of input vectors (one per time step)\n        h_prev: previous hidden state\n        \"\"\"\n        xs, hs, ys, ps = {}, {}, {}, {}\n        hs[-1] = np.copy(h_prev)\n        \n        # Forward pass through time\n        for t, x in enumerate(inputs):\n            xs[t] = x\n            # Hidden state update\n            hs[t] = np.tanh(np.dot(self.Wxh, xs[t]) + \n                           np.dot(self.Whh, hs[t-1]) + self.bh)\n            # Output\n            ys[t] = np.dot(self.Why, hs[t]) + self.by\n            # Softmax probabilities\n            ps[t] = np.exp(ys[t]) / np.sum(np.exp(ys[t]))\n        \n        return xs, hs, ys, ps\n    \n    def backward(self, xs, hs, ps, targets):\n        \"\"\"\n        Backward pass (BPTT)\n        \"\"\"\n        # Initialize gradients\n        dWxh = np.zeros_like(self.Wxh)\n        dWhh = np.zeros_like(self.Whh)\n        dWhy = np.zeros_like(self.Why)\n        dbh = np.zeros_like(self.bh)\n        dby = np.zeros_like(self.by)\n        dh_next = np.zeros_like(hs[0])\n        \n        # Backward pass through time\n        for t in reversed(range(len(xs))):\n            # Output layer gradient\n            dy = np.copy(ps[t])\n            dy[targets[t]] -= 1  # Softmax gradient\n            \n            dWhy += np.dot(dy, hs[t].T)\n            dby += dy\n            \n            # Hidden layer gradient\n            dh = np.dot(self.Why.T, dy) + dh_next\n            dhraw = (1 - hs[t] * hs[t]) * dh  # tanh gradient\n            \n            dbh += dhraw\n            dWxh += np.dot(dhraw, xs[t].T)\n            dWhh += np.dot(dhraw, hs[t-1].T)\n            dh_next = np.dot(self.Whh.T, dhraw)\n        \n        # Clip gradients to prevent exploding gradients\n        for dparam in [dWxh, dWhh, dWhy, dbh, dby]:\n            np.clip(dparam, -5, 5, out=dparam)\n        \n        return dWxh, dWhh, dWhy, dbh, dby\n    \n    def sample(self, h, seed_ix, n):\n        \"\"\"\n        Generate sequence by sampling from the model\n        \"\"\"\n        x = np.zeros((self.Wxh.shape[1], 1))\n        x[seed_ix] = 1\n        ixes = []\n        \n        for t in range(n):\n            h = np.tanh(np.dot(self.Wxh, x) + np.dot(self.Whh, h) + self.bh)\n            y = np.dot(self.Why, h) + self.by\n            p = np.exp(y) / np.sum(np.exp(y))\n            ix = np.random.choice(range(len(p)), p=p.ravel())\n            x = np.zeros((self.Wxh.shape[1], 1))\n            x[ix] = 1\n            ixes.append(ix)\n        \n        return ixes\n\n# Example usage\nif __name__ == '__main__':\n    # Simple character-level example\n    data = 'hello world'\n    chars = list(set(data))\n    data_size, vocab_size = len(data), len(chars)\n    \n    char_to_ix = {ch: i for i, ch in enumerate(chars)}\n    ix_to_char = {i: ch for i, ch in enumerate(chars)}\n    \n    # Create RNN\n    rnn = SimpleRNN(vocab_size, hidden_size=100, output_size=vocab_size)\n    \n    print(f\"Vocabulary: {chars}\")\n    print(f\"Vocabulary size: {vocab_size}\")\n    print(f\"Data: {data}\")",
+            "explanation": "This shows the core RNN mechanics: hidden state updates create memory, BPTT computes gradients through time, and gradient clipping prevents exploding gradients. Real implementations use LSTM/GRU for better performance."
+        },
+        "implementation_with_api": {
+            "title": "Python Implementation - With TensorFlow/Keras",
+            "description": "Building an LSTM for sentiment analysis",
+            "code": "import numpy as np\nimport tensorflow as tf\nfrom tensorflow import keras\nfrom tensorflow.keras import layers\nfrom tensorflow.keras.datasets import imdb\nfrom tensorflow.keras.preprocessing import sequence\n\n# Load IMDB dataset\nmax_features = 10000  # Vocabulary size\nmaxlen = 200  # Maximum sequence length\n\n(X_train, y_train), (X_test, y_test) = imdb.load_data(num_words=max_features)\n\nprint(f\"Training sequences: {len(X_train)}\")\nprint(f\"Test sequences: {len(X_test)}\")\nprint(f\"Average sequence length: {np.mean([len(x) for x in X_train]):.0f}\")\n\n# Pad sequences to same length\nX_train = sequence.pad_sequences(X_train, maxlen=maxlen)\nX_test = sequence.pad_sequences(X_test, maxlen=maxlen)\n\nprint(f\"X_train shape: {X_train.shape}\")\nprint(f\"X_test shape: {X_test.shape}\")\n\n# Build LSTM model\nmodel = keras.Sequential([\n    # Embedding layer: converts word indices to dense vectors\n    layers.Embedding(max_features, 128, input_length=maxlen),\n    \n    # Bidirectional LSTM: processes sequence forward and backward\n    layers.Bidirectional(layers.LSTM(64, return_sequences=True)),\n    layers.Dropout(0.5),\n    \n    # Second LSTM layer\n    layers.Bidirectional(layers.LSTM(32)),\n    layers.Dropout(0.5),\n    \n    # Dense layers for classification\n    layers.Dense(64, activation='relu'),\n    layers.Dropout(0.5),\n    layers.Dense(1, activation='sigmoid')  # Binary classification\n])\n\n# Compile model\nmodel.compile(\n    optimizer='adam',\n    loss='binary_crossentropy',\n    metrics=['accuracy']\n)\n\n# Model summary\nmodel.summary()\n\n# Train model\nhistory = model.fit(\n    X_train, y_train,\n    batch_size=128,\n    epochs=10,\n    validation_split=0.2,\n    callbacks=[\n        keras.callbacks.EarlyStopping(patience=2, restore_best_weights=True)\n    ]\n)\n\n# Evaluate\ntest_loss, test_acc = model.evaluate(X_test, y_test)\nprint(f'\\nTest Accuracy: {test_acc:.2%}')\n\n# Make predictions\nsample_reviews = X_test[:5]\npredictions = model.predict(sample_reviews)\n\nfor i, pred in enumerate(predictions):\n    sentiment = 'Positive' if pred[0] > 0.5 else 'Negative'\n    confidence = pred[0] if pred[0] > 0.5 else 1 - pred[0]\n    true_sentiment = 'Positive' if y_test[i] == 1 else 'Negative'\n    print(f'Review {i}: Predicted={sentiment} ({confidence:.2%}), True={true_sentiment}')\n\n# Alternative: Using GRU (faster than LSTM)\nmodel_gru = keras.Sequential([\n    layers.Embedding(max_features, 128),\n    layers.GRU(64, return_sequences=True),\n    layers.GRU(32),\n    layers.Dense(1, activation='sigmoid')\n])\n\nmodel_gru.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])\nprint(\"\\nGRU model created (faster alternative to LSTM)\")",
+            "comparison": "LSTM/GRU solve vanishing gradient problem of vanilla RNNs. Bidirectional processing captures context from both directions. Keras handles the complex BPTT automatically."
+        },
+        "model_evaluation": {
+            "title": "Model Evaluation",
+            "metrics": [
+                {
+                    "name": "Accuracy",
+                    "formula": "Correct Predictions / Total",
+                    "interpretation": "Overall correctness for classification tasks",
+                    "example": "88% accuracy on sentiment analysis is good"
+                },
+                {
+                    "name": "Perplexity (Language Modeling)",
+                    "formula": "Perplexity = exp(average cross-entropy loss)",
+                    "interpretation": "Lower is better. Measures how surprised the model is by test data",
+                    "example": "Perplexity of 50 means model is choosing from ~50 equally likely words"
+                },
+                {
+                    "name": "BLEU Score (Translation)",
+                    "formula": "Measures n-gram overlap with reference translations",
+                    "interpretation": "0-100 scale, higher is better. 40+ is good for translation",
+                    "example": "BLEU of 45 indicates high-quality translations"
+                },
+                {
+                    "name": "F1-Score",
+                    "formula": "Harmonic mean of precision and recall",
+                    "interpretation": "Balanced metric for classification",
+                    "example": "F1 of 0.85 shows good balance"
+                },
+                {
+                    "name": "Sequence Accuracy",
+                    "formula": "Percentage of sequences predicted completely correctly",
+                    "interpretation": "Strict metric - entire sequence must match",
+                    "example": "30% sequence accuracy is typical for complex tasks"
+                }
+            ],
+            "whyEvaluate": "RNNs can memorize training sequences. Evaluation on unseen data ensures generalization. Different metrics capture different aspects of sequence modeling quality."
+        },
+        "performance_interpretation": {
+            "title": "Interpretation of Model Performance",
+            "whatIsGood": "• Sentiment analysis: >85% accuracy is good\n• Language modeling: Perplexity <100 is decent, <50 is good\n• Translation: BLEU >30 is usable, >40 is good\n• Training and validation metrics should track together\n• Generated sequences should be coherent and grammatical",
+            "whenItFails": "• Vanishing gradients: Model can't learn long-term dependencies (use LSTM/GRU)\n• Exploding gradients: Loss becomes NaN (use gradient clipping)\n• Overfitting: Memorizes training sequences (add dropout, regularization)\n• Poor generation: Repetitive or nonsensical output (adjust temperature, use beam search)",
+            "biasVarianceTradeoff": "• High bias: Model too simple, can't capture sequence patterns (increase hidden size, add layers)\n• High variance: Model memorizes training data (add dropout, reduce model size)\n• Balance: Model complexity matches sequence complexity",
+            "overfittingVsUnderfitting": "Overfitting: High train accuracy, low test accuracy\nSolutions: Dropout (0.3-0.5), reduce hidden size, early stopping, more data\n\nUnderfitting: Both accuracies low\nSolutions: Increase hidden size, add layers, train longer, reduce dropout"
+        },
+        "ways_to_improve": {
+            "title": "Ways to Improve Model Performance",
+            "featureEngineering": [
+                "Use pre-trained word embeddings (Word2Vec, GloVe, FastText)",
+                "Normalize text: lowercase, remove punctuation",
+                "Handle out-of-vocabulary words with special token",
+                "Use subword tokenization (BPE, WordPiece) for rare words",
+                "Add positional encodings for position information"
+            ],
+            "hyperparameterTuning": [
+                "Hidden size: 128-512 for most tasks",
+                "Number of layers: 1-3 for simple tasks, 4-6 for complex",
+                "Learning rate: 0.001 with decay schedule",
+                "Batch size: 32-128 depending on sequence length",
+                "Dropout: 0.3-0.5 between layers",
+                "Gradient clipping: threshold of 5.0"
+            ],
+            "preprocessing": [
+                "Pad/truncate sequences to consistent length",
+                "Sort sequences by length for efficient batching",
+                "Remove very short or very long sequences",
+                "Balance dataset across classes",
+                "Use data augmentation: synonym replacement, back-translation"
+            ],
+            "algorithmSpecific": [
+                "Use LSTM or GRU instead of vanilla RNN",
+                "Try bidirectional RNNs for better context",
+                "Add attention mechanism to focus on relevant parts",
+                "Use layer normalization for stable training",
+                "Apply residual connections for deep networks",
+                "Use teacher forcing during training"
+            ],
+            "ensemble": [
+                "Train multiple models with different initializations",
+                "Use different architectures (LSTM, GRU, Transformer)",
+                "Ensemble predictions through voting or averaging",
+                "Use beam search for better sequence generation"
+            ]
+        }
+    }
+}

@@ -1,0 +1,188 @@
+{
+    "id": "cnn",
+    "name": "Convolutional Neural Network (CNN)",
+    "category": "Deep Learning - Computer Vision",
+    "difficulty": "Advanced",
+    "estimatedTime": "120 minutes",
+    "sections": {
+        "introduction": {
+            "title": "Introduction to Convolutional Neural Networks",
+            "plainLanguage": "CNNs are specialized neural networks designed for processing grid-like data, especially images. They use convolutional layers that scan across the image to detect patterns like edges, textures, and shapes, building up to recognize complex objects.",
+            "realWorldAnalogy": "Imagine looking at a photo to find a cat. You don't analyze every pixel individually. Instead, you look for cat-like features: pointy ears, whiskers, fur patterns. CNNs work the same way—early layers detect simple features (edges), middle layers combine them into parts (ears, eyes), and final layers recognize the whole object (cat).",
+            "whereAndWhy": "CNNs revolutionized computer vision. Used in: image classification, object detection, facial recognition, medical image analysis, autonomous vehicles, and video analysis. They automatically learn hierarchical features without manual feature engineering.",
+            "learningType": "Supervised Learning (primarily Classification)",
+            "strengths": [
+                "Automatically learns spatial hierarchies of features",
+                "Translation invariant - recognizes objects regardless of position",
+                "Parameter sharing reduces model size dramatically",
+                "Excellent for image and video data",
+                "State-of-the-art performance on vision tasks"
+            ],
+            "limitations": [
+                "Requires large amounts of labeled training data",
+                "Computationally expensive (needs GPU)",
+                "Not rotation or scale invariant by default",
+                "Difficult to interpret what the network learned",
+                "Vulnerable to adversarial attacks"
+            ]
+        },
+        "mathematical_model": {
+            "title": "Mathematical Formulation",
+            "introduction": "CNNs use convolution operations to extract local features, pooling to reduce dimensions, and fully connected layers for classification.",
+            "equations": [
+                {
+                    "name": "Convolution Operation",
+                    "latex": "S(i,j) = (I * K)(i,j) = \\sum_m \\sum_n I(i+m, j+n) \\cdot K(m,n)",
+                    "explanation": "Convolution slides a filter (kernel K) over the input image (I). At each position, it computes element-wise multiplication and sums the results. This detects specific patterns."
+                },
+                {
+                    "name": "Activation (ReLU)",
+                    "latex": "f(x) = \\max(0, x)",
+                    "explanation": "Applied after convolution to introduce non-linearity. Allows the network to learn complex patterns."
+                },
+                {
+                    "name": "Max Pooling",
+                    "latex": "y_{i,j} = \\max_{(m,n) \\in R_{i,j}} x_{m,n}",
+                    "explanation": "Takes the maximum value in each region. Reduces spatial dimensions while keeping important features. Makes the network more robust to small translations."
+                },
+                {
+                    "name": "Output (Softmax)",
+                    "latex": "p_i = \\frac{e^{z_i}}{\\sum_{j=1}^{K} e^{z_j}}",
+                    "explanation": "Converts final layer outputs to class probabilities."
+                }
+            ],
+            "keyTerms": {
+                "Convolution": "Sliding window operation that detects local patterns",
+                "Filter/Kernel": "Small matrix of learnable weights (e.g., 3×3, 5×5)",
+                "Feature Map": "Output of applying a filter to the input",
+                "Stride": "Step size when sliding the filter (usually 1 or 2)",
+                "Padding": "Adding zeros around input to control output size",
+                "Pooling": "Downsampling operation to reduce spatial dimensions",
+                "Receptive Field": "Region of input that affects a particular neuron"
+            },
+            "intuition": "Convolution detects local patterns (edges, textures). Pooling makes detection position-invariant. Stacking layers builds hierarchical representations: edges → shapes → parts → objects."
+        },
+        "sample_input_output": {
+            "title": "Sample Input & Output",
+            "problem": "Classify images into 10 categories (CIFAR-10 dataset)",
+            "sampleInput": {
+                "description": "32×32 RGB color image",
+                "shape": "[32, 32, 3]",
+                "example": "Image of an airplane with pixel values in range [0, 255]"
+            },
+            "sampleOutput": {
+                "description": "Probability distribution over 10 classes",
+                "shape": "[10]",
+                "example": "[0.85, 0.02, 0.01, 0.03, 0.01, 0.02, 0.01, 0.02, 0.02, 0.01]",
+                "interpretation": "Model predicts 'airplane' (class 0) with 85% confidence"
+            },
+            "walkthrough": "1. Input: 32×32×3 image\n2. Conv Layer 1: Applies 32 filters → 32×32×32\n3. Pooling: Reduces to 16×16×32\n4. Conv Layer 2: Applies 64 filters → 16×16×64\n5. Pooling: Reduces to 8×8×64\n6. Flatten: 8×8×64 = 4096 features\n7. Dense Layer: 4096 → 128\n8. Output Layer: 128 → 10 class probabilities"
+        },
+        "interpretation_of_output": {
+            "title": "Interpretation of Output",
+            "whatItMeans": "Output is a probability distribution over classes. The class with highest probability is the prediction. Intermediate layers learn increasingly abstract features.",
+            "howToRead": "• First conv layers: detect edges, colors, simple textures\n• Middle layers: detect shapes, patterns, object parts\n• Final layers: detect complete objects\n• Output probabilities: confidence for each class",
+            "commonMisinterpretations": [
+                "High confidence doesn't mean correct - model can be confidently wrong",
+                "Similar-looking classes may have close probabilities",
+                "Model may focus on background instead of main object",
+                "Adversarial examples can fool the network with imperceptible changes"
+            ],
+            "practicalTips": "Use visualization techniques (Grad-CAM, saliency maps) to see what the model focuses on. Check top-5 predictions for ambiguous cases. Validate on diverse test data."
+        },
+        "implementation_from_scratch": {
+            "title": "Python Implementation - From Scratch",
+            "description": "Building a simple CNN using NumPy (simplified for understanding)",
+            "code": "import numpy as np\n\nclass SimpleCNN:\n    def __init__(self):\n        # Initialize a simple 3x3 filter for edge detection\n        self.filter = np.array([[-1, -1, -1],\n                               [0, 0, 0],\n                               [1, 1, 1]], dtype=float)\n    \n    def convolve2d(self, image, kernel, stride=1, padding=0):\n        \"\"\"\n        Perform 2D convolution\n        image: input image (H x W)\n        kernel: filter (K x K)\n        \"\"\"\n        if padding > 0:\n            image = np.pad(image, padding, mode='constant')\n        \n        H, W = image.shape\n        K = kernel.shape[0]\n        \n        # Output dimensions\n        out_H = (H - K) // stride + 1\n        out_W = (W - K) // stride + 1\n        \n        output = np.zeros((out_H, out_W))\n        \n        # Slide filter over image\n        for i in range(0, out_H):\n            for j in range(0, out_W):\n                # Extract region\n                region = image[i*stride:i*stride+K, j*stride:j*stride+K]\n                # Element-wise multiplication and sum\n                output[i, j] = np.sum(region * kernel)\n        \n        return output\n    \n    def relu(self, x):\n        \"\"\"ReLU activation\"\"\"\n        return np.maximum(0, x)\n    \n    def max_pool(self, feature_map, pool_size=2, stride=2):\n        \"\"\"\n        Max pooling operation\n        \"\"\"\n        H, W = feature_map.shape\n        out_H = (H - pool_size) // stride + 1\n        out_W = (W - pool_size) // stride + 1\n        \n        output = np.zeros((out_H, out_W))\n        \n        for i in range(out_H):\n            for j in range(out_W):\n                region = feature_map[i*stride:i*stride+pool_size,\n                                    j*stride:j*stride+pool_size]\n                output[i, j] = np.max(region)\n        \n        return output\n    \n    def forward(self, image):\n        \"\"\"\n        Forward pass through CNN\n        \"\"\"\n        # Convolution\n        conv_output = self.convolve2d(image, self.filter, padding=1)\n        print(f\"After convolution: {conv_output.shape}\")\n        \n        # Activation\n        activated = self.relu(conv_output)\n        print(f\"After ReLU: {activated.shape}\")\n        \n        # Pooling\n        pooled = self.max_pool(activated)\n        print(f\"After pooling: {pooled.shape}\")\n        \n        return pooled\n\n# Example usage\nif __name__ == '__main__':\n    # Create sample 8x8 grayscale image\n    image = np.random.rand(8, 8) * 255\n    print(f\"Input image shape: {image.shape}\")\n    \n    # Create CNN and process\n    cnn = SimpleCNN()\n    output = cnn.forward(image)\n    \n    print(f\"\\nFinal output shape: {output.shape}\")\n    print(f\"Output values:\\n{output}\")",
+            "explanation": "This shows the core operations: convolution detects features, ReLU adds non-linearity, pooling reduces dimensions. Real CNNs have multiple layers and learnable filters."
+        },
+        "implementation_with_api": {
+            "title": "Python Implementation - With TensorFlow/Keras",
+            "description": "Building a production-ready CNN for image classification",
+            "code": "import numpy as np\nimport tensorflow as tf\nfrom tensorflow import keras\nfrom tensorflow.keras import layers\nfrom tensorflow.keras.datasets import cifar10\nfrom tensorflow.keras.utils import to_categorical\n\n# Load CIFAR-10 dataset\n(X_train, y_train), (X_test, y_test) = cifar10.load_data()\n\n# Normalize pixel values to [0, 1]\nX_train = X_train.astype('float32') / 255.0\nX_test = X_test.astype('float32') / 255.0\n\n# One-hot encode labels\ny_train = to_categorical(y_train, 10)\ny_test = to_categorical(y_test, 10)\n\nprint(f\"Training data shape: {X_train.shape}\")\nprint(f\"Test data shape: {X_test.shape}\")\n\n# Build CNN model\nmodel = keras.Sequential([\n    # First convolutional block\n    layers.Conv2D(32, (3, 3), activation='relu', padding='same',\n                  input_shape=(32, 32, 3)),\n    layers.BatchNormalization(),\n    layers.Conv2D(32, (3, 3), activation='relu', padding='same'),\n    layers.BatchNormalization(),\n    layers.MaxPooling2D((2, 2)),\n    layers.Dropout(0.25),\n    \n    # Second convolutional block\n    layers.Conv2D(64, (3, 3), activation='relu', padding='same'),\n    layers.BatchNormalization(),\n    layers.Conv2D(64, (3, 3), activation='relu', padding='same'),\n    layers.BatchNormalization(),\n    layers.MaxPooling2D((2, 2)),\n    layers.Dropout(0.25),\n    \n    # Third convolutional block\n    layers.Conv2D(128, (3, 3), activation='relu', padding='same'),\n    layers.BatchNormalization(),\n    layers.Conv2D(128, (3, 3), activation='relu', padding='same'),\n    layers.BatchNormalization(),\n    layers.MaxPooling2D((2, 2)),\n    layers.Dropout(0.25),\n    \n    # Fully connected layers\n    layers.Flatten(),\n    layers.Dense(128, activation='relu'),\n    layers.BatchNormalization(),\n    layers.Dropout(0.5),\n    layers.Dense(10, activation='softmax')\n])\n\n# Compile model\nmodel.compile(\n    optimizer='adam',\n    loss='categorical_crossentropy',\n    metrics=['accuracy']\n)\n\n# Model summary\nmodel.summary()\n\n# Data augmentation\ndata_augmentation = keras.Sequential([\n    layers.RandomFlip('horizontal'),\n    layers.RandomRotation(0.1),\n    layers.RandomZoom(0.1),\n])\n\n# Train model\nhistory = model.fit(\n    data_augmentation(X_train),\n    y_train,\n    batch_size=64,\n    epochs=50,\n    validation_data=(X_test, y_test),\n    callbacks=[\n        keras.callbacks.EarlyStopping(patience=5, restore_best_weights=True),\n        keras.callbacks.ReduceLROnPlateau(factor=0.5, patience=3)\n    ]\n)\n\n# Evaluate\ntest_loss, test_acc = model.evaluate(X_test, y_test)\nprint(f'\\nTest Accuracy: {test_acc:.2%}')\n\n# Make predictions\npredictions = model.predict(X_test[:5])\nfor i, pred in enumerate(predictions):\n    predicted_class = np.argmax(pred)\n    true_class = np.argmax(y_test[i])\n    confidence = pred[predicted_class]\n    print(f'Image {i}: Predicted={predicted_class}, True={true_class}, Confidence={confidence:.2%}')",
+            "comparison": "Keras handles backpropagation, GPU acceleration, and optimization automatically. The from-scratch version shows the math, but Keras is essential for real applications."
+        },
+        "model_evaluation": {
+            "title": "Model Evaluation",
+            "metrics": [
+                {
+                    "name": "Top-1 Accuracy",
+                    "formula": "Accuracy = Correct Predictions / Total",
+                    "interpretation": "Percentage where the highest probability class is correct",
+                    "example": "85% top-1 accuracy on ImageNet is excellent"
+                },
+                {
+                    "name": "Top-5 Accuracy",
+                    "formula": "Correct if true class in top 5 predictions",
+                    "interpretation": "More forgiving metric for large number of classes",
+                    "example": "95% top-5 accuracy means true class is in top 5 predictions"
+                },
+                {
+                    "name": "Confusion Matrix",
+                    "formula": "Matrix showing predicted vs actual classes",
+                    "interpretation": "Reveals which classes are confused with each other",
+                    "example": "Dogs often misclassified as cats indicates similar features"
+                },
+                {
+                    "name": "Precision per Class",
+                    "formula": "TP / (TP + FP) for each class",
+                    "interpretation": "How accurate predictions are for each specific class",
+                    "example": "High precision for 'cat' means few false cat predictions"
+                },
+                {
+                    "name": "Recall per Class",
+                    "formula": "TP / (TP + FN) for each class",
+                    "interpretation": "How many instances of each class were found",
+                    "example": "Low recall for 'bird' means many birds were missed"
+                }
+            ],
+            "whyEvaluate": "CNNs can overfit to training data. Evaluation on held-out test data ensures the model generalizes. Per-class metrics reveal biases and weaknesses."
+        },
+        "performance_interpretation": {
+            "title": "Interpretation of Model Performance",
+            "whatIsGood": "• CIFAR-10: >90% accuracy is good, >95% is excellent\n• ImageNet: >75% top-1, >92% top-5 is competitive\n• Training and validation accuracy should track together\n• Loss should decrease smoothly without oscillations",
+            "whenItFails": "• Overfitting: High train accuracy, low test accuracy (add dropout, augmentation)\n• Underfitting: Both accuracies low (increase model capacity)\n• Class imbalance: High overall accuracy but poor minority class performance\n• Vanishing gradients: Loss plateaus early (use batch normalization, residual connections)",
+            "biasVarianceTradeoff": "• High bias: Model too simple, can't learn patterns (add layers, filters)\n• High variance: Model too complex, memorizes training data (add regularization)\n• Balance: Model complexity matches data complexity",
+            "overfittingVsUnderfitting": "Overfitting signs: Large train-test gap, high variance in validation loss\nSolutions: Data augmentation, dropout, early stopping, more training data\n\nUnderfitting signs: Both train and test accuracy low\nSolutions: Deeper network, more filters, train longer, reduce regularization"
+        },
+        "ways_to_improve": {
+            "title": "Ways to Improve Model Performance",
+            "featureEngineering": [
+                "Data augmentation: rotation, flipping, cropping, color jittering",
+                "Normalize images: subtract mean, divide by std",
+                "Resize images to consistent dimensions",
+                "Handle class imbalance with weighted loss or oversampling",
+                "Use transfer learning from pre-trained models (ResNet, VGG)"
+            ],
+            "hyperparameterTuning": [
+                "Learning rate: Start with 0.001, use learning rate schedules",
+                "Batch size: 32-128 depending on GPU memory",
+                "Number of filters: 32, 64, 128, 256 in successive layers",
+                "Filter size: 3×3 is most common, sometimes 5×5 or 7×7",
+                "Pooling: 2×2 max pooling is standard",
+                "Optimizer: Adam or SGD with momentum"
+            ],
+            "preprocessing": [
+                "Center crop for consistent input size",
+                "Random crops during training for augmentation",
+                "Normalize to zero mean and unit variance",
+                "Remove corrupted or mislabeled images",
+                "Balance dataset across classes"
+            ],
+            "algorithmSpecific": [
+                "Use batch normalization after conv layers",
+                "Apply dropout (0.25-0.5) before dense layers",
+                "Use residual connections (ResNet) for very deep networks",
+                "Try different architectures: VGG, ResNet, Inception, EfficientNet",
+                "Use global average pooling instead of flatten",
+                "Apply label smoothing to prevent overconfidence"
+            ],
+            "ensemble": [
+                "Train multiple models with different initializations",
+                "Use different architectures and average predictions",
+                "Test-time augmentation: predict on multiple augmented versions",
+                "Snapshot ensembling: save models at different epochs"
+            ]
+        }
+    }
+}

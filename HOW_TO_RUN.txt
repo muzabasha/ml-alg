@@ -4,7 +4,7 @@
 
 SIMPLE METHOD:
 
-1. Double-click: LAUNCH.bat
+1. Double-click: SMART_START.bat
 
 2. Wait 1-2 minutes
 
@@ -14,20 +14,19 @@ SIMPLE METHOD:
 
 WHAT IT DOES:
 
-✓ Sets up backend
-✓ Sets up frontend  
-✓ Starts both servers
+✓ Checks Node.js installation
+✓ Installs dependencies
+✓ Clears cache
+✓ Starts frontend server
 ✓ Opens browser
 
 ========================================
 
 REQUIREMENTS:
 
-- Python 3.8+ installed
 - Node.js 16+ installed
 
 Download:
-Python: https://www.python.org/
 Node.js: https://nodejs.org/
 
 ========================================
@@ -35,20 +34,40 @@ Node.js: https://nodejs.org/
 URLS:
 
 Frontend: http://localhost:3000
-Backend: http://localhost:8000
+
+Pages:
+- Home: http://localhost:3000
+- Instructor: http://localhost:3000/instructor
+- Algorithms:
+  - Linear Regression: http://localhost:3000/algorithm/linear_regression
+  - Logistic Regression: http://localhost:3000/algorithm/logistic_regression
+  - KNN: http://localhost:3000/algorithm/knn
+  - Decision Tree: http://localhost:3000/algorithm/decision_tree
+  - SVM: http://localhost:3000/algorithm/svm
 
 ========================================
 
 TO STOP:
 
-Press Ctrl+C in both server windows
+Press Ctrl+C in the server window
 
 ========================================
 
 FIRST TIME:
-Takes 5-10 minutes (installing)
+Takes 3-5 minutes (installing dependencies)
 
 NEXT TIME:
 Takes 30 seconds (just starting)
+
+========================================
+
+TROUBLESHOOTING:
+
+If port 3000 is busy:
+- Script automatically uses port 3001
+- Visit http://localhost:3001 instead
+
+If you see errors:
+- Check TROUBLESHOOTING.md
 
 ========================================

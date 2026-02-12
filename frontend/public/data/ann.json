@@ -1,0 +1,192 @@
+{
+    "id": "ann",
+    "name": "Artificial Neural Network (ANN)",
+    "category": "Deep Learning - Supervised",
+    "difficulty": "Intermediate",
+    "estimatedTime": "90 minutes",
+    "sections": {
+        "introduction": {
+            "title": "Introduction to Artificial Neural Networks",
+            "plainLanguage": "An Artificial Neural Network (ANN) is inspired by how the human brain works. It consists of layers of interconnected nodes (neurons) that process information. Each connection has a weight that gets adjusted during training to make better predictions.",
+            "realWorldAnalogy": "Think of it like a team of experts voting on a decision. Each expert (neuron) looks at the input, forms an opinion (weighted sum), and passes it to the next layer. The final layer combines all opinions to make a prediction. During training, experts who make good predictions get more influence (higher weights).",
+            "whereAndWhy": "Used for complex pattern recognition tasks like image classification, speech recognition, fraud detection, and medical diagnosis. ANNs can learn non-linear relationships that simpler algorithms cannot capture.",
+            "learningType": "Supervised Learning (Classification & Regression)",
+            "strengths": [
+                "Can learn complex non-linear patterns",
+                "Works well with large datasets",
+                "Flexible architecture for different problems",
+                "Can handle multiple inputs and outputs",
+                "Automatic feature learning"
+            ],
+            "limitations": [
+                "Requires large amounts of training data",
+                "Computationally expensive to train",
+                "Black box - difficult to interpret decisions",
+                "Prone to overfitting without regularization",
+                "Requires careful hyperparameter tuning"
+            ]
+        },
+        "mathematical_model": {
+            "title": "Mathematical Formulation",
+            "introduction": "ANNs use forward propagation to make predictions and backpropagation to learn from errors.",
+            "equations": [
+                {
+                    "name": "Forward Propagation (Single Neuron)",
+                    "latex": "z = \\sum_{i=1}^{n} w_i x_i + b",
+                    "explanation": "Each neuron computes a weighted sum of its inputs plus a bias term. w are weights, x are inputs, b is bias."
+                },
+                {
+                    "name": "Activation Function (ReLU)",
+                    "latex": "a = \\max(0, z)",
+                    "explanation": "ReLU introduces non-linearity. It outputs z if positive, otherwise 0. This allows the network to learn complex patterns."
+                },
+                {
+                    "name": "Output Layer (Softmax for Classification)",
+                    "latex": "\\hat{y}_j = \\frac{e^{z_j}}{\\sum_{k=1}^{K} e^{z_k}}",
+                    "explanation": "Softmax converts raw scores into probabilities that sum to 1. Used for multi-class classification."
+                },
+                {
+                    "name": "Loss Function (Cross-Entropy)",
+                    "latex": "L = -\\sum_{j=1}^{K} y_j \\log(\\hat{y}_j)",
+                    "explanation": "Measures the difference between predicted probabilities and true labels. Lower is better."
+                },
+                {
+                    "name": "Backpropagation (Weight Update)",
+                    "latex": "w := w - \\alpha \\frac{\\partial L}{\\partial w}",
+                    "explanation": "Gradient descent updates weights to minimize loss. α is the learning rate."
+                }
+            ],
+            "keyTerms": {
+                "Neuron": "Basic computational unit that processes inputs",
+                "Weight (w)": "Connection strength between neurons",
+                "Bias (b)": "Offset term that shifts the activation function",
+                "Activation Function": "Non-linear function applied to neuron output",
+                "Hidden Layer": "Intermediate layers between input and output",
+                "Epoch": "One complete pass through the training dataset",
+                "Batch": "Subset of training data processed together"
+            },
+            "intuition": "The network learns by adjusting weights to minimize prediction errors. Backpropagation calculates how much each weight contributed to the error and updates it accordingly."
+        },
+        "sample_input_output": {
+            "title": "Sample Input & Output",
+            "problem": "Classify handwritten digits (0-9) from 28x28 pixel images",
+            "sampleInput": {
+                "description": "Flattened 28x28 grayscale image (784 features)",
+                "shape": "[784]",
+                "example": "Pixel values normalized to [0, 1]"
+            },
+            "sampleOutput": {
+                "description": "Probability distribution over 10 classes",
+                "shape": "[10]",
+                "example": "[0.01, 0.02, 0.85, 0.03, 0.01, 0.02, 0.01, 0.02, 0.02, 0.01]",
+                "interpretation": "The model predicts digit '2' with 85% confidence"
+            },
+            "walkthrough": "1. Input image is flattened to 784 values\n2. First hidden layer (128 neurons) processes features\n3. Second hidden layer (64 neurons) learns higher-level patterns\n4. Output layer (10 neurons) produces class probabilities\n5. Highest probability indicates predicted digit"
+        },
+        "interpretation_of_output": {
+            "title": "Interpretation of Output",
+            "whatItMeans": "For classification, output is a probability distribution. The class with highest probability is the prediction. For regression, output is the predicted continuous value.",
+            "howToRead": "• Softmax output: probabilities sum to 1.0\n• Confidence: higher probability = more confident\n• Multi-label: each output can be independent probability",
+            "commonMisinterpretations": [
+                "High probability doesn't guarantee correctness - model can be confidently wrong",
+                "Low probabilities across all classes indicate uncertainty",
+                "Output probabilities are not calibrated - 0.9 doesn't mean 90% chance of being correct",
+                "Hidden layer outputs are not directly interpretable"
+            ],
+            "practicalTips": "Use probability threshold for decision-making. For critical applications, consider the top-k predictions, not just the highest one."
+        },
+        "implementation_from_scratch": {
+            "title": "Python Implementation - From Scratch",
+            "description": "Building a simple 2-layer neural network using only NumPy",
+            "code": "import numpy as np\n\nclass NeuralNetwork:\n    def __init__(self, input_size, hidden_size, output_size):\n        # Initialize weights with small random values\n        self.W1 = np.random.randn(input_size, hidden_size) * 0.01\n        self.b1 = np.zeros((1, hidden_size))\n        self.W2 = np.random.randn(hidden_size, output_size) * 0.01\n        self.b2 = np.zeros((1, output_size))\n    \n    def relu(self, z):\n        \"\"\"ReLU activation function\"\"\"\n        return np.maximum(0, z)\n    \n    def relu_derivative(self, z):\n        \"\"\"Derivative of ReLU\"\"\"\n        return (z > 0).astype(float)\n    \n    def softmax(self, z):\n        \"\"\"Softmax for output layer\"\"\"\n        exp_z = np.exp(z - np.max(z, axis=1, keepdims=True))\n        return exp_z / np.sum(exp_z, axis=1, keepdims=True)\n    \n    def forward(self, X):\n        \"\"\"Forward propagation\"\"\"\n        # Hidden layer\n        self.z1 = np.dot(X, self.W1) + self.b1\n        self.a1 = self.relu(self.z1)\n        \n        # Output layer\n        self.z2 = np.dot(self.a1, self.W2) + self.b2\n        self.a2 = self.softmax(self.z2)\n        \n        return self.a2\n    \n    def backward(self, X, y, learning_rate=0.01):\n        \"\"\"Backpropagation\"\"\"\n        m = X.shape[0]\n        \n        # Output layer gradients\n        dz2 = self.a2 - y\n        dW2 = np.dot(self.a1.T, dz2) / m\n        db2 = np.sum(dz2, axis=0, keepdims=True) / m\n        \n        # Hidden layer gradients\n        da1 = np.dot(dz2, self.W2.T)\n        dz1 = da1 * self.relu_derivative(self.z1)\n        dW1 = np.dot(X.T, dz1) / m\n        db1 = np.sum(dz1, axis=0, keepdims=True) / m\n        \n        # Update weights\n        self.W2 -= learning_rate * dW2\n        self.b2 -= learning_rate * db2\n        self.W1 -= learning_rate * dW1\n        self.b1 -= learning_rate * db1\n    \n    def train(self, X, y, epochs=1000, learning_rate=0.01):\n        \"\"\"Training loop\"\"\"\n        for epoch in range(epochs):\n            # Forward pass\n            predictions = self.forward(X)\n            \n            # Compute loss\n            loss = -np.mean(np.sum(y * np.log(predictions + 1e-8), axis=1))\n            \n            # Backward pass\n            self.backward(X, y, learning_rate)\n            \n            if epoch % 100 == 0:\n                print(f'Epoch {epoch}, Loss: {loss:.4f}')\n    \n    def predict(self, X):\n        \"\"\"Make predictions\"\"\"\n        probs = self.forward(X)\n        return np.argmax(probs, axis=1)\n\n# Example usage\nif __name__ == '__main__':\n    # Generate sample data\n    np.random.seed(42)\n    X = np.random.randn(100, 20)  # 100 samples, 20 features\n    y = np.eye(3)[np.random.randint(0, 3, 100)]  # 3 classes, one-hot encoded\n    \n    # Create and train network\n    nn = NeuralNetwork(input_size=20, hidden_size=10, output_size=3)\n    nn.train(X, y, epochs=500, learning_rate=0.1)\n    \n    # Make predictions\n    predictions = nn.predict(X)\n    accuracy = np.mean(predictions == np.argmax(y, axis=1))\n    print(f'Training Accuracy: {accuracy:.2%}')",
+            "explanation": "This implementation shows the core concepts: forward propagation computes predictions, backpropagation calculates gradients, and gradient descent updates weights. The network learns to minimize cross-entropy loss."
+        },
+        "implementation_with_api": {
+            "title": "Python Implementation - With TensorFlow/Keras",
+            "description": "Using Keras for production-ready neural networks",
+            "code": "import numpy as np\nfrom tensorflow import keras\nfrom tensorflow.keras import layers\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.preprocessing import StandardScaler\nfrom sklearn.datasets import make_classification\n\n# Generate sample dataset\nX, y = make_classification(n_samples=1000, n_features=20, \n                          n_informative=15, n_classes=3, \n                          random_state=42)\n\n# Split data\nX_train, X_test, y_train, y_test = train_test_split(\n    X, y, test_size=0.2, random_state=42\n)\n\n# Normalize features\nscaler = StandardScaler()\nX_train = scaler.fit_transform(X_train)\nX_test = scaler.transform(X_test)\n\n# Build model\nmodel = keras.Sequential([\n    layers.Dense(64, activation='relu', input_shape=(20,)),\n    layers.Dropout(0.3),  # Regularization\n    layers.Dense(32, activation='relu'),\n    layers.Dropout(0.3),\n    layers.Dense(3, activation='softmax')  # 3 classes\n])\n\n# Compile model\nmodel.compile(\n    optimizer='adam',\n    loss='sparse_categorical_crossentropy',\n    metrics=['accuracy']\n)\n\n# Train model\nhistory = model.fit(\n    X_train, y_train,\n    epochs=50,\n    batch_size=32,\n    validation_split=0.2,\n    verbose=1\n)\n\n# Evaluate\ntest_loss, test_acc = model.evaluate(X_test, y_test)\nprint(f'Test Accuracy: {test_acc:.2%}')\n\n# Make predictions\npredictions = model.predict(X_test)\nprint(f'Prediction probabilities shape: {predictions.shape}')\nprint(f'Sample prediction: {predictions[0]}')\nprint(f'Predicted class: {np.argmax(predictions[0])}')\n\n# Model summary\nmodel.summary()",
+            "comparison": "Keras provides automatic differentiation, GPU support, and optimized implementations. The from-scratch version helps understand the math, but Keras is preferred for production."
+        },
+        "model_evaluation": {
+            "title": "Model Evaluation",
+            "metrics": [
+                {
+                    "name": "Accuracy",
+                    "formula": "Accuracy = (TP + TN) / Total",
+                    "interpretation": "Percentage of correct predictions. Good for balanced datasets.",
+                    "example": "95% accuracy means 95 out of 100 predictions are correct"
+                },
+                {
+                    "name": "Precision",
+                    "formula": "Precision = TP / (TP + FP)",
+                    "interpretation": "Of all positive predictions, how many were actually positive?",
+                    "example": "90% precision means 90% of predicted positives are true positives"
+                },
+                {
+                    "name": "Recall (Sensitivity)",
+                    "formula": "Recall = TP / (TP + FN)",
+                    "interpretation": "Of all actual positives, how many did we catch?",
+                    "example": "85% recall means we found 85% of all positive cases"
+                },
+                {
+                    "name": "F1-Score",
+                    "formula": "F1 = 2 × (Precision × Recall) / (Precision + Recall)",
+                    "interpretation": "Harmonic mean of precision and recall. Balanced metric.",
+                    "example": "F1 of 0.87 indicates good balance between precision and recall"
+                },
+                {
+                    "name": "Loss (Cross-Entropy)",
+                    "formula": "Loss = -Σ y log(ŷ)",
+                    "interpretation": "Lower is better. Measures prediction confidence.",
+                    "example": "Loss of 0.15 is better than 0.45"
+                }
+            ],
+            "whyEvaluate": "Evaluation ensures the model generalizes to unseen data and doesn't just memorize training examples. Different metrics matter for different applications."
+        },
+        "performance_interpretation": {
+            "title": "Interpretation of Model Performance",
+            "whatIsGood": "• Accuracy > 90% for simple tasks, > 95% for well-defined problems\n• Training and validation loss should decrease together\n• Small gap between train and test accuracy (< 5%)\n• Stable performance across different data splits",
+            "whenItFails": "• Underfitting: Both train and test accuracy are low (model too simple)\n• Overfitting: High train accuracy but low test accuracy (memorizing data)\n• Class imbalance: High accuracy but poor performance on minority class\n• Vanishing gradients: Loss stops decreasing early in training",
+            "biasVarianceTradeoff": "• High bias (underfitting): Model is too simple, can't capture patterns\n• High variance (overfitting): Model is too complex, captures noise\n• Sweet spot: Model complexity matches problem complexity",
+            "overfittingVsUnderfitting": "Overfitting: Add dropout, reduce model size, get more data, use regularization\nUnderfitting: Increase model capacity, train longer, reduce regularization"
+        },
+        "ways_to_improve": {
+            "title": "Ways to Improve Model Performance",
+            "featureEngineering": [
+                "Normalize/standardize input features to [0,1] or mean=0, std=1",
+                "Handle missing values appropriately",
+                "Create interaction features for related inputs",
+                "Remove highly correlated features",
+                "Use domain knowledge to create meaningful features"
+            ],
+            "hyperparameterTuning": [
+                "Learning rate: Start with 0.001, use learning rate schedules",
+                "Batch size: 32-128 for most problems",
+                "Number of layers: Start with 2-3 hidden layers",
+                "Neurons per layer: Start with 64-128, decrease in deeper layers",
+                "Activation functions: ReLU for hidden layers, softmax/sigmoid for output",
+                "Optimizer: Adam is a good default choice"
+            ],
+            "preprocessing": [
+                "Data augmentation for images (rotation, flip, zoom)",
+                "Handle class imbalance with oversampling/undersampling",
+                "Split data properly: 70% train, 15% validation, 15% test",
+                "Remove outliers that could confuse the model"
+            ],
+            "algorithmSpecific": [
+                "Use dropout (0.2-0.5) to prevent overfitting",
+                "Apply batch normalization for faster training",
+                "Use early stopping to prevent overtraining",
+                "Try different architectures (wider vs deeper)",
+                "Use weight initialization (He, Xavier)",
+                "Apply L1/L2 regularization"
+            ],
+            "ensemble": [
+                "Train multiple models with different initializations",
+                "Use k-fold cross-validation",
+                "Combine predictions through voting or averaging",
+                "Stack different architectures together"
+            ]
+        }
+    }
+}
