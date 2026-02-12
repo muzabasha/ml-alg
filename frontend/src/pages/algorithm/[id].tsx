@@ -1,7 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import 'katex/dist/katex.min.css';
+
+// Dynamic import for DataVisualization to avoid SSR issues with Chart.js
+const DataVisualization = dynamic(() => import('../../components/DataVisualization'), {
+    ssr: false,
+    loading: () => (
+        <div className="my-6 p-6 bg-white rounded-xl shadow-lg border-2 border-green-200">
+            <div className="flex items-center justify-center h-64">
+                <span className="text-green-600 animate-pulse">Loading visualization...</span>
+            </div>
+        </div>
+    )
+});
 
 // Type definition for KaTeX
 interface KaTeXStatic {
@@ -89,6 +102,12 @@ const SectionRenderer = ({ sectionKey, content }: { sectionKey: string; content:
             accent: 'text-purple-600'
         },
         sample_input_output: {
+            bg: 'bg-gradient-to-br from-green-50 to-emerald-50',
+            border: 'border-l-4 border-green-500',
+            icon: '📊',
+            accent: 'text-green-600'
+        },
+        sample_io: {
             bg: 'bg-gradient-to-br from-green-50 to-emerald-50',
             border: 'border-l-4 border-green-500',
             icon: '📊',
@@ -343,6 +362,10 @@ const SectionRenderer = ({ sectionKey, content }: { sectionKey: string; content:
 
     return (
         <div className="space-y-6">
+            {/* Add visualization for sample input/output sections */}
+            {(sectionKey === 'sample_io' || sectionKey === 'sample_input_output') && content && (
+                <DataVisualization data={content} algorithmType={sectionKey} />
+            )}
             {renderContent(content)}
         </div>
     );
