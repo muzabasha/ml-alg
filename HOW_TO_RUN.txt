@@ -1,0 +1,54 @@
+========================================
+  HOW TO RUN THE APPLICATION
+========================================
+
+SIMPLE METHOD:
+
+1. Double-click: LAUNCH.bat
+
+2. Wait 1-2 minutes
+
+3. Browser opens automatically
+
+========================================
+
+WHAT IT DOES:
+
+✓ Sets up backend
+✓ Sets up frontend  
+✓ Starts both servers
+✓ Opens browser
+
+========================================
+
+REQUIREMENTS:
+
+- Python 3.8+ installed
+- Node.js 16+ installed
+
+Download:
+Python: https://www.python.org/
+Node.js: https://nodejs.org/
+
+========================================
+
+URLS:
+
+Frontend: http://localhost:3000
+Backend: http://localhost:8000
+
+========================================
+
+TO STOP:
+
+Press Ctrl+C in both server windows
+
+========================================
+
+FIRST TIME:
+Takes 5-10 minutes (installing)
+
+NEXT TIME:
+Takes 30 seconds (just starting)
+
+========================================

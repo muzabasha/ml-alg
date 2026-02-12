@@ -99,7 +99,7 @@ echo   Starting Frontend Server
 echo ========================================
 echo.
 
-cd ..\frontend
+cd ..
 
 REM Check if node_modules exists
 if not exist "node_modules\" (

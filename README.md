@@ -16,20 +16,12 @@ This platform prioritizes:
 ### Supervised Learning
 #### Regression
 - ✅ **Linear Regression** - Predict continuous values
-- **Polynomial Regression** - Capture non-linear relationships
 
 #### Classification
 - ✅ **Logistic Regression** - Binary and multi-class classification
 - ✅ **k-Nearest Neighbors (KNN)** - Instance-based learning
-- **Naïve Bayes** - Probabilistic classification
 - ✅ **Decision Tree** - Interpretable tree-based decisions
-- **Random Forest** - Ensemble of decision trees
-- **Support Vector Machine (SVM)** - Maximum margin classification
-
-### Unsupervised Learning
-- **k-Means Clustering** - Partition-based clustering
-- **Hierarchical Clustering** - Tree-based clustering
-- **Principal Component Analysis (PCA)** - Dimensionality reduction
+- ✅ **Support Vector Machine (SVM)** - Maximum margin classification
 
 ## 🧱 Content Structure (For Each Algorithm)
 
@@ -87,20 +79,14 @@ Every algorithm follows this 9-section structure:
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Python 3.8+
 - Node.js 16+
-- npm or yarn
+- npm
 
-### Backend Setup
-```bash
-cd backend
-pip install -r requirements.txt
-python app/main.py
-```
+### Simple Setup (Windows)
+1. Double-click `SMART_START.bat` to launch the application
+2. Visit `http://localhost:3000` in your browser
 
-Backend will run on `http://localhost:8000`
-
-### Frontend Setup
+### Manual Setup
 ```bash
 cd frontend
 npm install
@@ -109,10 +95,15 @@ npm run dev
 
 Frontend will run on `http://localhost:3000`
 
-### API Documentation
-Once backend is running, visit:
-- Swagger UI: `http://localhost:8000/docs`
-- ReDoc: `http://localhost:8000/redoc`
+### Pages
+- Home: `http://localhost:3000`
+- Instructor Profile: `http://localhost:3000/instructor`
+- Algorithms:
+  - `http://localhost:3000/algorithm/linear_regression`
+  - `http://localhost:3000/algorithm/logistic_regression`
+  - `http://localhost:3000/algorithm/knn`
+  - `http://localhost:3000/algorithm/decision_tree`
+  - `http://localhost:3000/algorithm/svm`
 
 ## 🏗️ Technology Stack
 
@@ -121,170 +112,104 @@ Once backend is running, visit:
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS
 - **Math Rendering**: KaTeX
-- **Visualizations**: Plotly.js
-- **Code Highlighting**: Prism.js
-
-### Backend
-- **Framework**: FastAPI
-- **Language**: Python 3.11+
-- **ML Libraries**: scikit-learn, NumPy, Pandas
-- **Visualization**: Matplotlib, Plotly
-- **API Documentation**: OpenAPI (Swagger)
+- **Code Highlighting**: Built-in syntax highlighting
 
 ## 📁 Project Structure
 
 ```
-ml-learning-platform/
+ml-alg/
 ├── frontend/                 # React/Next.js application
 │   ├── src/
-│   │   ├── components/      # Reusable UI components
 │   │   ├── pages/           # Next.js pages
+│   │   │   ├── index.tsx    # Home page
+│   │   │   ├── instructor.tsx # Instructor profile
+│   │   │   └── algorithm/[id].tsx # Dynamic algorithm pages
 │   │   └── utils/           # Helper functions
+│   ├── public/
+│   │   ├── data/            # Algorithm JSON files
+│   │   └── DP_profile.png   # Instructor photo
 │   └── package.json
 │
-├── backend/                  # FastAPI server
+├── content/                  # Algorithm content (JSON)
+│   └── algorithms/          # Algorithm definitions
+│       ├── linear_regression.json
+│       ├── logistic_regression.json
+│       ├── knn.json
+│       ├── decision_tree.json
+│       └── svm.json
+│
+├── backend/                  # FastAPI server (optional)
 │   ├── app/
-│   │   ├── main.py          # FastAPI app
-│   │   ├── routes/          # API endpoints
-│   │   ├── services/        # ML algorithm services
-│   │   └── models/          # Pydantic schemas
+│   │   └── main.py          # FastAPI app
 │   └── requirements.txt
 │
-├── content/                  # Algorithm content (JSON)
-│   ├── algorithms/          # Algorithm definitions
-│   └── sample_datasets/     # Sample CSV files
-│
-└── docs/                     # Documentation
-    ├── ARCHITECTURE.md
-    ├── PROJECT_STRUCTURE.md
-    └── UI_WIREFRAME.md
+└── SMART_START.bat          # Easy launcher for Windows
 ```
 
-## 🎨 Key Features
+## 🎨 Features
 
-### Interactive Learning
-- **Step-by-step accordion layout** for structured learning
-- **Toggle switches**: Math ↔ Intuition, Scratch ↔ API
-- **Interactive code blocks** with syntax highlighting
-- **Live code execution** in sandboxed environment
+### Current Implementation
+- ✅ 5 complete ML algorithms with full content
+- ✅ Professional instructor profile page
+- ✅ Dynamic routing for algorithm pages
+- ✅ Responsive design with Tailwind CSS
+- ✅ Math rendering support (KaTeX)
+- ✅ Code syntax highlighting
+- ✅ Section-based navigation
+- ✅ Previous/Next navigation buttons
+- ✅ Error pages (404, 500)
 
-### Pedagogical Enhancements
-- **"Why this matters?"** callouts
-- **"Exam Tip"** sections
-- **"Common Mistakes"** alerts
-- **Mini quizzes** after each algorithm
-- **Side-by-side algorithm comparison**
-
-### Visualizations
-- Interactive plots with Plotly
-- Decision boundaries
-- Confusion matrices
-- Learning curves
-- Feature importance charts
-
-## 📖 API Endpoints
-
-### Algorithm Routes (`/api/algorithms`)
-- `GET /list` - List all algorithms
-- `GET /{algorithm_id}` - Get full algorithm content
-- `GET /{algorithm_id}/section/{section_name}` - Get specific section
-- `GET /{algorithm_id}/compare?compare_with={id2}` - Compare algorithms
-- `GET /categories/list` - List algorithm categories
-
-### Execution Routes (`/api/execute`)
-- `POST /run` - Execute Python code
-- `POST /evaluate` - Evaluate model performance
-- `POST /visualize` - Generate visualization data
-
-## 🧪 Example Usage
-
-### Fetch Algorithm Content
-```bash
-curl http://localhost:8000/api/algorithms/linear_regression
-```
-
-### Execute Code
-```bash
-curl -X POST http://localhost:8000/api/execute/run \
-  -H "Content-Type: application/json" \
-  -d '{"code": "import numpy as np\nprint(np.array([1,2,3]).mean())"}'
-```
-
-### Evaluate Model
-```bash
-curl -X POST http://localhost:8000/api/execute/evaluate \
-  -H "Content-Type: application/json" \
-  -d '{
-    "y_true": [1, 2, 3, 4, 5],
-    "y_pred": [1.1, 2.2, 2.9, 4.1, 5.2],
-    "task_type": "regression"
-  }'
-```
+### Algorithm Content Structure
+Each algorithm includes:
+1. Introduction with real-world examples
+2. Mathematical formulation
+3. Sample input/output
+4. Output interpretation
+5. Python implementation (from scratch)
+6. Python implementation (with scikit-learn)
+7. Model evaluation metrics
+8. Performance interpretation
+9. Ways to improve performance
 
 ## 🎓 Learning Path
 
 ### Beginner Track
-1. Linear Regression
-2. Logistic Regression
-3. k-Nearest Neighbors
-4. Naïve Bayes
+1. Linear Regression - Start here for regression problems
+2. Logistic Regression - Introduction to classification
 
 ### Intermediate Track
-5. Decision Tree
-6. Random Forest
-7. k-Means Clustering
+3. k-Nearest Neighbors (KNN) - Instance-based learning
+4. Decision Tree - Interpretable models
 
 ### Advanced Track
-8. Support Vector Machine
-9. Hierarchical Clustering
-10. Principal Component Analysis
-
-## 🤝 Contributing
-
-Contributions are welcome! Please follow these guidelines:
-1. Maintain the 9-section structure for all algorithms
-2. Use beginner-friendly language
-3. Include heavily commented code examples
-4. Test all code before submitting
-5. Follow the existing JSON schema
-
-## 📝 Content Guidelines
-
-### Tone & Style
-- Academic but beginner-friendly
-- Use analogies where helpful
-- No unexplained jargon
-- Assume learner is seeing algorithm for first time
-- Prioritize interpretability over mathematical intimidation
-
-### Code Standards
-- Include comments for every line
-- Show both from-scratch and API implementations
-- Use realistic sample data
-- Include interpretation of results
+5. Support Vector Machine (SVM) - Maximum margin classification
 
 ## 🔮 Future Enhancements
 
-- [ ] User accounts and progress tracking
-- [ ] Interactive parameter sliders
-- [ ] Real-time code collaboration
-- [ ] Jupyter notebook integration
-- [ ] Mobile-responsive design
-- [ ] Multilingual support
+- [ ] Add more algorithms (Random Forest, Naive Bayes, PCA, etc.)
+- [ ] Interactive visualizations with Plotly
+- [ ] Live code execution sandbox
+- [ ] User progress tracking
+- [ ] Practice problems and quizzes
 - [ ] Video tutorials
-- [ ] Practice problems and solutions
+- [ ] Mobile app version
+- [ ] Multilingual support
 
 ## 📄 License
 
 MIT License - See LICENSE file for details
 
-## 👥 Authors
+## 👨‍🏫 Instructor
 
-Built for engineering students by ML educators and practitioners.
+**Dr. Syed Muzamil Basha**
+- Professor, Department of Computer Science & Engineering
+- REVA University, Bangalore, India
+- 65 Scopus Publications | 25+ Textbooks | 12 Awards
+- Research Areas: Machine Learning, Deep Learning, IoT, Cloud Computing
 
 ## 📧 Contact
 
-For questions, suggestions, or contributions, please open an issue on GitHub.
+For questions or suggestions, please open an issue on GitHub.
 
 ---
 
