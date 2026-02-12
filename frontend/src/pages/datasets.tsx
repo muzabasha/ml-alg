@@ -332,9 +332,9 @@ print(f"Classes: {data.target_names}")`}</code>
                                         <li>+1.0 = Perfect positive correlation (features move together)</li>
                                         <li>-1.0 = Perfect negative correlation (features move opposite)</li>
                                         <li>0.0 = No correlation (features are independent)</li>
-                                        <li>|r| > 0.7 = Strong correlation</li>
+                                        <li>|r| &gt; 0.7 = Strong correlation</li>
                                         <li>|r| 0.3-0.7 = Moderate correlation</li>
-                                        <li>|r| < 0.3 = Weak correlation</li>
+                                        <li>|r| &lt; 0.3 = Weak correlation</li>
                                     </ul>
                                 </div>
                             </div>
