@@ -2,12 +2,12 @@
 const nextConfig = {
     reactStrictMode: true,
     swcMinify: true,
-    // Disable image optimization for local development
+    // Disable image optimization for Vercel deployment
     images: {
         unoptimized: true,
     },
-    // Configure output for standalone deployment
-    output: 'standalone',
+    // Remove standalone output for Vercel (causes issues)
+    // output: 'standalone',
     // Disable telemetry
     telemetry: false,
     // Configure webpack for better error handling
@@ -22,12 +22,14 @@ const nextConfig = {
         }
         return config;
     },
-    // Optimize for local development
+    // Optimize for production
     compress: true,
     poweredByHeader: false,
     generateEtags: true,
     // Handle page extensions
     pageExtensions: ['tsx', 'ts', 'jsx', 'js'],
+    // Ensure trailing slashes are handled correctly
+    trailingSlash: false,
 }
 
 module.exports = nextConfig
