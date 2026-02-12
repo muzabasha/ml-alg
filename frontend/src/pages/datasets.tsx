@@ -121,8 +121,8 @@ const DatasetsPage: React.FC = () => {
                                         key={key}
                                         onClick={() => setSelectedDataset(key)}
                                         className={`w-full px-4 py-3 rounded-lg text-left transition ${selectedDataset === key
-                                                ? 'bg-blue-600 text-white font-semibold'
-                                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                            ? 'bg-blue-600 text-white font-semibold'
+                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                             }`}
                                     >
                                         <div className="font-semibold">{dataset.name}</div>
@@ -143,8 +143,8 @@ const DatasetsPage: React.FC = () => {
                                         key={v}
                                         onClick={() => setView(v)}
                                         className={`w-full px-3 py-2 rounded-lg text-sm transition capitalize ${view === v
-                                                ? 'bg-blue-600 text-white'
-                                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                            ? 'bg-blue-600 text-white'
+                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                             }`}
                                     >
                                         {v}
@@ -270,10 +270,10 @@ print(f"Classes: {data.target_names}")`}</code>
                                 <h3 className="text-2xl font-bold text-gray-900 mb-4">🔗 Feature Correlations</h3>
                                 <div className="space-y-4">
                                     {currentDataset.correlations.map(([feat1, feat2, corr], idx) => {
-                                        const strength = Math.abs(corr);
-                                        const type = corr > 0 ? 'Positive' : 'Negative';
-                                        const color = corr > 0 ? 'blue' : 'red';
-                                        const bgColor = corr > 0 ? 'bg-blue-50' : 'bg-red-50';
+                                        const strength = Math.abs(Number(corr));
+                                        const type = Number(corr) > 0 ? 'Positive' : 'Negative';
+                                        const color = Number(corr) > 0 ? 'blue' : 'red';
+                                        const bgColor = Number(corr) > 0 ? 'bg-blue-50' : 'bg-red-50';
 
                                         return (
                                             <div key={idx} className={`${bgColor} p-4 rounded-lg border-2 border-${color}-200`}>
@@ -283,7 +283,7 @@ print(f"Classes: {data.target_names}")`}</code>
                                                             {feat1.replace(/_/g, ' ')} ↔ {feat2.replace(/_/g, ' ')}
                                                         </div>
                                                         <div className={`text-sm text-${color}-700 mt-1`}>
-                                                            {type} Correlation: {corr.toFixed(3)}
+                                                            {type} Correlation: {Number(corr).toFixed(3)}
                                                         </div>
                                                     </div>
                                                     <div className={`text-3xl font-bold text-${color}-600`}>
