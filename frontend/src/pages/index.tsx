@@ -29,6 +29,9 @@ const HomePage: React.FC = () => {
                             <Link href="/" className="text-gray-700 hover:text-blue-600">
                                 Home
                             </Link>
+                            <Link href="/datasets" className="text-gray-700 hover:text-blue-600">
+                                Datasets
+                            </Link>
                             <Link href="/instructor" className="text-gray-700 hover:text-blue-600">
                                 Instructor
                             </Link>
@@ -94,6 +97,82 @@ const HomePage: React.FC = () => {
 
             {/* Features */}
             <section className="container mx-auto px-4 py-16">
+                <h3 className="text-3xl font-bold text-gray-900 mb-12 text-center">
+                    What You'll Learn
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div className="bg-white rounded-lg p-6 shadow-lg">
+                        <div className="text-4xl mb-4">📚</div>
+                        <h4 className="text-xl font-bold text-gray-900 mb-2">
+                            Conceptual Understanding
+                        </h4>
+                        <p className="text-gray-600">
+                            Plain-language explanations with real-world analogies for every algorithm
+                        </p>
+                    </div>
+                    <div className="bg-white rounded-lg p-6 shadow-lg">
+                        <div className="text-4xl mb-4">🔬</div>
+                        <h4 className="text-xl font-bold text-gray-900 mb-2">
+                            Mathematical Foundations
+                        </h4>
+                        <p className="text-gray-600">
+                            LaTeX formulations with intuitive interpretations and key terms
+                        </p>
+                    </div>
+                    <div className="bg-white rounded-lg p-6 shadow-lg">
+                        <div className="text-4xl mb-4">💻</div>
+                        <h4 className="text-xl font-bold text-gray-900 mb-2">
+                            Practical Implementation
+                        </h4>
+                        <p className="text-gray-600">
+                            From-scratch code and industry-standard library implementations
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            {/* Dataset Explorer Section */}
+            <section className="container mx-auto px-4 py-16 bg-gradient-to-r from-green-50 to-teal-50 rounded-xl shadow-lg my-8">
+                <div className="text-center mb-8">
+                    <h3 className="text-3xl font-bold text-gray-900 mb-4">
+                        📊 Explore Real-World Datasets
+                    </h3>
+                    <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                        Learn data exploration and analysis with classic ML datasets. Understand data characteristics, correlations, and how to prepare data for training.
+                    </p>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+                    <div className="bg-white rounded-lg p-6 shadow-md">
+                        <h4 className="text-xl font-bold text-gray-900 mb-2">🌸 Iris Dataset</h4>
+                        <p className="text-gray-600 mb-4">150 samples, 4 features, 3 classes</p>
+                        <ul className="text-sm text-gray-700 space-y-1 mb-4">
+                            <li>• Classic classification dataset</li>
+                            <li>• Flower measurements</li>
+                            <li>• Perfect for beginners</li>
+                        </ul>
+                    </div>
+                    <div className="bg-white rounded-lg p-6 shadow-md">
+                        <h4 className="text-xl font-bold text-gray-900 mb-2">🍷 Wine Dataset</h4>
+                        <p className="text-gray-600 mb-4">178 samples, 13 features, 3 classes</p>
+                        <ul className="text-sm text-gray-700 space-y-1 mb-4">
+                            <li>• Chemical analysis data</li>
+                            <li>• Quality prediction</li>
+                            <li>• Feature-rich dataset</li>
+                        </ul>
+                    </div>
+                </div>
+                <div className="text-center mt-8">
+                    <Link
+                        href="/datasets"
+                        className="inline-block bg-green-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-green-700 transition shadow-lg"
+                    >
+                        Explore Datasets →
+                    </Link>
+                </div>
+            </section>
+
+            {/* Features */}
+            <section className="container mx-auto px-4 py-8">
                 <h3 className="text-3xl font-bold text-gray-900 mb-12 text-center">
                     What You'll Learn
                 </h3>
