@@ -1,0 +1,281 @@
+{
+    "id": "naive_bayes",
+    "name": "Naive Bayes Classifier",
+    "category": "Supervised Learning - Classification",
+    "difficulty": "Beginner",
+    "estimatedTime": "50 minutes",
+    "sections": {
+        "introduction": {
+            "title": "Introduction to Naive Bayes Classifier",
+            "plainLanguage": "Naive Bayes is a probabilistic classifier based on Bayes' Theorem. It predicts the probability of each class and chooses the one with the highest probability. Despite its 'naive' assumption that features are independent, it works surprisingly well in practice.",
+            "realWorldAnalogy": "Think of a doctor diagnosing a disease. They look at symptoms (fever, cough, fatigue) and calculate: 'Given these symptoms, what's the probability it's flu vs cold vs COVID?' They choose the diagnosis with the highest probability. That's exactly what Naive Bayes does!",
+            "whereAndWhy": "Used for spam detection, sentiment analysis, document classification, medical diagnosis, and recommendation systems. It's fast, works well with small datasets, and handles high-dimensional data efficiently.",
+            "learningType": "Supervised Learning (Classification)",
+            "strengths": [
+                "Fast training and prediction—works in real-time",
+                "Works well with small datasets",
+                "Handles high-dimensional data (many features)",
+                "Performs well even when independence assumption is violated",
+                "Provides probability estimates, not just predictions",
+                "Simple and easy to implement"
+            ],
+            "limitations": [
+                "Assumes features are independent (rarely true in reality)",
+                "Sensitive to irrelevant features",
+                "Zero-frequency problem (if a feature value never appears in training)",
+                "Cannot learn feature interactions",
+                "Probability estimates can be poorly calibrated"
+            ]
+        },
+        "mathematical_model": {
+            "title": "Mathematical Formulation",
+            "introduction": "Naive Bayes applies Bayes' Theorem with the 'naive' assumption that features are conditionally independent given the class.",
+            "equations": [
+                {
+                    "name": "Bayes' Theorem",
+                    "latex": "P(C|X) = \\frac{P(X|C) \\cdot P(C)}{P(X)}",
+                    "explanation": "Probability of class C given features X. P(C) is prior probability, P(X|C) is likelihood, P(X) is evidence (normalizing constant)."
+                },
+                {
+                    "name": "Naive Bayes Assumption",
+                    "latex": "P(X|C) = P(x_1|C) \\cdot P(x_2|C) \\cdot ... \\cdot P(x_n|C) = \\prod_{i=1}^{n} P(x_i|C)",
+                    "explanation": "Assumes features are independent given the class. This simplifies computation dramatically but is rarely true in practice."
+                },
+                {
+                    "name": "Classification Rule",
+                    "latex": "\\hat{C} = \\arg\\max_{C} P(C) \\prod_{i=1}^{n} P(x_i|C)",
+                    "explanation": "Choose the class with maximum posterior probability. We can ignore P(X) since it's the same for all classes."
+                },
+                {
+                    "name": "Log Probability (Numerical Stability)",
+                    "latex": "\\hat{C} = \\arg\\max_{C} \\left[ \\log P(C) + \\sum_{i=1}^{n} \\log P(x_i|C) \\right]",
+                    "explanation": "Use log probabilities to avoid numerical underflow when multiplying many small probabilities."
+                }
+            ],
+            "variants": {
+                "Gaussian Naive Bayes": "For continuous features. Assumes features follow normal distribution: P(x|C) = (1/√(2πσ²)) exp(-(x-μ)²/(2σ²))",
+                "Multinomial Naive Bayes": "For discrete counts (e.g., word frequencies). Used in text classification.",
+                "Bernoulli Naive Bayes": "For binary features (0/1). Used when features are presence/absence indicators."
+            },
+            "keyTerms": {
+                "Prior P(C)": "Probability of class before seeing features (from training data)",
+                "Likelihood P(X|C)": "Probability of features given class",
+                "Posterior P(C|X)": "Probability of class given features (what we want)",
+                "Evidence P(X)": "Probability of features (normalizing constant)",
+                "Independence Assumption": "Features are independent given class (naive assumption)"
+            },
+            "intuition": "Naive Bayes is like a detective. Each piece of evidence (feature) provides a clue. The detective combines all clues (multiplies probabilities) to determine the most likely suspect (class). The 'naive' part? Assuming clues don't influence each other."
+        },
+        "sample_io": {
+            "title": "Sample Input & Output",
+            "description": "Let's classify emails as spam or not spam based on word frequencies.",
+            "input": {
+                "format": "Email features (word counts) and labels",
+                "training_data": [
+                    {
+                        "contains_free": 1,
+                        "contains_money": 1,
+                        "contains_winner": 1,
+                        "label": "spam"
+                    },
+                    {
+                        "contains_free": 1,
+                        "contains_money": 0,
+                        "contains_winner": 1,
+                        "label": "spam"
+                    },
+                    {
+                        "contains_free": 0,
+                        "contains_money": 1,
+                        "contains_winner": 1,
+                        "label": "spam"
+                    },
+                    {
+                        "contains_free": 0,
+                        "contains_money": 0,
+                        "contains_winner": 0,
+                        "label": "not_spam"
+                    },
+                    {
+                        "contains_free": 0,
+                        "contains_money": 0,
+                        "contains_winner": 0,
+                        "label": "not_spam"
+                    },
+                    {
+                        "contains_free": 0,
+                        "contains_money": 0,
+                        "contains_winner": 0,
+                        "label": "not_spam"
+                    }
+                ],
+                "test_email": {
+                    "contains_free": 1,
+                    "contains_money": 0,
+                    "contains_winner": 0
+                }
+            },
+            "calculation": {
+                "priors": {
+                    "P(spam)": "3/6 = 0.5",
+                    "P(not_spam)": "3/6 = 0.5"
+                },
+                "likelihoods_spam": {
+                    "P(free=1|spam)": "2/3 = 0.67",
+                    "P(money=0|spam)": "1/3 = 0.33",
+                    "P(winner=0|spam)": "0/3 = 0 → use smoothing → 0.1"
+                },
+                "likelihoods_not_spam": {
+                    "P(free=1|not_spam)": "0/3 = 0 → use smoothing → 0.1",
+                    "P(money=0|not_spam)": "3/3 = 1.0",
+                    "P(winner=0|not_spam)": "3/3 = 1.0"
+                },
+                "posterior_spam": "0.5 × 0.67 × 0.33 × 0.1 = 0.011",
+                "posterior_not_spam": "0.5 × 0.1 × 1.0 × 1.0 = 0.05"
+            },
+            "output": {
+                "prediction": "not_spam",
+                "probabilities": {
+                    "spam": 0.18,
+                    "not_spam": 0.82
+                },
+                "reasoning": "Despite containing 'free', the absence of 'money' and 'winner' makes it more likely to be legitimate email."
+            },
+            "visualization": "Bar chart showing P(spam) vs P(not_spam). Feature importance chart showing which words contribute most to classification."
+        },
+        "interpretation": {
+            "title": "Interpreting the Output",
+            "predictions": "The classifier outputs probabilities for each class. Choose the class with highest probability. In our example: P(not_spam) = 0.82 > P(spam) = 0.18, so predict 'not_spam'.",
+            "probabilities": {
+                "meaning": "Probabilities represent confidence in prediction. 0.82 means 82% confident it's not spam.",
+                "calibration": "Naive Bayes probabilities are often poorly calibrated (too extreme). Use calibration techniques if exact probabilities matter.",
+                "threshold": "Can adjust decision threshold. Default is 0.5, but can use 0.7 for spam to reduce false positives."
+            },
+            "featureImportance": "Features with extreme probabilities (close to 0 or 1) have more influence. In spam detection: 'winner', 'free', 'money' are strong spam indicators.",
+            "zeroFrequency": {
+                "problem": "If a feature value never appears in training for a class, P(x|C) = 0, making entire posterior 0.",
+                "solution": "Laplace smoothing: Add small constant (α=1) to all counts. P(x|C) = (count + α) / (total + α×num_values)"
+            },
+            "commonMisinterpretations": [
+                "❌ WRONG: 'Features are actually independent' → ✓ RIGHT: 'We assume independence for simplicity, but it's rarely true'",
+                "❌ WRONG: 'Probabilities are exact' → ✓ RIGHT: 'Probabilities are estimates and often poorly calibrated'",
+                "❌ WRONG: 'More features always help' → ✓ RIGHT: 'Irrelevant features can hurt performance'"
+            ]
+        },
+        "implementation_scratch": {
+            "title": "Python Implementation (From Scratch)",
+            "description": "Building Gaussian Naive Bayes using only NumPy.",
+            "code": "import numpy as np\n\nclass GaussianNaiveBayes:\n    \"\"\"Gaussian Naive Bayes classifier from scratch.\"\"\"\n    \n    def __init__(self):\n        self.classes = None\n        self.class_priors = {}  # P(C)\n        self.means = {}         # μ for each feature per class\n        self.variances = {}     # σ² for each feature per class\n    \n    def fit(self, X, y):\n        \"\"\"Train the Naive Bayes classifier.\"\"\"\n        self.classes = np.unique(y)\n        n_samples = len(y)\n        \n        # Calculate priors and parameters for each class\n        for c in self.classes:\n            # Get all samples belonging to class c\n            X_c = X[y == c]\n            \n            # Prior: P(C) = count(C) / total_samples\n            self.class_priors[c] = len(X_c) / n_samples\n            \n            # For each feature, calculate mean and variance\n            # Assumes features follow Gaussian distribution\n            self.means[c] = X_c.mean(axis=0)\n            self.variances[c] = X_c.var(axis=0)\n        \n        return self\n    \n    def _calculate_likelihood(self, x, mean, var):\n        \"\"\"Calculate Gaussian probability density.\"\"\"\n        # Gaussian PDF: (1/√(2πσ²)) * exp(-(x-μ)²/(2σ²))\n        eps = 1e-6  # Small constant to avoid division by zero\n        coeff = 1.0 / np.sqrt(2 * np.pi * var + eps)\n        exponent = np.exp(-((x - mean) ** 2) / (2 * var + eps))\n        return coeff * exponent\n    \n    def _calculate_class_probability(self, x, c):\n        \"\"\"Calculate P(C|X) ∝ P(C) * P(X|C).\"\"\"\n        # Start with prior probability\n        log_prob = np.log(self.class_priors[c])\n        \n        # Multiply by likelihood of each feature (use log for stability)\n        # P(X|C) = P(x₁|C) * P(x₂|C) * ... * P(xₙ|C)\n        for i in range(len(x)):\n            likelihood = self._calculate_likelihood(\n                x[i], \n                self.means[c][i], \n                self.variances[c][i]\n            )\n            log_prob += np.log(likelihood + 1e-10)  # Add small constant to avoid log(0)\n        \n        return log_prob\n    \n    def predict(self, X):\n        \"\"\"Predict class for each sample.\"\"\"\n        predictions = []\n        \n        for x in X:\n            # Calculate probability for each class\n            class_probs = {}\n            for c in self.classes:\n                class_probs[c] = self._calculate_class_probability(x, c)\n            \n            # Choose class with maximum probability\n            predicted_class = max(class_probs, key=class_probs.get)\n            predictions.append(predicted_class)\n        \n        return np.array(predictions)\n    \n    def predict_proba(self, X):\n        \"\"\"Predict probability for each class.\"\"\"\n        probabilities = []\n        \n        for x in X:\n            # Calculate log probability for each class\n            log_probs = []\n            for c in self.classes:\n                log_probs.append(self._calculate_class_probability(x, c))\n            \n            # Convert log probabilities to probabilities (softmax)\n            log_probs = np.array(log_probs)\n            # Subtract max for numerical stability\n            log_probs = log_probs - np.max(log_probs)\n            probs = np.exp(log_probs)\n            probs = probs / np.sum(probs)  # Normalize\n            \n            probabilities.append(probs)\n        \n        return np.array(probabilities)\n\n# Example usage\nif __name__ == '__main__':\n    # Generate sample data: 2 classes with different means\n    np.random.seed(42)\n    \n    # Class 0: mean=[2, 2]\n    X_class0 = np.random.randn(50, 2) + [2, 2]\n    y_class0 = np.zeros(50)\n    \n    # Class 1: mean=[5, 5]\n    X_class1 = np.random.randn(50, 2) + [5, 5]\n    y_class1 = np.ones(50)\n    \n    # Combine data\n    X = np.vstack([X_class0, X_class1])\n    y = np.hstack([y_class0, y_class1])\n    \n    # Train model\n    nb = GaussianNaiveBayes()\n    nb.fit(X, y)\n    \n    # Test predictions\n    test_samples = np.array([[2, 2], [5, 5], [3.5, 3.5]])\n    predictions = nb.predict(test_samples)\n    probabilities = nb.predict_proba(test_samples)\n    \n    print('Predictions:')\n    for i, (sample, pred, prob) in enumerate(zip(test_samples, predictions, probabilities)):\n        print(f'  Sample {sample}: Class {int(pred)}, Probabilities: {prob}')\n    \n    print(f'\\nClass Priors: {nb.class_priors}')\n    print(f'Class 0 means: {nb.means[0.0]}')\n    print(f'Class 1 means: {nb.means[1.0]}')",
+            "explanation": "This implementation shows Gaussian Naive Bayes for continuous features. The fit() method calculates priors and Gaussian parameters (mean, variance) for each class. The predict() method uses Bayes' theorem with the independence assumption to classify new samples. Log probabilities prevent numerical underflow."
+        },
+        "implementation_api": {
+            "title": "Python Implementation (Using scikit-learn)",
+            "description": "Using scikit-learn for production-ready Naive Bayes classification.",
+            "code": "import numpy as np\nimport pandas as pd\nfrom sklearn.naive_bayes import GaussianNB, MultinomialNB, BernoulliNB\nfrom sklearn.model_selection import train_test_split\nfrom sklearn.metrics import accuracy_score, classification_report, confusion_matrix\nfrom sklearn.datasets import load_iris\nimport matplotlib.pyplot as plt\nimport seaborn as sns\n\n# Load sample data (Iris dataset)\niris = load_iris()\nX = iris.data\ny = iris.target\n\n# Split data\nX_train, X_test, y_train, y_test = train_test_split(\n    X, y, test_size=0.3, random_state=42\n)\n\n# Create and train Gaussian Naive Bayes\n# Use GaussianNB for continuous features\ngnb = GaussianNB()\ngnb.fit(X_train, y_train)\n\n# Make predictions\ny_pred = gnb.predict(X_test)\ny_proba = gnb.predict_proba(X_test)\n\n# Evaluate\naccuracy = accuracy_score(y_test, y_pred)\nprint(f'Accuracy: {accuracy:.3f}')\nprint(f'\\nClassification Report:')\nprint(classification_report(y_test, y_pred, target_names=iris.target_names))\n\n# Show some predictions with probabilities\nprint(f'\\nSample Predictions:')\nfor i in range(5):\n    print(f'  True: {iris.target_names[y_test[i]]}, '\n          f'Predicted: {iris.target_names[y_pred[i]]}, '\n          f'Probabilities: {y_proba[i]}')\n\n# Confusion Matrix\ncm = confusion_matrix(y_test, y_pred)\nplt.figure(figsize=(8, 6))\nsns.heatmap(cm, annot=True, fmt='d', cmap='Blues',\n            xticklabels=iris.target_names,\n            yticklabels=iris.target_names)\nplt.title('Confusion Matrix - Gaussian Naive Bayes')\nplt.ylabel('True Label')\nplt.xlabel('Predicted Label')\nplt.show()\n\n# Example: Text Classification with Multinomial Naive Bayes\nfrom sklearn.feature_extraction.text import CountVectorizer\n\n# Sample text data\ntexts = [\n    'free money winner',\n    'hello friend meeting',\n    'win free prize now',\n    'lunch tomorrow schedule',\n    'congratulations winner prize',\n    'project deadline reminder'\n]\nlabels = [1, 0, 1, 0, 1, 0]  # 1=spam, 0=not spam\n\n# Convert text to word counts\nvectorizer = CountVectorizer()\nX_text = vectorizer.fit_transform(texts)\n\n# Train Multinomial Naive Bayes (for count data)\nmnb = MultinomialNB(alpha=1.0)  # alpha=1.0 is Laplace smoothing\nmnb.fit(X_text, labels)\n\n# Test on new email\ntest_email = ['free prize winner']\ntest_vector = vectorizer.transform(test_email)\nprediction = mnb.predict(test_vector)\nproba = mnb.predict_proba(test_vector)\n\nprint(f'\\nText Classification Example:')\nprint(f'  Email: \"{test_email[0]}\"')\nprint(f'  Prediction: {\"Spam\" if prediction[0] == 1 else \"Not Spam\"}')\nprint(f'  Probabilities: Not Spam={proba[0][0]:.3f}, Spam={proba[0][1]:.3f}')\n\n# Example: Binary Features with Bernoulli Naive Bayes\nX_binary = np.array([\n    [1, 1, 0],  # has feature 1 and 2\n    [0, 1, 1],  # has feature 2 and 3\n    [1, 0, 1],  # has feature 1 and 3\n    [0, 0, 1],  # has only feature 3\n])\ny_binary = np.array([1, 0, 1, 0])\n\nbnb = BernoulliNB(alpha=1.0)\nbnb.fit(X_binary, y_binary)\n\ntest_binary = np.array([[1, 1, 1]])\npred_binary = bnb.predict(test_binary)\nprint(f'\\nBinary Features Example:')\nprint(f'  Features: {test_binary[0]}')\nprint(f'  Prediction: Class {pred_binary[0]}')",
+            "comparison": "Scikit-learn provides three Naive Bayes variants: GaussianNB (continuous features), MultinomialNB (count data like word frequencies), and BernoulliNB (binary features). All include Laplace smoothing (alpha parameter) to handle zero frequencies. Use GaussianNB for numerical data, MultinomialNB for text classification, and BernoulliNB for binary features."
+        },
+        "evaluation": {
+            "title": "Model Evaluation",
+            "why": "Naive Bayes is a probabilistic classifier, so we evaluate both classification accuracy and probability quality. We also check if the independence assumption significantly hurts performance.",
+            "metrics": [
+                {
+                    "name": "Accuracy",
+                    "formula": "Accuracy = (TP + TN) / (TP + TN + FP + FN)",
+                    "interpretation": "Percentage of correct predictions. Simple but can be misleading with imbalanced classes.",
+                    "example": "Accuracy = 0.92 → 92% of emails correctly classified"
+                },
+                {
+                    "name": "Precision",
+                    "formula": "Precision = TP / (TP + FP)",
+                    "interpretation": "Of predicted positives, how many are actually positive. Important when false positives are costly.",
+                    "example": "Precision = 0.95 → 95% of emails marked as spam are actually spam"
+                },
+                {
+                    "name": "Recall (Sensitivity)",
+                    "formula": "Recall = TP / (TP + FN)",
+                    "interpretation": "Of actual positives, how many did we catch. Important when false negatives are costly.",
+                    "example": "Recall = 0.88 → We catch 88% of actual spam emails"
+                },
+                {
+                    "name": "F1 Score",
+                    "formula": "F1 = 2 × (Precision × Recall) / (Precision + Recall)",
+                    "interpretation": "Harmonic mean of precision and recall. Balances both metrics.",
+                    "example": "F1 = 0.91 → Good balance between precision and recall"
+                },
+                {
+                    "name": "Log Loss (Cross-Entropy)",
+                    "formula": "LogLoss = -Σ yᵢ log(pᵢ)",
+                    "interpretation": "Measures quality of probability predictions. Lower is better. Penalizes confident wrong predictions heavily.",
+                    "example": "LogLoss = 0.25 → Probability estimates are reasonably calibrated"
+                }
+            ],
+            "confusionMatrix": {
+                "description": "2×2 table showing True Positives, False Positives, True Negatives, False Negatives",
+                "interpretation": "Diagonal elements are correct predictions. Off-diagonal are errors. Helps identify which classes are confused."
+            }
+        },
+        "performance_interpretation": {
+            "title": "Interpreting Model Performance",
+            "whatIsGood": {
+                "Accuracy": ">0.85 is good for balanced datasets",
+                "Precision": ">0.90 for spam detection (minimize false positives)",
+                "Recall": ">0.85 for medical diagnosis (catch all cases)",
+                "F1 Score": ">0.80 is good overall"
+            },
+            "whenModelFails": [
+                "**Correlated features**: When features are highly dependent, independence assumption breaks down",
+                "**Continuous features with non-Gaussian distribution**: Gaussian NB assumes normal distribution",
+                "**Imbalanced classes**: May predict majority class too often without proper handling",
+                "**Zero frequency**: When test data has feature values never seen in training"
+            ],
+            "comparisonToOthers": {
+                "vs Logistic Regression": "Naive Bayes is faster and works better with small data, but Logistic Regression handles feature correlations better",
+                "vs Decision Trees": "Naive Bayes is simpler and faster, but Decision Trees can learn feature interactions",
+                "vs SVM": "Naive Bayes is much faster and works with less data, but SVM often more accurate",
+                "vs Neural Networks": "Naive Bayes is interpretable and needs less data, but Neural Networks handle complex patterns better"
+            },
+            "whenToUse": [
+                "**Small datasets**: Works well with limited training data",
+                "**High-dimensional data**: Handles many features efficiently (text classification)",
+                "**Real-time prediction**: Very fast inference",
+                "**Baseline model**: Quick first model to establish baseline performance",
+                "**Interpretability needed**: Easy to understand and explain"
+            ]
+        },
+        "improvements": {
+            "title": "Ways to Improve Model Performance",
+            "featureEngineering": [
+                "**Feature selection**: Remove irrelevant features that add noise",
+                "**Feature transformation**: Log transform skewed features for Gaussian NB",
+                "**Feature discretization**: Convert continuous to categorical for Multinomial NB",
+                "**N-grams for text**: Use bigrams/trigrams instead of just unigrams",
+                "**TF-IDF**: Use TF-IDF instead of raw counts for text classification"
+            ],
+            "hyperparameterTuning": [
+                "**Smoothing (alpha)**: Adjust Laplace smoothing parameter (default=1.0)",
+                "  - Increase alpha if overfitting (too confident predictions)",
+                "  - Decrease alpha if underfitting (but keep > 0)",
+                "**Priors**: Can specify class priors manually if you have domain knowledge",
+                "**Variance smoothing**: For Gaussian NB, add to variance for numerical stability"
+            ],
+            "dataPreprocessing": [
+                "**Handle imbalanced classes**: Use SMOTE, class weights, or resampling",
+                "**Remove outliers**: Outliers affect Gaussian parameters significantly",
+                "**Normalize features**: For Gaussian NB, standardize features to similar scales",
+                "**Handle missing values**: Impute or remove (NB can't handle missing values directly)"
+            ],
+            "algorithmVariants": [
+                "**Complement Naive Bayes**: Better for imbalanced datasets",
+                "**Categorical Naive Bayes**: For categorical features",
+                "**Semi-supervised Naive Bayes**: Use unlabeled data to improve estimates",
+                "**Ensemble methods**: Combine multiple Naive Bayes models"
+            ],
+            "advancedTechniques": [
+                "**Probability calibration**: Use Platt scaling or isotonic regression to calibrate probabilities",
+                "**Feature weighting**: Weight features by importance (violates independence but can help)",
+                "**Hybrid models**: Combine Naive Bayes with other classifiers (ensemble)",
+                "**Bayesian networks**: Relax independence assumption with graphical models"
+            ]
+        }
+    }
+}

@@ -6,6 +6,8 @@ const HomePage: React.FC = () => {
         { id: 'linear_regression', name: 'Linear Regression', category: 'Regression', difficulty: 'Beginner' },
         { id: 'logistic_regression', name: 'Logistic Regression', category: 'Classification', difficulty: 'Beginner' },
         { id: 'knn', name: 'k-Nearest Neighbors', category: 'Classification', difficulty: 'Beginner' },
+        { id: 'kmeans', name: 'K-Means Clustering', category: 'Clustering', difficulty: 'Beginner' },
+        { id: 'naive_bayes', name: 'Naive Bayes Classifier', category: 'Classification', difficulty: 'Beginner' },
         { id: 'decision_tree', name: 'Decision Tree', category: 'Classification', difficulty: 'Intermediate' },
         { id: 'svm', name: 'Support Vector Machine', category: 'Classification', difficulty: 'Advanced' },
         { id: 'ann', name: 'Artificial Neural Network', category: 'Deep Learning', difficulty: 'Intermediate' },
@@ -41,7 +43,7 @@ const HomePage: React.FC = () => {
                     Learn Machine Learning & Deep Learning
                 </h2>
                 <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-                    Master 9 essential algorithms from classical ML to modern Deep Learning.
+                    Master 11 essential algorithms from classical ML to modern Deep Learning.
                     Complete with mathematical formulations, Python implementations, and practical examples.
                 </p>
                 <div className="flex justify-center gap-4">

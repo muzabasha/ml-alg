@@ -1,0 +1,309 @@
+{
+    "id": "kmeans",
+    "name": "K-Means Clustering",
+    "category": "Unsupervised Learning - Clustering",
+    "difficulty": "Beginner",
+    "estimatedTime": "60 minutes",
+    "sections": {
+        "introduction": {
+            "title": "Introduction to K-Means Clustering",
+            "plainLanguage": "K-Means is an unsupervised learning algorithm that groups similar data points together into clusters. Unlike supervised learning, it doesn't need labeled data—it discovers patterns on its own by finding natural groupings in the data.",
+            "realWorldAnalogy": "Imagine organizing a messy closet. You don't have predefined categories, but you naturally group similar items together: all shirts in one pile, pants in another, shoes in a third. K-Means does the same with data—it finds natural groups based on similarity.",
+            "whereAndWhy": "Used for customer segmentation, image compression, document clustering, anomaly detection, and data exploration. It's the go-to algorithm when you want to discover hidden patterns or group similar items without predefined categories.",
+            "learningType": "Unsupervised Learning (Clustering)",
+            "strengths": [
+                "Simple and easy to understand",
+                "Fast and efficient for large datasets",
+                "Works well when clusters are spherical and well-separated",
+                "Scales to large datasets",
+                "Guaranteed to converge"
+            ],
+            "limitations": [
+                "Must specify K (number of clusters) in advance",
+                "Sensitive to initial centroid placement",
+                "Assumes clusters are spherical and similar size",
+                "Sensitive to outliers",
+                "Can get stuck in local optima"
+            ]
+        },
+        "mathematical_model": {
+            "title": "Mathematical Formulation",
+            "introduction": "K-Means minimizes the within-cluster sum of squares (inertia) by iteratively assigning points to nearest centroids and updating centroids.",
+            "equations": [
+                {
+                    "name": "Objective Function (Inertia)",
+                    "latex": "J = \\sum_{i=1}^{K} \\sum_{x \\in C_i} \\|x - \\mu_i\\|^2",
+                    "explanation": "Minimize the sum of squared distances between points and their cluster centroids. K is number of clusters, C_i is cluster i, μ_i is centroid of cluster i, and x is a data point."
+                },
+                {
+                    "name": "Euclidean Distance",
+                    "latex": "d(x, \\mu) = \\sqrt{\\sum_{j=1}^{n} (x_j - \\mu_j)^2}",
+                    "explanation": "Distance between a point x and centroid μ in n-dimensional space. Used to assign points to nearest cluster."
+                },
+                {
+                    "name": "Centroid Update",
+                    "latex": "\\mu_i = \\frac{1}{|C_i|} \\sum_{x \\in C_i} x",
+                    "explanation": "Update centroid as the mean of all points in the cluster. |C_i| is the number of points in cluster i."
+                },
+                {
+                    "name": "Cluster Assignment",
+                    "latex": "C_i = \\{x : \\|x - \\mu_i\\| \\leq \\|x - \\mu_j\\| \\text{ for all } j\\}",
+                    "explanation": "Assign each point to the cluster with the nearest centroid."
+                }
+            ],
+            "algorithm": [
+                "1. Initialize: Randomly select K points as initial centroids",
+                "2. Assignment Step: Assign each point to nearest centroid",
+                "3. Update Step: Recalculate centroids as mean of assigned points",
+                "4. Repeat steps 2-3 until convergence (centroids don't change)"
+            ],
+            "keyTerms": {
+                "K": "Number of clusters (hyperparameter)",
+                "Centroid (μ)": "Center point of a cluster",
+                "Inertia (J)": "Sum of squared distances within clusters",
+                "Convergence": "When centroids stop moving significantly",
+                "Cluster": "Group of similar data points"
+            },
+            "intuition": "K-Means is like a game of musical chairs. Points (people) move to the nearest centroid (chair). After everyone sits, we move the chairs to the center of each group. Repeat until chairs stop moving—that's convergence!"
+        },
+        "sample_io": {
+            "title": "Sample Input & Output",
+            "description": "Let's cluster customers based on annual income and spending score.",
+            "input": {
+                "format": "2D data points (Income, Spending Score)",
+                "table": [
+                    {
+                        "Income ($k)": 15,
+                        "Spending Score": 39
+                    },
+                    {
+                        "Income ($k)": 16,
+                        "Spending Score": 81
+                    },
+                    {
+                        "Income ($k)": 17,
+                        "Spending Score": 6
+                    },
+                    {
+                        "Income ($k)": 18,
+                        "Spending Score": 77
+                    },
+                    {
+                        "Income ($k)": 19,
+                        "Spending Score": 40
+                    },
+                    {
+                        "Income ($k)": 42,
+                        "Spending Score": 76
+                    },
+                    {
+                        "Income ($k)": 43,
+                        "Spending Score": 94
+                    },
+                    {
+                        "Income ($k)": 44,
+                        "Spending Score": 72
+                    },
+                    {
+                        "Income ($k)": 54,
+                        "Spending Score": 35
+                    },
+                    {
+                        "Income ($k)": 55,
+                        "Spending Score": 92
+                    },
+                    {
+                        "Income ($k)": 70,
+                        "Spending Score": 5
+                    },
+                    {
+                        "Income ($k)": 71,
+                        "Spending Score": 14
+                    },
+                    {
+                        "Income ($k)": 72,
+                        "Spending Score": 8
+                    },
+                    {
+                        "Income ($k)": 88,
+                        "Spending Score": 39
+                    },
+                    {
+                        "Income ($k)": 89,
+                        "Spending Score": 48
+                    }
+                ]
+            },
+            "parameters": {
+                "K": 3,
+                "max_iterations": 100,
+                "initialization": "k-means++"
+            },
+            "output": {
+                "clusters": [
+                    {
+                        "cluster_id": 0,
+                        "centroid": [
+                            18.2,
+                            59.4
+                        ],
+                        "size": 5,
+                        "label": "Low Income, High Spending"
+                    },
+                    {
+                        "cluster_id": 1,
+                        "centroid": [
+                            48.7,
+                            80.7
+                        ],
+                        "size": 4,
+                        "label": "Medium Income, High Spending"
+                    },
+                    {
+                        "cluster_id": 2,
+                        "centroid": [
+                            75.3,
+                            18.5
+                        ],
+                        "size": 6,
+                        "label": "High Income, Low Spending"
+                    }
+                ],
+                "inertia": 12847.5,
+                "iterations": 8
+            },
+            "visualization": "Scatter plot with points colored by cluster. Centroids marked with large X symbols. Clear separation between three customer segments."
+        },
+        "interpretation": {
+            "title": "Interpreting the Output",
+            "clusters": {
+                "Cluster 0": "Low-income customers who spend a lot (young professionals, credit users). Target with affordable premium products.",
+                "Cluster 1": "Medium-income high spenders (established professionals). Target with mid-range quality products.",
+                "Cluster 2": "High-income low spenders (wealthy savers). Target with exclusive, high-value products."
+            },
+            "centroids": "Each centroid represents the 'average' customer in that segment. Use these to characterize each group and tailor marketing strategies.",
+            "inertia": "12,847.5 is the total within-cluster variance. Lower is better, but too low might mean overfitting (too many clusters).",
+            "clusterSize": "Cluster sizes (5, 4, 6) are relatively balanced. Highly imbalanced clusters might indicate poor K choice or outliers.",
+            "businessInsights": [
+                "**Cluster 0**: Young spenders—offer credit options, trendy products",
+                "**Cluster 1**: Quality seekers—emphasize value and reliability",
+                "**Cluster 2**: Luxury segment—focus on exclusivity and prestige"
+            ],
+            "commonMisinterpretations": [
+                "❌ WRONG: 'Clusters are fixed categories' → ✓ RIGHT: 'Clusters are data-driven groupings that may change with new data'",
+                "❌ WRONG: 'All points in a cluster are identical' → ✓ RIGHT: 'Points in a cluster are similar but not identical'",
+                "❌ WRONG: 'K-Means finds the true groups' → ✓ RIGHT: 'K-Means finds one possible grouping based on distance'"
+            ]
+        },
+        "implementation_scratch": {
+            "title": "Python Implementation (From Scratch)",
+            "description": "Building K-Means using only NumPy to understand the algorithm.",
+            "code": "import numpy as np\nimport matplotlib.pyplot as plt\n\nclass KMeansFromScratch:\n    \"\"\"K-Means clustering implemented from scratch.\"\"\"\n    \n    def __init__(self, n_clusters=3, max_iters=100, random_state=42):\n        self.n_clusters = n_clusters\n        self.max_iters = max_iters\n        self.random_state = random_state\n        self.centroids = None\n        self.labels = None\n        self.inertia = None\n    \n    def fit(self, X):\n        \"\"\"Fit K-Means to data X.\"\"\"\n        np.random.seed(self.random_state)\n        \n        # Step 1: Initialize centroids randomly\n        # Pick K random points from data as initial centroids\n        random_indices = np.random.choice(len(X), self.n_clusters, replace=False)\n        self.centroids = X[random_indices].copy()\n        \n        # Iterate until convergence or max iterations\n        for iteration in range(self.max_iters):\n            # Step 2: Assignment - assign each point to nearest centroid\n            self.labels = self._assign_clusters(X)\n            \n            # Step 3: Update - recalculate centroids\n            new_centroids = self._update_centroids(X)\n            \n            # Check for convergence (centroids don't change)\n            if np.allclose(self.centroids, new_centroids):\n                print(f'Converged at iteration {iteration + 1}')\n                break\n            \n            self.centroids = new_centroids\n        \n        # Calculate final inertia (within-cluster sum of squares)\n        self.inertia = self._calculate_inertia(X)\n        \n        return self\n    \n    def _assign_clusters(self, X):\n        \"\"\"Assign each point to the nearest centroid.\"\"\"\n        # Calculate distance from each point to each centroid\n        distances = np.zeros((len(X), self.n_clusters))\n        \n        for k in range(self.n_clusters):\n            # Euclidean distance: sqrt(sum((x - centroid)^2))\n            distances[:, k] = np.sqrt(np.sum((X - self.centroids[k]) ** 2, axis=1))\n        \n        # Assign to nearest centroid (minimum distance)\n        return np.argmin(distances, axis=1)\n    \n    def _update_centroids(self, X):\n        \"\"\"Update centroids as mean of assigned points.\"\"\"\n        new_centroids = np.zeros((self.n_clusters, X.shape[1]))\n        \n        for k in range(self.n_clusters):\n            # Find all points assigned to cluster k\n            cluster_points = X[self.labels == k]\n            \n            if len(cluster_points) > 0:\n                # Centroid = mean of all points in cluster\n                new_centroids[k] = cluster_points.mean(axis=0)\n            else:\n                # If cluster is empty, keep old centroid\n                new_centroids[k] = self.centroids[k]\n        \n        return new_centroids\n    \n    def _calculate_inertia(self, X):\n        \"\"\"Calculate within-cluster sum of squares.\"\"\"\n        inertia = 0\n        for k in range(self.n_clusters):\n            cluster_points = X[self.labels == k]\n            if len(cluster_points) > 0:\n                # Sum of squared distances to centroid\n                inertia += np.sum((cluster_points - self.centroids[k]) ** 2)\n        return inertia\n    \n    def predict(self, X):\n        \"\"\"Predict cluster for new data.\"\"\"\n        return self._assign_clusters(X)\n\n# Example usage\nif __name__ == '__main__':\n    # Generate sample data: 3 clusters\n    np.random.seed(42)\n    cluster1 = np.random.randn(50, 2) + [2, 2]\n    cluster2 = np.random.randn(50, 2) + [8, 2]\n    cluster3 = np.random.randn(50, 2) + [5, 8]\n    X = np.vstack([cluster1, cluster2, cluster3])\n    \n    # Fit K-Means\n    kmeans = KMeansFromScratch(n_clusters=3, max_iters=100)\n    kmeans.fit(X)\n    \n    # Results\n    print(f'\\nFinal Inertia: {kmeans.inertia:.2f}')\n    print(f'\\nCentroids:')\n    for i, centroid in enumerate(kmeans.centroids):\n        print(f'  Cluster {i}: {centroid}')\n    \n    # Visualize\n    plt.figure(figsize=(10, 6))\n    plt.scatter(X[:, 0], X[:, 1], c=kmeans.labels, cmap='viridis', alpha=0.6)\n    plt.scatter(kmeans.centroids[:, 0], kmeans.centroids[:, 1], \n                c='red', marker='X', s=200, edgecolors='black', linewidths=2)\n    plt.title('K-Means Clustering (From Scratch)')\n    plt.xlabel('Feature 1')\n    plt.ylabel('Feature 2')\n    plt.colorbar(label='Cluster')\n    plt.show()",
+            "explanation": "This implementation shows the core K-Means algorithm: initialize centroids, assign points to nearest centroid, update centroids, repeat until convergence. The _assign_clusters() method calculates distances, _update_centroids() computes means, and _calculate_inertia() measures cluster quality."
+        },
+        "implementation_api": {
+            "title": "Python Implementation (Using scikit-learn)",
+            "description": "Using scikit-learn for production-ready K-Means clustering.",
+            "code": "import numpy as np\nimport pandas as pd\nfrom sklearn.cluster import KMeans\nfrom sklearn.preprocessing import StandardScaler\nfrom sklearn.metrics import silhouette_score, davies_bouldin_score\nimport matplotlib.pyplot as plt\n\n# Sample data: Customer segmentation\ndata = {\n    'Income': [15, 16, 17, 18, 19, 42, 43, 44, 54, 55, 70, 71, 72, 88, 89],\n    'Spending': [39, 81, 6, 77, 40, 76, 94, 72, 35, 92, 5, 14, 8, 39, 48]\n}\ndf = pd.DataFrame(data)\nX = df.values\n\n# Optional: Standardize features (recommended)\nscaler = StandardScaler()\nX_scaled = scaler.fit_transform(X)\n\n# Create and fit K-Means model\nkmeans = KMeans(\n    n_clusters=3,           # Number of clusters\n    init='k-means++',       # Smart initialization\n    n_init=10,              # Number of times to run with different seeds\n    max_iter=300,           # Maximum iterations\n    random_state=42         # For reproducibility\n)\n\nkmeans.fit(X_scaled)\n\n# Get results\nlabels = kmeans.labels_\ncentroids = scaler.inverse_transform(kmeans.cluster_centers_)  # Back to original scale\ninertia = kmeans.inertia_\n\n# Add cluster labels to dataframe\ndf['Cluster'] = labels\n\nprint('Cluster Assignments:')\nprint(df)\nprint(f'\\nCentroids (original scale):')\nfor i, centroid in enumerate(centroids):\n    print(f'  Cluster {i}: Income=${centroid[0]:.1f}k, Spending={centroid[1]:.1f}')\nprint(f'\\nInertia: {inertia:.2f}')\n\n# Evaluate clustering quality\nsilhouette = silhouette_score(X_scaled, labels)\ndavies_bouldin = davies_bouldin_score(X_scaled, labels)\n\nprint(f'\\nClustering Quality:')\nprint(f'  Silhouette Score: {silhouette:.3f} (higher is better, range: -1 to 1)')\nprint(f'  Davies-Bouldin Index: {davies_bouldin:.3f} (lower is better)')\n\n# Visualize clusters\nplt.figure(figsize=(10, 6))\nscatter = plt.scatter(df['Income'], df['Spending'], c=labels, \n                     cmap='viridis', s=100, alpha=0.6, edgecolors='black')\nplt.scatter(centroids[:, 0], centroids[:, 1], c='red', marker='X', \n           s=300, edgecolors='black', linewidths=2, label='Centroids')\nplt.xlabel('Annual Income ($k)')\nplt.ylabel('Spending Score')\nplt.title('Customer Segmentation with K-Means')\nplt.colorbar(scatter, label='Cluster')\nplt.legend()\nplt.grid(True, alpha=0.3)\nplt.show()\n\n# Elbow method to find optimal K\ninertias = []\nK_range = range(1, 10)\nfor k in K_range:\n    km = KMeans(n_clusters=k, random_state=42)\n    km.fit(X_scaled)\n    inertias.append(km.inertia_)\n\nplt.figure(figsize=(8, 5))\nplt.plot(K_range, inertias, 'bo-')\nplt.xlabel('Number of Clusters (K)')\nplt.ylabel('Inertia')\nplt.title('Elbow Method for Optimal K')\nplt.grid(True)\nplt.show()",
+            "comparison": "Scikit-learn's KMeans is highly optimized with smart initialization (k-means++), parallel processing, and efficient algorithms. It handles edge cases automatically and provides additional features like multiple initializations to avoid local optima."
+        },
+        "evaluation": {
+            "title": "Model Evaluation",
+            "why": "Unlike supervised learning, clustering has no ground truth labels. We need metrics to assess cluster quality: compactness (points close to centroid) and separation (clusters far apart).",
+            "metrics": [
+                {
+                    "name": "Inertia (Within-Cluster Sum of Squares)",
+                    "formula": "WCSS = Σ Σ ||x - μᵢ||²",
+                    "interpretation": "Sum of squared distances within clusters. Lower is better, but decreases with more clusters. Use elbow method to find optimal K.",
+                    "example": "Inertia = 12,847 → Average point is ~113 units from its centroid"
+                },
+                {
+                    "name": "Silhouette Score",
+                    "formula": "s = (b - a) / max(a, b)",
+                    "interpretation": "Measures how similar a point is to its cluster vs other clusters. Range: -1 to 1. >0.5 is good, >0.7 is excellent.",
+                    "example": "Silhouette = 0.65 → Clusters are well-separated and compact"
+                },
+                {
+                    "name": "Davies-Bouldin Index",
+                    "formula": "DB = (1/K) Σ max((σᵢ + σⱼ) / d(cᵢ, cⱼ))",
+                    "interpretation": "Ratio of within-cluster to between-cluster distances. Lower is better. <1 is good.",
+                    "example": "DB = 0.8 → Good separation between clusters"
+                },
+                {
+                    "name": "Calinski-Harabasz Index",
+                    "formula": "CH = (SSB / (K-1)) / (SSW / (N-K))",
+                    "interpretation": "Ratio of between-cluster to within-cluster variance. Higher is better.",
+                    "example": "CH = 450 → Well-defined clusters"
+                }
+            ],
+            "elbowMethod": {
+                "description": "Plot inertia vs K. Look for 'elbow' where inertia decrease slows. That's optimal K.",
+                "steps": [
+                    "1. Run K-Means for K = 1, 2, 3, ..., 10",
+                    "2. Plot K vs Inertia",
+                    "3. Find the 'elbow' point where curve bends",
+                    "4. Choose K at the elbow"
+                ]
+            }
+        },
+        "performance_interpretation": {
+            "title": "Interpreting Model Performance",
+            "whatIsGood": {
+                "Silhouette Score": ">0.5 is good, >0.7 is excellent",
+                "Davies-Bouldin": "<1 is good, <0.5 is excellent",
+                "Inertia": "Low relative to data scale, but use elbow method"
+            },
+            "whenModelFails": [
+                "**Non-spherical clusters**: K-Means assumes spherical clusters. Use DBSCAN for arbitrary shapes.",
+                "**Different cluster sizes**: K-Means prefers equal-sized clusters. Use Gaussian Mixture Models.",
+                "**Different densities**: K-Means struggles with varying densities. Use DBSCAN or hierarchical clustering.",
+                "**Outliers**: Outliers pull centroids away. Remove outliers or use robust clustering methods."
+            ],
+            "choosingK": {
+                "Elbow Method": "Plot inertia vs K, choose elbow point",
+                "Silhouette Analysis": "Choose K with highest average silhouette score",
+                "Domain Knowledge": "Use business understanding (e.g., 3 customer tiers)",
+                "Gap Statistic": "Compare inertia to random data"
+            },
+            "convergenceIssues": [
+                "**Slow convergence**: Increase max_iter or use better initialization",
+                "**Local optima**: Use k-means++ initialization or multiple runs (n_init)",
+                "**Empty clusters**: Reinitialize or reduce K"
+            ]
+        },
+        "improvements": {
+            "title": "Ways to Improve Model Performance",
+            "featureEngineering": [
+                "**Feature scaling**: Standardize features to equal importance (StandardScaler)",
+                "**Feature selection**: Remove irrelevant features that add noise",
+                "**Dimensionality reduction**: Use PCA before clustering for high-dimensional data",
+                "**Feature transformation**: Log transform skewed features"
+            ],
+            "hyperparameterTuning": [
+                "**K (n_clusters)**: Use elbow method, silhouette analysis, or domain knowledge",
+                "**Initialization (init)**: Use 'k-means++' for better starting centroids",
+                "**n_init**: Run multiple times (10-50) to avoid local optima",
+                "**max_iter**: Increase if not converging (default 300 usually sufficient)"
+            ],
+            "dataPreprocessing": [
+                "**Remove outliers**: Use IQR or Z-score to detect and remove outliers",
+                "**Handle missing values**: Impute or remove incomplete records",
+                "**Normalize features**: Use StandardScaler or MinMaxScaler",
+                "**Balance features**: Ensure features have similar scales"
+            ],
+            "algorithmAlternatives": [
+                "**K-Means++**: Better initialization (already default in scikit-learn)",
+                "**Mini-Batch K-Means**: Faster for large datasets, slight accuracy trade-off",
+                "**Gaussian Mixture Models**: Soft clustering, handles elliptical clusters",
+                "**DBSCAN**: Density-based, finds arbitrary shapes, handles outliers",
+                "**Hierarchical Clustering**: No need to specify K, creates dendrogram"
+            ],
+            "advancedTechniques": [
+                "**Ensemble clustering**: Combine multiple K-Means runs",
+                "**Constrained K-Means**: Add must-link/cannot-link constraints",
+                "**Kernel K-Means**: Handle non-linear separability",
+                "**Fuzzy C-Means**: Soft cluster assignments"
+            ]
+        }
+    }
+}
