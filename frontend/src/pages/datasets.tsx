@@ -6,6 +6,29 @@ import dynamic from 'next/dynamic';
 const Bar = dynamic(() => import('react-chartjs-2').then(mod => mod.Bar), { ssr: false });
 const Scatter = dynamic(() => import('react-chartjs-2').then(mod => mod.Scatter), { ssr: false });
 
+// Type definitions
+interface Statistics {
+    mean: number;
+    std: number;
+    min: number;
+    max: number;
+}
+
+interface Dataset {
+    name: string;
+    description: string;
+    source: string;
+    task: string;
+    samples: number;
+    features: number;
+    classes: number;
+    featureNames: string[];
+    targetNames: string[];
+    statistics: Record<string, Statistics>;
+    correlations: [string, string, number][];
+    useCases: string[];
+}
+
 const DatasetsPage: React.FC = () => {
     const [selectedDataset, setSelectedDataset] = useState('iris');
     const [view, setView] = useState('overview');
@@ -17,7 +40,7 @@ const DatasetsPage: React.FC = () => {
     }, []);
 
     // Dataset information
-    const datasets = {
+    const datasets: Record<string, Dataset> = {
         iris: {
             name: 'Iris Flower Dataset',
             description: 'Classic dataset containing 150 samples of iris flowers from 3 species (Setosa, Versicolor, Virginica). Each sample has 4 features: sepal length, sepal width, petal length, and petal width.',
@@ -35,9 +58,9 @@ const DatasetsPage: React.FC = () => {
                 petal_width: { mean: 1.20, std: 0.76, min: 0.1, max: 2.5 }
             },
             correlations: [
-                ['sepal_length', 'petal_length', 0.87],
-                ['sepal_length', 'petal_width', 0.82],
-                ['petal_length', 'petal_width', 0.96]
+                ['sepal_length', 'petal_length', 0.87] as [string, string, number],
+                ['sepal_length', 'petal_width', 0.82] as [string, string, number],
+                ['petal_length', 'petal_width', 0.96] as [string, string, number]
             ],
             useCases: [
                 'Classification algorithm comparison',
@@ -63,9 +86,9 @@ const DatasetsPage: React.FC = () => {
                 flavanoids: { mean: 2.03, std: 1.00, min: 0.34, max: 5.08 }
             },
             correlations: [
-                ['alcohol', 'phenols', 0.29],
-                ['flavanoids', 'phenols', 0.86],
-                ['alcohol', 'proline', 0.64]
+                ['alcohol', 'phenols', 0.29] as [string, string, number],
+                ['flavanoids', 'phenols', 0.86] as [string, string, number],
+                ['alcohol', 'proline', 0.64] as [string, string, number]
             ],
             useCases: [
                 'Quality prediction models',
@@ -270,20 +293,20 @@ print(f"Classes: {data.target_names}")`}</code>
                                 <h3 className="text-2xl font-bold text-gray-900 mb-4">🔗 Feature Correlations</h3>
                                 <div className="space-y-4">
                                     {currentDataset.correlations.map(([feat1, feat2, corr], idx) => {
-                                        const strength = Math.abs(Number(corr));
-                                        const type = Number(corr) > 0 ? 'Positive' : 'Negative';
-                                        const color = Number(corr) > 0 ? 'blue' : 'red';
-                                        const bgColor = Number(corr) > 0 ? 'bg-blue-50' : 'bg-red-50';
+                                        const strength = Math.abs(corr);
+                                        const type = corr > 0 ? 'Positive' : 'Negative';
+                                        const color = corr > 0 ? 'blue' : 'red';
+                                        const bgColor = corr > 0 ? 'bg-blue-50' : 'bg-red-50';
 
                                         return (
                                             <div key={idx} className={`${bgColor} p-4 rounded-lg border-2 border-${color}-200`}>
                                                 <div className="flex justify-between items-center">
                                                     <div>
                                                         <div className="font-bold text-gray-900">
-                                                            {String(feat1).replace(/_/g, ' ')} ↔ {String(feat2).replace(/_/g, ' ')}
+                                                            {feat1.replace(/_/g, ' ')} ↔ {feat2.replace(/_/g, ' ')}
                                                         </div>
                                                         <div className={`text-sm text-${color}-700 mt-1`}>
-                                                            {type} Correlation: {Number(corr).toFixed(3)}
+                                                            {type} Correlation: {corr.toFixed(3)}
                                                         </div>
                                                     </div>
                                                     <div className={`text-3xl font-bold text-${color}-600`}>
