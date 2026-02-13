@@ -119,6 +119,7 @@ const DatasetsPage: React.FC = () => {
                         <nav className="space-x-6">
                             <Link href="/" className="text-gray-700 hover:text-blue-600">Home</Link>
                             <Link href="/datasets" className="text-blue-600 font-semibold">Datasets</Link>
+                            <Link href="/eda" className="text-gray-700 hover:text-blue-600">EDA</Link>
                             <Link href="/instructor" className="text-gray-700 hover:text-blue-600">Instructor</Link>
                         </nav>
                     </div>
