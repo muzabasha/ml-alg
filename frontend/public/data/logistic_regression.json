@@ -58,71 +58,7 @@
             },
             "intuition": "The sigmoid function is like a smooth step: very negative inputs → probability near 0; very positive inputs → probability near 1. The model learns weights that push correct examples toward their true class."
         },
-        "sample_io": {
-            "title": "Sample Input & Output",
-            "description": "Predicting whether a student passes an exam based on hours studied.",
-            "input": {
-                "format": "Features and binary labels",
-                "table": [
-                    {
-                        "Hours Studied": 1,
-                        "Passed": 0
-                    },
-                    {
-                        "Hours Studied": 2,
-                        "Passed": 0
-                    },
-                    {
-                        "Hours Studied": 3,
-                        "Passed": 0
-                    },
-                    {
-                        "Hours Studied": 4,
-                        "Passed": 1
-                    },
-                    {
-                        "Hours Studied": 5,
-                        "Passed": 1
-                    },
-                    {
-                        "Hours Studied": 6,
-                        "Passed": 1
-                    }
-                ]
-            },
-            "output": {
-                "parameters": {
-                    "θ₀ (intercept)": -3.5,
-                    "θ₁ (weight)": 1.2
-                },
-                "predictions": [
-                    {
-                        "Hours": 1,
-                        "Probability": 0.05,
-                        "Predicted Class": 0,
-                        "Actual": 0
-                    },
-                    {
-                        "Hours": 3,
-                        "Probability": 0.27,
-                        "Predicted Class": 0,
-                        "Actual": 0
-                    },
-                    {
-                        "Hours": 5,
-                        "Probability": 0.82,
-                        "Predicted Class": 1,
-                        "Actual": 1
-                    }
-                ],
-                "metrics": {
-                    "Accuracy": 0.95,
-                    "Precision": 0.93,
-                    "Recall": 0.97
-                }
-            },
-            "visualization": "Scatter plot with pass/fail points. S-shaped sigmoid curve shows decision boundary."
-        },
+        "sample_io": "**Sample Input & Output**\n\nLet's predict whether a student passes an exam based on hours studied.\n\n**Input Data:**\n\nHours Studied | Passed (0=No, 1=Yes)\n------------- | --------------------\n1             | 0\n2             | 0\n3             | 0\n4             | 1\n5             | 1\n6             | 1\n\n**Model Training:**\n\nThe algorithm learns the relationship between study hours and passing probability using the sigmoid function to map inputs to probabilities between 0 and 1.\n\n**Learned Parameters:**\n• θ₀ (intercept) = -3.5\n• θ₁ (weight) = 1.2\n\nThis means: Probability = σ(-3.5 + 1.2 × Hours)\nwhere σ is the sigmoid function: σ(z) = 1 / (1 + e^(-z))\n\n**Predictions:**\n\nHours | Probability | Predicted Class | Actual Class\n----- | ----------- | --------------- | ------------\n1     | 0.05 (5%)   | 0 (Fail)        | 0 (Fail)\n2     | 0.12 (12%)  | 0 (Fail)        | 0 (Fail)\n3     | 0.27 (27%)  | 0 (Fail)        | 0 (Fail)\n4     | 0.50 (50%)  | 1 (Pass)        | 1 (Pass)\n5     | 0.82 (82%)  | 1 (Pass)        | 1 (Pass)\n6     | 0.95 (95%)  | 1 (Pass)        | 1 (Pass)\n\n**Performance Metrics:**\n• Accuracy: 95% (correctly classified 95% of students)\n• Precision: 93% (of students predicted to pass, 93% actually passed)\n• Recall: 97% (of students who passed, 97% were correctly identified)\n\n**Interpretation:**\n✓ Decision boundary is at ~3.5 hours (50% probability)\n✓ Students studying < 3.5 hours are predicted to fail\n✓ Students studying > 3.5 hours are predicted to pass\n✓ The model is 95% accurate overall\n\n**Example Predictions:**\n• 2 hours studied → 12% probability of passing → Predicted: Fail\n• 4 hours studied → 50% probability of passing → Predicted: Pass (borderline)\n• 6 hours studied → 95% probability of passing → Predicted: Pass (confident)\n\n**Visualization:**\nA scatter plot would show fail points (0) clustered on the left and pass points (1) on the right, with an S-shaped sigmoid curve showing the smooth transition from fail to pass probability as study hours increase.",
         "implementation_scratch": {
             "title": "Python Implementation (From Scratch)",
             "description": "Building Logistic Regression using only NumPy.",
