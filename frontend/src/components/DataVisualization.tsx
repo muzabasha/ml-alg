@@ -27,6 +27,7 @@ ChartJS.register(
     ScatterController
 );
 
+// Data visualization component for algorithm sample I/O
 interface DataPoint {
     x: number;
     y: number;
