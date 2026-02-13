@@ -16,6 +16,18 @@ const DataVisualization = dynamic(() => import('../../components/DataVisualizati
     )
 });
 
+// Dynamic import for Enhanced Sample I/O
+const EnhancedSampleIO = dynamic(() => import('../../components/EnhancedSampleIO'), {
+    ssr: false,
+    loading: () => (
+        <div className="my-6 p-6 bg-white rounded-xl shadow-lg">
+            <div className="flex items-center justify-center h-32">
+                <span className="text-gray-600 animate-pulse">Loading sample data...</span>
+            </div>
+        </div>
+    )
+});
+
 // Dynamic import for Neural Network Playground
 const NeuralNetworkPlayground = dynamic(() => import('../../components/NeuralNetworkPlayground'), {
     ssr: false,
@@ -27,7 +39,6 @@ const NeuralNetworkPlayground = dynamic(() => import('../../components/NeuralNet
         </div>
     )
 });
-
 // Dynamic import for ML Playground
 const MLPlayground = dynamic(() => import('../../components/MLPlayground'), {
     ssr: false,
@@ -398,11 +409,19 @@ const SectionRenderer = ({ sectionKey, content }: { sectionKey: string; content:
 
     return (
         <div className="space-y-6">
-            {/* Add visualization for sample input/output sections */}
-            {(sectionKey === 'sample_io' || sectionKey === 'sample_input_output') && content && (
-                <DataVisualization data={content} algorithmType={sectionKey} />
+            {/* Use Enhanced Sample I/O for sample input/output sections */}
+            {(sectionKey === 'sample_io' || sectionKey === 'sample_input_output') && content ? (
+                <>
+                    <EnhancedSampleIO
+                        content={content}
+                        icon={style.icon}
+                        accent={style.accent}
+                    />
+                    <DataVisualization data={content} algorithmType={sectionKey} />
+                </>
+            ) : (
+                renderContent(content)
             )}
-            {renderContent(content)}
         </div>
     );
 };
