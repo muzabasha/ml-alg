@@ -41,9 +41,13 @@ interface VisualizationProps {
 const DataVisualization: React.FC<VisualizationProps> = ({ data, algorithmType }) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const chartRef = useRef<ChartJS | null>(null);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        if (!canvasRef.current || !data) return;
+        if (!canvasRef.current || !data) {
+            setError('No data available for visualization');
+            return;
+        }
 
         // Destroy existing chart
         if (chartRef.current) {
@@ -51,15 +55,27 @@ const DataVisualization: React.FC<VisualizationProps> = ({ data, algorithmType }
         }
 
         const ctx = canvasRef.current.getContext('2d');
-        if (!ctx) return;
+        if (!ctx) {
+            setError('Unable to get canvas context');
+            return;
+        }
 
-        // Parse data based on structure
-        const chartData = parseDataForVisualization(data, algorithmType);
+        try {
+            // Parse data based on structure
+            const chartData = parseDataForVisualization(data, algorithmType);
 
-        if (!chartData) return;
+            if (!chartData) {
+                setError('Unable to parse data for visualization');
+                return;
+            }
 
-        // Create new chart
-        chartRef.current = new ChartJS(ctx, chartData);
+            // Create new chart
+            chartRef.current = new ChartJS(ctx, chartData);
+            setError(null);
+        } catch (err) {
+            console.error('Chart creation error:', err);
+            setError('Failed to create visualization');
+        }
 
         return () => {
             if (chartRef.current) {
@@ -67,6 +83,18 @@ const DataVisualization: React.FC<VisualizationProps> = ({ data, algorithmType }
             }
         };
     }, [data, algorithmType]);
+
+    if (error) {
+        return (
+            <div className="my-6 p-6 bg-yellow-50 rounded-xl border-2 border-yellow-200">
+                <div className="flex items-center gap-2 mb-2">
+                    <span className="text-2xl">⚠️</span>
+                    <h4 className="text-xl font-bold text-yellow-700">Visualization Unavailable</h4>
+                </div>
+                <p className="text-yellow-800">{error}</p>
+            </div>
+        );
+    }
 
     return (
         <div className="my-6 p-6 bg-white rounded-xl shadow-lg border-2 border-green-200">
@@ -82,178 +110,206 @@ const DataVisualization: React.FC<VisualizationProps> = ({ data, algorithmType }
 };
 
 function parseDataForVisualization(data: any, algorithmType: string): any {
-    // Handle different data structures
-    if (data.input && data.input.table && Array.isArray(data.input.table)) {
-        return createScatterPlotWithLine(data.input.table, data.output);
-    }
+    try {
+        // Handle different data structures
+        if (data && data.input && data.input.table && Array.isArray(data.input.table) && data.input.table.length > 0) {
+            return createScatterPlotWithLine(data.input.table, data.output);
+        }
 
-    if (data.table && Array.isArray(data.table)) {
-        return createScatterPlotWithLine(data.table, null);
-    }
+        if (data && data.table && Array.isArray(data.table) && data.table.length > 0) {
+            return createScatterPlotWithLine(data.table, null);
+        }
 
-    return null;
+        return null;
+    } catch (error) {
+        console.error('Error parsing data for visualization:', error);
+        return null;
+    }
 }
 
 function createScatterPlotWithLine(tableData: any[], outputData: any): any {
-    // Extract x and y values from table
-    const keys = Object.keys(tableData[0]);
-    const xKey = keys[0]; // First column as X
-    const yKey = keys[1]; // Second column as Y
-
-    const dataPoints = tableData.map(row => ({
-        x: row[xKey],
-        y: row[yKey]
-    }));
-
-    // Prepare datasets
-    const datasets: any[] = [
-        {
-            label: 'Actual Data',
-            data: dataPoints,
-            backgroundColor: 'rgba(59, 130, 246, 0.8)',
-            borderColor: 'rgba(59, 130, 246, 1)',
-            borderWidth: 2,
-            pointRadius: 8,
-            pointHoverRadius: 10,
-            type: 'scatter'
+    try {
+        // Validate input
+        if (!tableData || !Array.isArray(tableData) || tableData.length === 0) {
+            return null;
         }
-    ];
 
-    // Add prediction line if output data exists
-    if (outputData && outputData.predictions) {
-        const predictionPoints = outputData.predictions.map((pred: any) => ({
-            x: pred[xKey] || pred['Square Feet'],
-            y: pred['Predicted Price'] || pred.predicted
+        // Extract x and y values from table
+        const keys = Object.keys(tableData[0] || {});
+        if (keys.length < 2) {
+            return null;
+        }
+
+        const xKey = keys[0]; // First column as X
+        const yKey = keys[1]; // Second column as Y
+
+        const dataPoints = tableData.map(row => ({
+            x: Number(row[xKey]) || 0,
+            y: Number(row[yKey]) || 0
         }));
 
-        datasets.push({
-            label: 'Predictions',
-            data: predictionPoints,
-            backgroundColor: 'rgba(239, 68, 68, 0.2)',
-            borderColor: 'rgba(239, 68, 68, 1)',
-            borderWidth: 3,
-            pointRadius: 6,
-            pointHoverRadius: 8,
-            type: 'scatter',
-            pointStyle: 'triangle'
-        });
+        // Prepare datasets
+        const datasets: any[] = [
+            {
+                label: 'Actual Data',
+                data: dataPoints,
+                backgroundColor: 'rgba(59, 130, 246, 0.8)',
+                borderColor: 'rgba(59, 130, 246, 1)',
+                borderWidth: 2,
+                pointRadius: 8,
+                pointHoverRadius: 10,
+                type: 'scatter'
+            }
+        ];
 
-        // Add fitted line
-        const sortedPoints = [...predictionPoints].sort((a, b) => a.x - b.x);
-        datasets.push({
-            label: 'Fitted Line',
-            data: sortedPoints,
-            backgroundColor: 'rgba(239, 68, 68, 0.1)',
-            borderColor: 'rgba(239, 68, 68, 0.8)',
-            borderWidth: 2,
-            fill: false,
-            type: 'line',
-            pointRadius: 0,
-            tension: 0.1
-        });
-    }
+        // Add prediction line if output data exists
+        if (outputData && outputData.predictions && Array.isArray(outputData.predictions) && outputData.predictions.length > 0) {
+            // Try to find matching keys in predictions
+            const predKeys = Object.keys(outputData.predictions[0] || {});
+            const predXKey = predKeys.find(k => k.toLowerCase().includes('square') || k.toLowerCase().includes('hours') || k.toLowerCase().includes('hour')) || predKeys[0];
+            const predYKey = predKeys.find(k => k.toLowerCase().includes('predicted')) || predKeys[1];
 
-    return {
-        type: 'scatter',
-        data: { datasets },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: true,
-                    position: 'top' as const,
-                    labels: {
-                        font: {
-                            size: 14,
-                            weight: 'bold'
-                        },
-                        padding: 15,
-                        usePointStyle: true
-                    }
-                },
-                title: {
-                    display: true,
-                    text: `${xKey} vs ${yKey}`,
-                    font: {
-                        size: 18,
-                        weight: 'bold'
-                    },
-                    padding: 20,
-                    color: '#1f2937'
-                },
-                tooltip: {
-                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                    padding: 12,
-                    titleFont: {
-                        size: 14,
-                        weight: 'bold'
-                    },
-                    bodyFont: {
-                        size: 13
-                    },
-                    callbacks: {
-                        label: function (context: any) {
-                            const label = context.dataset.label || '';
-                            const x = context.parsed.x;
-                            const y = context.parsed.y;
-                            return `${label}: (${x.toLocaleString()}, ${y.toLocaleString()})`;
-                        }
-                    }
+            if (predXKey && predYKey) {
+                const predictionPoints = outputData.predictions.map((pred: any) => ({
+                    x: Number(pred[predXKey]) || 0,
+                    y: Number(pred[predYKey]) || 0
+                })).filter((p: any) => !isNaN(p.x) && !isNaN(p.y));
+
+                if (predictionPoints.length > 0) {
+                    datasets.push({
+                        label: 'Predictions',
+                        data: predictionPoints,
+                        backgroundColor: 'rgba(239, 68, 68, 0.2)',
+                        borderColor: 'rgba(239, 68, 68, 1)',
+                        borderWidth: 3,
+                        pointRadius: 6,
+                        pointHoverRadius: 8,
+                        type: 'scatter',
+                        pointStyle: 'triangle'
+                    });
+
+                    // Add fitted line
+                    const sortedPoints = [...predictionPoints].sort((a, b) => a.x - b.x);
+                    datasets.push({
+                        label: 'Fitted Line',
+                        data: sortedPoints,
+                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                        borderColor: 'rgba(239, 68, 68, 0.8)',
+                        borderWidth: 2,
+                        fill: false,
+                        type: 'line',
+                        pointRadius: 0,
+                        tension: 0.1
+                    });
                 }
-            },
-            scales: {
-                x: {
-                    type: 'linear',
-                    position: 'bottom',
-                    title: {
-                        display: true,
-                        text: xKey,
-                        font: {
-                            size: 14,
-                            weight: 'bold'
-                        },
-                        color: '#4b5563'
-                    },
-                    grid: {
-                        color: 'rgba(0, 0, 0, 0.05)'
-                    },
-                    ticks: {
-                        font: {
-                            size: 12
-                        }
-                    }
-                },
-                y: {
-                    type: 'linear',
-                    title: {
-                        display: true,
-                        text: yKey,
-                        font: {
-                            size: 14,
-                            weight: 'bold'
-                        },
-                        color: '#4b5563'
-                    },
-                    grid: {
-                        color: 'rgba(0, 0, 0, 0.05)'
-                    },
-                    ticks: {
-                        font: {
-                            size: 12
-                        },
-                        callback: function (value: any) {
-                            return value.toLocaleString();
-                        }
-                    }
-                }
-            },
-            interaction: {
-                mode: 'nearest' as const,
-                intersect: false
             }
         }
-    };
+
+        return {
+            type: 'scatter',
+            data: { datasets },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top' as const,
+                        labels: {
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            },
+                            padding: 15,
+                            usePointStyle: true
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: `${xKey} vs ${yKey}`,
+                        font: {
+                            size: 18,
+                            weight: 'bold'
+                        },
+                        padding: 20,
+                        color: '#1f2937'
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        padding: 12,
+                        titleFont: {
+                            size: 14,
+                            weight: 'bold'
+                        },
+                        bodyFont: {
+                            size: 13
+                        },
+                        callbacks: {
+                            label: function (context: any) {
+                                const label = context.dataset.label || '';
+                                const x = context.parsed.x;
+                                const y = context.parsed.y;
+                                return `${label}: (${x.toLocaleString()}, ${y.toLocaleString()})`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        type: 'linear',
+                        position: 'bottom',
+                        title: {
+                            display: true,
+                            text: xKey,
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            },
+                            color: '#4b5563'
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        },
+                        ticks: {
+                            font: {
+                                size: 12
+                            }
+                        }
+                    },
+                    y: {
+                        type: 'linear',
+                        title: {
+                            display: true,
+                            text: yKey,
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            },
+                            color: '#4b5563'
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        },
+                        ticks: {
+                            font: {
+                                size: 12
+                            },
+                            callback: function (value: any) {
+                                return value.toLocaleString();
+                            }
+                        }
+                    }
+                },
+                interaction: {
+                    mode: 'nearest' as const,
+                    intersect: false
+                }
+            }
+        };
+    } catch (error) {
+        console.error('Error creating scatter plot:', error);
+        return null;
+    }
 }
 
 export default DataVisualization;

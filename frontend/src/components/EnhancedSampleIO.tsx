@@ -19,7 +19,7 @@ const EnhancedSampleIO: React.FC<EnhancedSampleIOProps> = ({ content, icon, acce
         }
 
         // Check if content has input/output structure
-        const hasStructuredData = typeof content === 'object' && (content.input || content.output);
+        const hasStructuredData = typeof content === 'object' && content !== null && (content.input || content.output);
 
         if (!hasStructuredData) {
             // Fallback: display as text
@@ -74,7 +74,7 @@ const EnhancedSampleIO: React.FC<EnhancedSampleIOProps> = ({ content, icon, acce
                                         <table className="min-w-full divide-y divide-gray-200">
                                             <thead className="bg-gray-50">
                                                 <tr>
-                                                    {Object.keys(content.input.table[0]).map((key: string, idx: number) => (
+                                                    {Object.keys(content.input.table[0] || {}).map((key: string, idx: number) => (
                                                         <th key={idx} className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
                                                             {String(key)}
                                                         </th>
@@ -86,7 +86,7 @@ const EnhancedSampleIO: React.FC<EnhancedSampleIOProps> = ({ content, icon, acce
                                                     <tr key={idx} className="hover:bg-blue-50 transition">
                                                         {Object.values(row).map((value: any, vidx: number) => (
                                                             <td key={vidx} className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
-                                                                {typeof value === 'number' ? value.toLocaleString() : String(value)}
+                                                                {typeof value === 'number' ? value.toLocaleString() : String(value || '')}
                                                             </td>
                                                         ))}
                                                     </tr>
@@ -139,7 +139,7 @@ const EnhancedSampleIO: React.FC<EnhancedSampleIOProps> = ({ content, icon, acce
                                         <table className="min-w-full divide-y divide-gray-200">
                                             <thead className="bg-gray-50">
                                                 <tr>
-                                                    {Object.keys(content.output.predictions[0]).map((key: string, idx: number) => (
+                                                    {Object.keys(content.output.predictions[0] || {}).map((key: string, idx: number) => (
                                                         <th key={idx} className="px-3 py-2 text-left text-xs font-medium text-gray-700 uppercase">
                                                             {String(key)}
                                                         </th>
@@ -153,7 +153,7 @@ const EnhancedSampleIO: React.FC<EnhancedSampleIOProps> = ({ content, icon, acce
                                                             <td key={vidx} className="px-3 py-2 whitespace-nowrap text-sm text-gray-900">
                                                                 {typeof value === 'number' ?
                                                                     (value < 1 && value > 0 ? value.toFixed(2) : value.toLocaleString())
-                                                                    : String(value)}
+                                                                    : String(value || '')}
                                                             </td>
                                                         ))}
                                                     </tr>
