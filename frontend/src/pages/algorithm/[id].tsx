@@ -134,7 +134,7 @@ const LaTeXRenderer = ({ latex }: { latex: string }) => {
 };
 
 // Enhanced content renderer with section-specific styling and LaTeX support
-const SectionRenderer = ({ sectionKey, content }: { sectionKey: string; content: any }) => {
+const SectionRenderer = ({ sectionKey, content, algorithmId }: { sectionKey: string; content: any; algorithmId?: string }) => {
     const sectionStyles: Record<string, { bg: string; border: string; icon: string; accent: string }> = {
         introduction: {
             bg: 'bg-gradient-to-br from-blue-50 to-indigo-50',
@@ -417,7 +417,10 @@ const SectionRenderer = ({ sectionKey, content }: { sectionKey: string; content:
                         icon={style.icon}
                         accent={style.accent}
                     />
-                    <DataVisualization data={content} algorithmType={sectionKey} />
+                    {/* Only show DataVisualization for algorithms other than linear_regression and logistic_regression */}
+                    {algorithmId !== 'linear_regression' && algorithmId !== 'logistic_regression' && (
+                        <DataVisualization data={content} algorithmType={sectionKey} />
+                    )}
                 </>
             ) : (
                 renderContent(content)
@@ -618,6 +621,7 @@ const AlgorithmPage: React.FC = () => {
                                 <SectionRenderer
                                     sectionKey={activeSection}
                                     content={sections[activeSection]}
+                                    algorithmId={algorithmData.id}
                                 />
                             </div>
 
