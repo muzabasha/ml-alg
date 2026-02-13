@@ -7,12 +7,27 @@ interface EnhancedSampleIOProps {
 }
 
 const EnhancedSampleIO: React.FC<EnhancedSampleIOProps> = ({ content, icon, accent }) => {
-    // Add error boundary
+    // Safety check
+    if (!content) {
+        return (
+            <div className="bg-yellow-50 rounded-lg p-6 border border-yellow-200">
+                <p className="text-yellow-800">No sample data available.</p>
+            </div>
+        );
+    }
+
     try {
         // Check if content is structured JSON with input/output
-        const isStructuredData = content && typeof content === 'object' && (content.input || content.output);
+        const hasStructuredData = content && typeof content === 'object' && (content.input || content.output);
 
-        if (isStructuredData) {
+        if (hasStructuredData) {
+            const inputData = content.input || {};
+            const outputData = content.output || {};
+            const inputTable = inputData.table || [];
+            const outputPredictions = outputData.predictions || [];
+            const outputParameters = outputData.parameters || {};
+            const outputMetrics = outputData.metrics || {};
+
             return (
                 <div className="space-y-6">
                     {/* Header */}
@@ -32,23 +47,23 @@ const EnhancedSampleIO: React.FC<EnhancedSampleIOProps> = ({ content, icon, acce
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         {/* Input Section */}
                         {content.input && (
-                            <div className="bg-white rounded-xl shadow-lg border-2 border-blue-200 overflow-hidden transform transition-all hover:shadow-xl hover:scale-[1.02]">
+                            <div className="bg-white rounded-xl shadow-lg border-2 border-blue-200 overflow-hidden">
                                 <div className="bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-4">
                                     <div className="flex items-center gap-3">
                                         <span className="text-2xl">📥</span>
                                         <h4 className="text-xl font-bold text-white">Input Data</h4>
                                     </div>
-                                    {content.input.format && (
-                                        <p className="text-blue-100 text-sm mt-1">{content.input.format}</p>
+                                    {inputData.format && (
+                                        <p className="text-blue-100 text-sm mt-1">{inputData.format}</p>
                                     )}
                                 </div>
                                 <div className="p-6">
-                                    {content.input.table && Array.isArray(content.input.table) && content.input.table.length > 0 ? (
+                                    {inputTable.length > 0 ? (
                                         <div className="overflow-x-auto">
                                             <table className="min-w-full divide-y divide-gray-200">
                                                 <thead className="bg-gray-50">
                                                     <tr>
-                                                        {Object.keys(content.input.table[0] || {}).map((key, idx) => (
+                                                        {Object.keys(inputTable[0]).map((key, idx) => (
                                                             <th key={idx} className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
                                                                 {key}
                                                             </th>
@@ -56,7 +71,7 @@ const EnhancedSampleIO: React.FC<EnhancedSampleIOProps> = ({ content, icon, acce
                                                     </tr>
                                                 </thead>
                                                 <tbody className="bg-white divide-y divide-gray-200">
-                                                    {content.input.table.map((row: any, idx: number) => (
+                                                    {inputTable.map((row: any, idx: number) => (
                                                         <tr key={idx} className="hover:bg-blue-50 transition">
                                                             {Object.values(row).map((value: any, vidx: number) => (
                                                                 <td key={vidx} className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
@@ -70,7 +85,7 @@ const EnhancedSampleIO: React.FC<EnhancedSampleIOProps> = ({ content, icon, acce
                                         </div>
                                     ) : (
                                         <pre className="bg-gray-50 p-4 rounded-lg border border-gray-200 overflow-x-auto text-sm font-mono text-gray-800">
-                                            {JSON.stringify(content.input, null, 2)}
+                                            {JSON.stringify(inputData, null, 2)}
                                         </pre>
                                     )}
                                 </div>
@@ -79,7 +94,7 @@ const EnhancedSampleIO: React.FC<EnhancedSampleIOProps> = ({ content, icon, acce
 
                         {/* Output Section */}
                         {content.output && (
-                            <div className="bg-white rounded-xl shadow-lg border-2 border-green-200 overflow-hidden transform transition-all hover:shadow-xl hover:scale-[1.02]">
+                            <div className="bg-white rounded-xl shadow-lg border-2 border-green-200 overflow-hidden">
                                 <div className="bg-gradient-to-r from-green-500 to-green-600 px-6 py-4">
                                     <div className="flex items-center gap-3">
                                         <span className="text-2xl">📤</span>
@@ -88,14 +103,14 @@ const EnhancedSampleIO: React.FC<EnhancedSampleIOProps> = ({ content, icon, acce
                                 </div>
                                 <div className="p-6 space-y-4">
                                     {/* Parameters */}
-                                    {content.output.parameters && (
+                                    {Object.keys(outputParameters).length > 0 && (
                                         <div className="bg-purple-50 rounded-lg p-4 border border-purple-200">
                                             <h5 className="font-bold text-purple-900 mb-3 flex items-center gap-2">
                                                 <span>⚙️</span>
                                                 Learned Parameters
                                             </h5>
                                             <div className="space-y-2">
-                                                {Object.entries(content.output.parameters).map(([key, value]: [string, any], idx) => (
+                                                {Object.entries(outputParameters).map(([key, value]: [string, any], idx) => (
                                                     <div key={idx} className="flex justify-between items-center">
                                                         <span className="text-sm font-medium text-gray-700">{key}:</span>
                                                         <span className="text-sm font-mono bg-white px-3 py-1 rounded border border-purple-200">
@@ -108,12 +123,12 @@ const EnhancedSampleIO: React.FC<EnhancedSampleIOProps> = ({ content, icon, acce
                                     )}
 
                                     {/* Predictions Table */}
-                                    {content.output.predictions && Array.isArray(content.output.predictions) && content.output.predictions.length > 0 && (
+                                    {outputPredictions.length > 0 && (
                                         <div className="overflow-x-auto">
                                             <table className="min-w-full divide-y divide-gray-200">
                                                 <thead className="bg-gray-50">
                                                     <tr>
-                                                        {Object.keys(content.output.predictions[0] || {}).map((key, idx) => (
+                                                        {Object.keys(outputPredictions[0]).map((key, idx) => (
                                                             <th key={idx} className="px-3 py-2 text-left text-xs font-medium text-gray-700 uppercase">
                                                                 {key}
                                                             </th>
@@ -121,7 +136,7 @@ const EnhancedSampleIO: React.FC<EnhancedSampleIOProps> = ({ content, icon, acce
                                                     </tr>
                                                 </thead>
                                                 <tbody className="bg-white divide-y divide-gray-200">
-                                                    {content.output.predictions.map((row: any, idx: number) => (
+                                                    {outputPredictions.map((row: any, idx: number) => (
                                                         <tr key={idx} className="hover:bg-green-50 transition">
                                                             {Object.values(row).map((value: any, vidx: number) => (
                                                                 <td key={vidx} className="px-3 py-2 whitespace-nowrap text-sm text-gray-900">
@@ -138,14 +153,14 @@ const EnhancedSampleIO: React.FC<EnhancedSampleIOProps> = ({ content, icon, acce
                                     )}
 
                                     {/* Metrics */}
-                                    {content.output.metrics && (
+                                    {Object.keys(outputMetrics).length > 0 && (
                                         <div className="bg-amber-50 rounded-lg p-4 border border-amber-200">
                                             <h5 className="font-bold text-amber-900 mb-3 flex items-center gap-2">
                                                 <span>📊</span>
                                                 Performance Metrics
                                             </h5>
                                             <div className="grid grid-cols-2 gap-3">
-                                                {Object.entries(content.output.metrics).map(([key, value]: [string, any], idx) => (
+                                                {Object.entries(outputMetrics).map(([key, value]: [string, any], idx) => (
                                                     <div key={idx} className="bg-white rounded p-3 border border-amber-200">
                                                         <div className="text-xs text-gray-600 mb-1">{key}</div>
                                                         <div className="text-lg font-bold text-gray-900">
@@ -240,12 +255,15 @@ const EnhancedSampleIO: React.FC<EnhancedSampleIOProps> = ({ content, icon, acce
                     </h3>
                 </div>
                 <div className="bg-red-50 rounded-xl shadow-lg border-2 border-red-200 p-6">
-                    <p className="text-red-800">
-                        Unable to display sample data. Please check the console for details.
+                    <p className="text-red-800 mb-4">
+                        Unable to display sample data in enhanced format.
                     </p>
-                    <pre className="mt-4 bg-white p-4 rounded text-sm overflow-auto">
-                        {JSON.stringify(content, null, 2)}
-                    </pre>
+                    <details className="mt-4">
+                        <summary className="cursor-pointer text-red-900 font-semibold">Show raw data</summary>
+                        <pre className="mt-4 bg-white p-4 rounded text-sm overflow-auto max-h-96">
+                            {JSON.stringify(content, null, 2)}
+                        </pre>
+                    </details>
                 </div>
             </div>
         );
