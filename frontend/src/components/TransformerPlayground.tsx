@@ -1,4 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
+import dynamic from 'next/dynamic';
+import 'katex/dist/katex.min.css';
+import { InlineMath, BlockMath } from 'react-katex';
 
 interface Token {
     text: string;
@@ -13,6 +16,7 @@ interface AttentionWeight {
 
 const TransformerPlayground: React.FC = () => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
+    const [activeTab, setActiveTab] = useState<'visualizer' | 'context' | 'architecture'>('visualizer');
     const [inputText, setInputText] = useState('The cat sat on the mat');
     const [tokens, setTokens] = useState<Token[]>([]);
     const [attentionWeights, setAttentionWeights] = useState<AttentionWeight[]>([]);
@@ -21,27 +25,57 @@ const TransformerPlayground: React.FC = () => {
     const [numLayers, setNumLayers] = useState(2);
     const [embeddingDim, setEmbeddingDim] = useState(64);
     const [isProcessing, setIsProcessing] = useState(false);
-    const [currentLayer, setCurrentLayer] = useState(0);
     const [showPositionalEncoding, setShowPositionalEncoding] = useState(true);
     const [temperature, setTemperature] = useState(1.0);
+    const [contextPair, setContextPair] = useState(0);
+
+    const contextExamples = [
+        {
+            s1: "Wait at the bank of the river.",
+            s2: "Go to the bank to deposit cash.",
+            word: "bank",
+            explanation: "In Sentence 1, 'bank' strongly attends to 'river' (Geographic context). In Sentence 2, it attends to 'deposit' and 'cash' (Financial context)."
+        },
+        {
+            s1: "The bark of the oak tree is rough.",
+            s2: "The angry dog started to bark.",
+            word: "bark",
+            explanation: "In Sentence 1, 'bark' is linked to 'tree'. In Sentence 2, it is linked to 'dog' and 'angry'."
+        }
+    ];
+
+    const sampleSentences = [
+        'The cat sat on the mat',
+        'I love machine learning',
+        'Transformers use attention mechanisms',
+        'The quick brown fox jumps',
+        'Natural language processing is amazing'
+    ];
+
+    // Generate random embedding vector seeded by word
+    const generateRandomEmbedding = (dim: number, word?: string): number[] => {
+        let seed = 0;
+        if (word) {
+            for (let i = 0; i < word.length; i++) seed += word.charCodeAt(i);
+        }
+        return Array.from({ length: dim }, (_, i) => {
+            const val = Math.sin(seed + i) * 10000;
+            return (val - Math.floor(val)) * 2 - 1;
+        });
+    };
 
     // Tokenize input text
     useEffect(() => {
         const words = inputText.toLowerCase().split(/\s+/).filter(w => w.length > 0);
         const newTokens: Token[] = words.map(word => ({
             text: word,
-            embedding: generateRandomEmbedding(embeddingDim)
+            embedding: generateRandomEmbedding(embeddingDim, word)
         }));
         setTokens(newTokens);
         if (newTokens.length > 0 && selectedToken >= newTokens.length) {
             setSelectedToken(0);
         }
     }, [inputText, embeddingDim]);
-
-    // Generate random embedding vector
-    const generateRandomEmbedding = (dim: number): number[] => {
-        return Array.from({ length: dim }, () => Math.random() * 2 - 1);
-    };
 
     // Calculate attention weights using simplified self-attention
     const calculateAttention = () => {
@@ -50,68 +84,73 @@ const TransformerPlayground: React.FC = () => {
         setIsProcessing(true);
         const weights: AttentionWeight[] = [];
 
-        // Simulate self-attention calculation
         for (let i = 0; i < tokens.length; i++) {
             for (let j = 0; j < tokens.length; j++) {
-                // Simplified dot product attention
                 const query = tokens[i].embedding;
                 const key = tokens[j].embedding;
 
-                // Dot product
                 let score = 0;
                 for (let k = 0; k < Math.min(query.length, key.length); k++) {
                     score += query[k] * key[k];
                 }
 
-                // Scale by sqrt(d_k)
+                // Inject contextual bias for common words if we are in context lab
+                if (activeTab === 'context') {
+                    const currentWord = tokens[i].text.toLowerCase();
+                    const targetWord = contextExamples[contextPair].word;
+                    const neighborWord = tokens[j].text.toLowerCase();
+
+                    if (currentWord.includes(targetWord)) {
+                        if (contextPair === 0) { // bank
+                            if (inputText.includes("river") && neighborWord.includes("river")) score += 5;
+                            if (inputText.includes("cash") && (neighborWord.includes("cash") || neighborWord.includes("deposit"))) score += 5;
+                        } else if (contextPair === 1) { // bark
+                            if (inputText.includes("tree") && neighborWord.includes("tree")) score += 5;
+                            if (inputText.includes("dog") && (neighborWord.includes("dog") || neighborWord.includes("angry"))) score += 5;
+                        }
+                    }
+                }
+
                 score = score / Math.sqrt(embeddingDim);
-
-                // Apply temperature
                 score = score / temperature;
-
                 weights.push({ from: i, to: j, weight: score });
             }
         }
 
-        // Softmax normalization for each query token
+        // Softmax
         for (let i = 0; i < tokens.length; i++) {
             const tokenWeights = weights.filter(w => w.from === i);
             const maxScore = Math.max(...tokenWeights.map(w => w.weight));
 
-            // Exp and sum
             let sumExp = 0;
             tokenWeights.forEach(w => {
                 w.weight = Math.exp(w.weight - maxScore);
                 sumExp += w.weight;
             });
 
-            // Normalize
             tokenWeights.forEach(w => {
                 w.weight = w.weight / sumExp;
             });
         }
 
         setAttentionWeights(weights);
-
-        setTimeout(() => setIsProcessing(false), 500);
+        setTimeout(() => setIsProcessing(false), 300);
     };
 
-    // Auto-calculate attention when tokens change
     useEffect(() => {
         if (tokens.length > 0) {
             calculateAttention();
         }
-    }, [tokens, temperature, embeddingDim]);
+    }, [tokens, temperature, embeddingDim, activeTab, contextPair]);
 
     // Draw attention visualization
     useEffect(() => {
         const canvas = canvasRef.current;
-        if (!canvas || tokens.length === 0) return;
+        if (!canvas || tokens.length === 0 || activeTab !== 'visualizer') return;
 
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
 
-        // Clear canvas
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         const width = canvas.width;
@@ -120,51 +159,36 @@ const TransformerPlayground: React.FC = () => {
         const tokenY = height / 2;
         const tokenRadius = 30;
 
-        // Draw attention lines from selected token
         const selectedWeights = attentionWeights.filter(w => w.from === selectedToken);
 
         selectedWeights.forEach(weight => {
             const fromX = tokenSpacing * (selectedToken + 1);
             const toX = tokenSpacing * (weight.to + 1);
-
-            // Line opacity based on attention weight
             const opacity = weight.weight;
-            const lineWidth = 1 + weight.weight * 8;
+            const lineWidth = 1 + weight.weight * 12;
 
-            // Color gradient based on weight
-            const hue = 200 + weight.weight * 60; // Blue to cyan
+            const hue = 220 + weight.weight * 100;
             ctx.strokeStyle = `hsla(${hue}, 80%, 50%, ${opacity})`;
             ctx.lineWidth = lineWidth;
 
-            // Draw curved line
             ctx.beginPath();
             ctx.moveTo(fromX, tokenY);
-
-            const controlY = tokenY - 100 - weight.weight * 50;
+            const controlY = tokenY - 120 - weight.weight * 60;
             const midX = (fromX + toX) / 2;
-
             ctx.quadraticCurveTo(midX, controlY, toX, tokenY);
             ctx.stroke();
 
-            // Draw weight label for strong connections
             if (weight.weight > 0.15) {
-                ctx.fillStyle = `hsla(${hue}, 80%, 40%, ${opacity})`;
-                ctx.font = 'bold 12px Arial';
+                ctx.fillStyle = `hsla(${hue}, 80%, 30%, ${opacity})`;
+                ctx.font = 'bold 10px Arial';
                 ctx.textAlign = 'center';
-                ctx.fillText(
-                    weight.weight.toFixed(2),
-                    midX,
-                    controlY - 10
-                );
+                ctx.fillText(weight.weight.toFixed(2), midX, controlY - 10);
             }
         });
 
-        // Draw tokens
         tokens.forEach((token, idx) => {
             const x = tokenSpacing * (idx + 1);
             const y = tokenY;
-
-            // Token circle
             const isSelected = idx === selectedToken;
             const isTarget = selectedWeights.some(w => w.to === idx);
 
@@ -172,50 +196,33 @@ const TransformerPlayground: React.FC = () => {
             ctx.arc(x, y, tokenRadius, 0, 2 * Math.PI);
 
             if (isSelected) {
-                ctx.fillStyle = '#3b82f6';
-                ctx.strokeStyle = '#1e40af';
+                ctx.fillStyle = '#4f46e5';
+                ctx.strokeStyle = '#312e81';
                 ctx.lineWidth = 4;
             } else if (isTarget) {
                 const weight = selectedWeights.find(w => w.to === idx)?.weight || 0;
                 const intensity = Math.floor(weight * 255);
-                ctx.fillStyle = `rgb(${100 + intensity}, ${150 + intensity}, 255)`;
-                ctx.strokeStyle = '#60a5fa';
-                ctx.lineWidth = 3;
+                ctx.fillStyle = `rgb(${240 - intensity / 2}, ${240 - intensity / 2}, 255)`;
+                ctx.strokeStyle = '#818cf8';
+                ctx.lineWidth = 2 + weight * 5;
             } else {
-                ctx.fillStyle = '#e5e7eb';
-                ctx.strokeStyle = '#9ca3af';
-                ctx.lineWidth = 2;
+                ctx.fillStyle = '#f8fafc';
+                ctx.strokeStyle = '#e2e8f0';
+                ctx.lineWidth = 1;
             }
 
             ctx.fill();
             ctx.stroke();
 
-            // Token text
-            ctx.fillStyle = isSelected ? '#ffffff' : '#1f2937';
-            ctx.font = 'bold 14px Arial';
+            ctx.fillStyle = isSelected ? '#ffffff' : '#1e293b';
+            ctx.font = 'bold 12px Inter, sans-serif';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(token.text, x, y);
-
-            // Attention score below token
-            if (isTarget && !isSelected) {
-                const weight = selectedWeights.find(w => w.to === idx)?.weight || 0;
-                ctx.fillStyle = '#3b82f6';
-                ctx.font = 'bold 11px Arial';
-                ctx.fillText(weight.toFixed(3), x, y + tokenRadius + 15);
-            }
         });
 
-        // Draw legend
-        ctx.fillStyle = '#6b7280';
-        ctx.font = '12px Arial';
-        ctx.textAlign = 'left';
-        ctx.fillText('💡 Click on tokens to see their attention patterns', 10, 20);
-        ctx.fillText(`🎯 Showing attention from: "${tokens[selectedToken]?.text}"`, 10, 40);
+    }, [tokens, attentionWeights, selectedToken, activeTab]);
 
-    }, [tokens, attentionWeights, selectedToken]);
-
-    // Handle canvas click
     const handleCanvasClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
         const canvas = canvasRef.current;
         if (!canvas || tokens.length === 0) return;
@@ -228,284 +235,185 @@ const TransformerPlayground: React.FC = () => {
         const tokenY = canvas.height / 2;
         const tokenRadius = 30;
 
-        // Check which token was clicked
-        tokens.forEach((token, idx) => {
+        tokens.forEach((_, idx) => {
             const tokenX = tokenSpacing * (idx + 1);
             const distance = Math.sqrt((x - tokenX) ** 2 + (y - tokenY) ** 2);
-
-            if (distance <= tokenRadius) {
-                setSelectedToken(idx);
-            }
+            if (distance <= tokenRadius) setSelectedToken(idx);
         });
     };
 
-    // Sample sentences
-    const sampleSentences = [
-        'The cat sat on the mat',
-        'I love machine learning',
-        'Transformers use attention mechanisms',
-        'The quick brown fox jumps',
-        'Natural language processing is amazing'
-    ];
-
     return (
-        <div className="my-8 p-6 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl shadow-2xl border-2 border-purple-200">
-            <div className="flex items-center gap-3 mb-6">
-                <span className="text-3xl">🤖</span>
-                <h3 className="text-2xl font-bold text-purple-900">
-                    Transformer Attention Playground
-                </h3>
+        <div className="my-12 p-8 bg-white rounded-[3rem] border border-slate-100 shadow-xl overflow-hidden">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
+                <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center text-white text-2xl shadow-lg shadow-indigo-100 italic font-black">T</div>
+                    <div>
+                        <h3 className="text-2xl font-black text-slate-900 tracking-tight">Transformer <span className="text-indigo-600">Attention Lab</span></h3>
+                        <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mt-0.5">Contextual Tensor Visualization</p>
+                    </div>
+                </div>
+                <div className="flex bg-slate-100 p-1.5 rounded-2xl gap-2">
+                    {[
+                        { id: 'visualizer', label: 'Playground', icon: '🎨' },
+                        { id: 'context', label: 'Context Lab', icon: '🧠' },
+                        { id: 'architecture', label: 'Architecture', icon: '🏗️' }
+                    ].map(tab => (
+                        <button
+                            key={tab.id}
+                            onClick={() => setActiveTab(tab.id as any)}
+                            className={`px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === tab.id ? 'bg-white text-indigo-600 shadow-xl' : 'text-slate-500 hover:bg-slate-200'}`}
+                        >
+                            <span className="mr-2">{tab.icon}</span>
+                            {tab.label}
+                        </button>
+                    ))}
+                </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                {/* Left Panel - Controls */}
-                <div className="space-y-4">
-                    {/* Input Text */}
-                    <div className="bg-white p-4 rounded-lg shadow-md">
-                        <h4 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
-                            <span>✍️</span> Input Text
-                        </h4>
-                        <textarea
-                            value={inputText}
-                            onChange={(e) => setInputText(e.target.value)}
-                            className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none text-sm"
-                            rows={3}
-                            placeholder="Enter text to analyze..."
-                        />
-                        <div className="mt-2 text-xs text-gray-600">
-                            {tokens.length} tokens
+            {activeTab === 'visualizer' && (
+                <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 animate-fadeIn">
+                    <div className="lg:col-span-1 space-y-6">
+                        <div className="bg-slate-50 p-6 rounded-[2rem] border border-slate-100">
+                            <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-6">Input Sequence</h4>
+                            <textarea
+                                value={inputText}
+                                onChange={(e) => setInputText(e.target.value)}
+                                className="w-full px-4 py-3 bg-white border border-slate-200 rounded-2xl focus:border-indigo-500 focus:outline-none text-xs font-medium"
+                                rows={3}
+                                placeholder="Enter text..."
+                            />
+                            <div className="mt-6 space-y-2">
+                                {sampleSentences.map((s, i) => (
+                                    <button
+                                        key={i}
+                                        onClick={() => setInputText(s)}
+                                        className="w-full text-left px-4 py-2 bg-white/50 hover:bg-white rounded-xl text-[10px] font-bold text-slate-500 border border-slate-100 transition"
+                                    >
+                                        {s}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="bg-slate-50 p-6 rounded-[2rem] border border-slate-100">
+                            <h4 className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-6">Hyper-Parameters</h4>
+                            <div className="space-y-4">
+                                <div>
+                                    <div className="flex justify-between text-[10px] font-black text-slate-400 mb-2"><span>TEMPERATURE</span><span>{temperature}</span></div>
+                                    <input type="range" min="0.1" max="2.0" step="0.1" value={temperature} onChange={(e) => setTemperature(parseFloat(e.target.value))} className="w-full accent-indigo-600" />
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    {/* Sample Sentences */}
-                    <div className="bg-white p-4 rounded-lg shadow-md">
-                        <h4 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
-                            <span>📝</span> Samples
-                        </h4>
-                        <div className="space-y-2">
-                            {sampleSentences.map((sentence, idx) => (
-                                <button
-                                    key={idx}
-                                    onClick={() => setInputText(sentence)}
-                                    className="w-full px-3 py-2 text-left text-sm bg-gray-100 hover:bg-purple-100 rounded-lg transition"
-                                >
-                                    {sentence}
-                                </button>
+                    <div className="lg:col-span-3 space-y-8">
+                        <div className="bg-slate-900 rounded-[2.5rem] p-1 shadow-2xl overflow-hidden">
+                            <canvas
+                                ref={canvasRef}
+                                width={800}
+                                height={400}
+                                onClick={handleCanvasClick}
+                                className="w-full cursor-crosshair bg-slate-900"
+                            />
+                        </div>
+                        <div className="bg-indigo-50 border border-indigo-100 p-6 rounded-[2rem]">
+                            <p className="text-xs text-indigo-700 font-medium leading-relaxed">
+                                <span className="font-black mr-2">PRO TIP:</span> Click on individual tokens to see their <strong>Self-Attention Pattern</strong>. Thick, bright indigo curves represent tokens the model is "focusing" on to build meaning for the selected word.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {activeTab === 'context' && (
+                <div className="space-y-8 animate-fadeIn">
+                    <div className="bg-indigo-900 rounded-[3rem] p-12 text-white shadow-2xl relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-[100px] -mr-48 -mt-48"></div>
+                        <h3 className="text-3xl font-black mb-6">Polysemy & Attention Shift</h3>
+                        <p className="text-indigo-200 text-lg font-light leading-relaxed max-w-2xl mb-12">
+                            How does a Transformer know if <span className="text-white font-bold italic">bank</span> means a river edge or a financial institution? It looks at the <strong>context words</strong>.
+                        </p>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                            {[contextExamples[contextPair].s1, contextExamples[contextPair].s2].map((s, i) => (
+                                <div key={i} className="bg-white/5 border border-white/10 p-8 rounded-[2.5rem] hover:bg-white/10 transition group">
+                                    <h4 className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-6 underline decoration-indigo-500">Observation {i + 1}</h4>
+                                    <div className="text-xl font-medium mb-8">
+                                        {s.split(' ').map((w, j) => (
+                                            <span
+                                                key={j}
+                                                className={`mr-2 px-3 py-1.5 rounded-xl transition-all ${w.toLowerCase().includes(contextExamples[contextPair].word) ? 'bg-indigo-600 text-white shadow-xl scale-110' : 'opacity-40'}`}
+                                            >
+                                                {w}
+                                            </span>
+                                        ))}
+                                    </div>
+                                    <button
+                                        onClick={() => { setInputText(s); setActiveTab('visualizer'); }}
+                                        className="text-[10px] font-black uppercase text-indigo-300 border-b-2 border-indigo-500 pb-1 hover:text-white hover:border-white transition-all"
+                                    >
+                                        Inspect Attention Tensor →
+                                    </button>
+                                </div>
                             ))}
                         </div>
-                    </div>
 
-                    {/* Model Parameters */}
-                    <div className="bg-white p-4 rounded-lg shadow-md">
-                        <h4 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
-                            <span>⚙️</span> Parameters
-                        </h4>
-                        <div className="space-y-3">
-                            <div>
-                                <label className="text-sm font-semibold text-gray-700 block mb-1">
-                                    Attention Heads: {numHeads}
-                                </label>
-                                <input
-                                    type="range"
-                                    min="1"
-                                    max="8"
-                                    step="1"
-                                    value={numHeads}
-                                    onChange={(e) => setNumHeads(parseInt(e.target.value))}
-                                    className="w-full"
-                                />
-                            </div>
-                            <div>
-                                <label className="text-sm font-semibold text-gray-700 block mb-1">
-                                    Layers: {numLayers}
-                                </label>
-                                <input
-                                    type="range"
-                                    min="1"
-                                    max="6"
-                                    step="1"
-                                    value={numLayers}
-                                    onChange={(e) => setNumLayers(parseInt(e.target.value))}
-                                    className="w-full"
-                                />
-                            </div>
-                            <div>
-                                <label className="text-sm font-semibold text-gray-700 block mb-1">
-                                    Embedding Dim: {embeddingDim}
-                                </label>
-                                <input
-                                    type="range"
-                                    min="32"
-                                    max="128"
-                                    step="32"
-                                    value={embeddingDim}
-                                    onChange={(e) => setEmbeddingDim(parseInt(e.target.value))}
-                                    className="w-full"
-                                />
-                            </div>
-                            <div>
-                                <label className="text-sm font-semibold text-gray-700 block mb-1">
-                                    Temperature: {temperature.toFixed(1)}
-                                </label>
-                                <input
-                                    type="range"
-                                    min="0.1"
-                                    max="2.0"
-                                    step="0.1"
-                                    value={temperature}
-                                    onChange={(e) => setTemperature(parseFloat(e.target.value))}
-                                    className="w-full"
-                                />
-                                <p className="text-xs text-gray-500 mt-1">
-                                    Lower = sharper, Higher = smoother
-                                </p>
-                            </div>
+                        <div className="p-8 bg-indigo-950/50 rounded-3xl border border-white/5">
+                            <h5 className="text-[10px] font-black uppercase text-indigo-400 mb-4">Architectural Interpretation</h5>
+                            <p className="text-sm font-light leading-relaxed text-indigo-100">{contextExamples[contextPair].explanation}</p>
                         </div>
                     </div>
 
-                    {/* Options */}
-                    <div className="bg-white p-4 rounded-lg shadow-md">
-                        <h4 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
-                            <span>🎛️</span> Options
-                        </h4>
-                        <div className="space-y-2">
-                            <label className="flex items-center gap-2 cursor-pointer">
-                                <input
-                                    type="checkbox"
-                                    checked={showPositionalEncoding}
-                                    onChange={(e) => setShowPositionalEncoding(e.target.checked)}
-                                    className="w-4 h-4"
-                                />
-                                <span className="text-sm text-gray-700">Show Positional Encoding</span>
-                            </label>
-                        </div>
+                    <div className="flex justify-center gap-4">
+                        {contextExamples.map((_, i) => (
+                            <button key={i} onClick={() => setContextPair(i)} className={`px-10 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${contextPair === i ? 'bg-indigo-600 text-white shadow-xl' : 'bg-white text-slate-400 border border-slate-100 hover:bg-slate-50'}`}>
+                                Challenge {i + 1}: {contextExamples[i].word}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {activeTab === 'architecture' && (
+                <div className="space-y-12 animate-fadeIn">
+                    <div className="text-center max-w-3xl mx-auto">
+                        <h3 className="text-3xl font-black text-slate-900 mb-4">Anatomy of a Transformer Layer</h3>
+                        <p className="text-slate-500 font-light text-lg">Stage-by-stage transformation of raw tokens into semantic tensors.</p>
                     </div>
 
-                    {/* Stats */}
-                    <div className="bg-white p-4 rounded-lg shadow-md">
-                        <h4 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
-                            <span>📊</span> Stats
-                        </h4>
-                        <div className="space-y-2 text-sm">
-                            <div className="flex justify-between">
-                                <span className="text-gray-600">Tokens:</span>
-                                <span className="font-bold text-gray-900">{tokens.length}</span>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {[
+                            { step: "01", title: "Input Embedding", desc: "Discrete word IDs are transformed into continuous vectors in latent space.", math: "X_{emb} = W_e \cdot Tokens", color: "indigo" },
+                            { step: "02", title: "Positional Encoding", desc: "Since Transformers have no recurrence, we inject order using Sine waves.", math: "PE_{(pos, 2i)} = \sin(pos/10000^{2i/d})", color: "purple" },
+                            { step: "03", title: "Multi-Head Attention", desc: "The core engine. It computes 'relevance scores' using Query/Key dot products.", math: "Attn = \text{softmax}(\frac{QK^T}{\sqrt{d_k}})V", color: "emerald" },
+                            { step: "04", title: "Residual Add & Norm", desc: "Original input is added back to output to prevent gradient vanishing.", math: "\text{LayerNorm}(x + \text{Sublayer}(x))", color: "amber" },
+                            { step: "05", title: "Feed-Forward (FFN)", desc: "Deep non-linear expansion (usually 4x d_model) for complex feature extraction.", math: "\text{FFN}(x) = \text{ReLU}(xW_1 + b_1)W_2 + b_2", color: "rose" },
+                            { step: "06", title: "Output Projection", desc: "Contextual vectors are projected back to vocabulary space for prediction.", math: "y = \text{softmax}(Linear(z))", color: "slate" }
+                        ].map((s, i) => (
+                            <div key={i} className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm border-t-8 transition-all hover:scale-[1.02] hover:shadow-xl" style={{ borderTopColor: `var(--color-${s.color}-500, ${s.color === 'indigo' ? '#6366f1' : s.color === 'purple' ? '#a855f7' : s.color === 'emerald' ? '#10b981' : s.color === 'amber' ? '#f59e0b' : s.color === 'rose' ? '#f43f5e' : '#1e293b'})` }}>
+                                <div className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mb-4">Step {s.step}</div>
+                                <h4 className="text-xl font-black text-slate-900 mb-4">{s.title}</h4>
+                                <p className="text-xs text-slate-500 font-medium leading-relaxed mb-8">{s.desc}</p>
+                                <div className="p-6 bg-slate-50 rounded-2xl h-16 flex items-center justify-center">
+                                    <BlockMath math={s.math} />
+                                </div>
                             </div>
-                            <div className="flex justify-between">
-                                <span className="text-gray-600">Parameters:</span>
-                                <span className="font-bold text-gray-900">
-                                    {(embeddingDim * embeddingDim * numHeads * numLayers / 1000).toFixed(1)}K
-                                </span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-gray-600">Attention Ops:</span>
-                                <span className="font-bold text-gray-900">
-                                    {tokens.length * tokens.length * numHeads}
-                                </span>
-                            </div>
+                        ))}
+                    </div>
+
+                    <div className="bg-slate-900 rounded-[3rem] p-16 text-white text-center shadow-2xl overflow-hidden relative">
+                        <div className="absolute top-0 right-0 w-full h-full bg-gradient-to-br from-indigo-500/10 to-transparent"></div>
+                        <h3 className="text-3xl font-black mb-8">Propagation Flow</h3>
+                        <div className="flex flex-col md:flex-row items-center justify-center gap-6">
+                            <div className="px-8 py-4 bg-indigo-600 rounded-2xl text-xs font-black shadow-xl">INPUT TENSOR</div>
+                            <div className="text-slate-700 font-black">▶▶</div>
+                            <div className="px-8 py-4 bg-slate-800 rounded-2xl text-xs font-black border border-white/10 lowercase tracking-widest italic">N x transformer_blocks</div>
+                            <div className="text-slate-700 font-black">▶▶</div>
+                            <div className="px-8 py-4 bg-emerald-600 rounded-2xl text-xs font-black shadow-xl">PROBABILITY DIST</div>
                         </div>
                     </div>
                 </div>
-
-                {/* Right Panel - Visualization */}
-                <div className="lg:col-span-3 space-y-4">
-                    <div className="bg-white p-6 rounded-lg shadow-md">
-                        <h4 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-                            <span>🔍</span> Self-Attention Visualization
-                        </h4>
-                        <canvas
-                            ref={canvasRef}
-                            width={800}
-                            height={400}
-                            onClick={handleCanvasClick}
-                            className="w-full border-2 border-gray-200 rounded-lg cursor-pointer bg-gradient-to-b from-gray-50 to-white"
-                        />
-                        <p className="text-sm text-gray-600 mt-3 text-center">
-                            Click on any token to see what it attends to
-                        </p>
-                    </div>
-
-                    {/* Attention Matrix */}
-                    <div className="bg-white p-6 rounded-lg shadow-md">
-                        <h4 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-                            <span>📈</span> Attention Matrix
-                        </h4>
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-xs">
-                                <thead>
-                                    <tr>
-                                        <th className="p-2 border border-gray-300 bg-gray-100">Query →<br />Key ↓</th>
-                                        {tokens.map((token, idx) => (
-                                            <th key={idx} className="p-2 border border-gray-300 bg-purple-100 font-bold">
-                                                {token.text}
-                                            </th>
-                                        ))}
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {tokens.map((queryToken, queryIdx) => (
-                                        <tr key={queryIdx}>
-                                            <td className="p-2 border border-gray-300 bg-purple-100 font-bold">
-                                                {queryToken.text}
-                                            </td>
-                                            {tokens.map((keyToken, keyIdx) => {
-                                                const weight = attentionWeights.find(
-                                                    w => w.from === queryIdx && w.to === keyIdx
-                                                )?.weight || 0;
-
-                                                const intensity = Math.floor(weight * 255);
-                                                const bgColor = `rgb(${255 - intensity}, ${255 - intensity / 2}, 255)`;
-
-                                                return (
-                                                    <td
-                                                        key={keyIdx}
-                                                        className="p-2 border border-gray-300 text-center font-mono"
-                                                        style={{ backgroundColor: bgColor }}
-                                                    >
-                                                        {weight.toFixed(3)}
-                                                    </td>
-                                                );
-                                            })}
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                        <p className="text-xs text-gray-600 mt-3">
-                            Darker purple = stronger attention. Each row sums to 1.0 (softmax normalized).
-                        </p>
-                    </div>
-
-                    {/* Instructions */}
-                    <div className="bg-purple-100 p-4 rounded-lg border-2 border-purple-300">
-                        <h4 className="font-bold text-purple-900 mb-2 flex items-center gap-2">
-                            <span>💡</span> How to Use
-                        </h4>
-                        <ul className="text-sm text-purple-800 space-y-1">
-                            <li>• Type your own text or select a sample sentence</li>
-                            <li>• Click on any token to see its attention pattern</li>
-                            <li>• Thicker/brighter lines = stronger attention</li>
-                            <li>• Adjust temperature to control attention sharpness</li>
-                            <li>• The attention matrix shows all token-to-token weights</li>
-                            <li>• Each row in the matrix represents one query token's attention distribution</li>
-                        </ul>
-                    </div>
-
-                    {/* Key Concepts */}
-                    <div className="bg-blue-50 p-4 rounded-lg border-2 border-blue-200">
-                        <h4 className="font-bold text-blue-900 mb-2 flex items-center gap-2">
-                            <span>🎓</span> Key Concepts
-                        </h4>
-                        <div className="text-sm text-blue-800 space-y-2">
-                            <p><strong>Self-Attention:</strong> Each token looks at all other tokens to understand context</p>
-                            <p><strong>Query, Key, Value:</strong> Q finds what to look for, K is what to match, V is what to retrieve</p>
-                            <p><strong>Multi-Head:</strong> Multiple attention patterns run in parallel for richer representations</p>
-                            <p><strong>Softmax:</strong> Converts scores to probabilities (all weights sum to 1)</p>
-                            <p><strong>Temperature:</strong> Controls how focused vs distributed the attention is</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            )}
         </div>
     );
 };

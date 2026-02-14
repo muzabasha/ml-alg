@@ -1,435 +1,334 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
-
-// Dynamic imports for Chart.js
-const Bar = dynamic(() => import('react-chartjs-2').then(mod => mod.Bar), { ssr: false });
-const Scatter = dynamic(() => import('react-chartjs-2').then(mod => mod.Scatter), { ssr: false });
+import 'katex/dist/katex.min.css';
+import { InlineMath, BlockMath } from 'react-katex';
+import Layout from '../components/Layout';
 
 const CodeBlock = dynamic(() => import('../components/CodeBlock'), {
     ssr: false,
-    loading: () => <div className="h-40 bg-gray-900 rounded-xl animate-pulse my-6"></div>
+    loading: () => <div className="h-40 bg-slate-900 rounded-[2rem] animate-pulse my-6"></div>
 });
 
 // Type definitions
-interface Statistics {
-    mean: number;
-    std: number;
-    min: number;
-    max: number;
-}
-
 interface Dataset {
+    id: string;
     name: string;
+    library: 'Scikit-Learn' | 'Seaborn' | 'Statsmodels' | 'Deep Learning';
     description: string;
     source: string;
-    task: string;
-    samples: number;
-    features: number;
-    classes: number;
-    featureNames: string[];
-    targetNames: string[];
-    statistics: Record<string, Statistics>;
-    correlations: [string, string, number][];
+    task: 'Classification' | 'Regression' | 'Clustering' | 'Time Series' | 'Image' | 'Text';
+    samples: number | string;
+    features: number | string;
+    classes?: number | string;
+    featureNames?: string[];
+    targetNames?: string[];
     useCases: string[];
 }
 
 const DatasetsPage: React.FC = () => {
     const [selectedDataset, setSelectedDataset] = useState('iris');
-    const [view, setView] = useState('overview');
-    const [selectedFeature, setSelectedFeature] = useState('sepal_length');
+    const [filter, setFilter] = useState<'All' | 'Scikit-Learn' | 'Seaborn' | 'Statsmodels' | 'Deep Learning'>('All');
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
         setMounted(true);
     }, []);
 
-    // Dataset information
-    const datasets: Record<string, Dataset> = {
-        iris: {
-            name: 'Iris Flower Dataset',
-            description: 'Classic dataset containing 150 samples of iris flowers from 3 species (Setosa, Versicolor, Virginica). Each sample has 4 features: sepal length, sepal width, petal length, and petal width.',
+    const datasets: Dataset[] = [
+        {
+            id: 'iris',
+            name: 'Iris Flower',
+            library: 'Scikit-Learn',
+            description: 'The Golden Standard for Linear Classifiers. Measuring sepal and petal dimensions across 3 species.',
             source: 'sklearn.datasets.load_iris()',
-            task: 'Multi-class Classification',
+            task: 'Classification',
             samples: 150,
             features: 4,
             classes: 3,
             featureNames: ['sepal_length', 'sepal_width', 'petal_length', 'petal_width'],
             targetNames: ['Setosa', 'Versicolor', 'Virginica'],
-            statistics: {
-                sepal_length: { mean: 5.84, std: 0.83, min: 4.3, max: 7.9 },
-                sepal_width: { mean: 3.05, std: 0.43, min: 2.0, max: 4.4 },
-                petal_length: { mean: 3.76, std: 1.76, min: 1.0, max: 6.9 },
-                petal_width: { mean: 1.20, std: 0.76, min: 0.1, max: 2.5 }
-            },
-            correlations: [
-                ['sepal_length', 'petal_length', 0.87] as [string, string, number],
-                ['sepal_length', 'petal_width', 0.82] as [string, string, number],
-                ['petal_length', 'petal_width', 0.96] as [string, string, number]
-            ],
-            useCases: [
-                'Classification algorithm comparison',
-                'Feature selection techniques',
-                'Dimensionality reduction (PCA)',
-                'Clustering analysis'
-            ]
+            useCases: ['Euclidean Distance Modelling', 'LDA', 'Probability Density Estimation']
         },
-        wine: {
-            name: 'Wine Quality Dataset',
-            description: 'Contains chemical analysis results of 178 wine samples from 3 different cultivars. Features include alcohol content, acidity, phenols, and other chemical properties.',
+        {
+            id: 'wine',
+            name: 'Wine Chemistry',
+            library: 'Scikit-Learn',
+            description: 'A Multi-variate Chemical Tensor. 13 chemical features from three different Italian cultivars.',
             source: 'sklearn.datasets.load_wine()',
-            task: 'Multi-class Classification',
+            task: 'Classification',
             samples: 178,
             features: 13,
             classes: 3,
-            featureNames: ['alcohol', 'malic_acid', 'ash', 'alcalinity', 'magnesium', 'phenols', 'flavanoids', 'nonflavanoid_phenols', 'proanthocyanins', 'color_intensity', 'hue', 'od280_od315', 'proline'],
-            targetNames: ['Class 0', 'Class 1', 'Class 2'],
-            statistics: {
-                alcohol: { mean: 13.0, std: 0.81, min: 11.0, max: 14.8 },
-                malic_acid: { mean: 2.34, std: 1.12, min: 0.74, max: 5.80 },
-                phenols: { mean: 2.29, std: 0.63, min: 0.98, max: 3.88 },
-                flavanoids: { mean: 2.03, std: 1.00, min: 0.34, max: 5.08 }
-            },
-            correlations: [
-                ['alcohol', 'phenols', 0.29] as [string, string, number],
-                ['flavanoids', 'phenols', 0.86] as [string, string, number],
-                ['alcohol', 'proline', 0.64] as [string, string, number]
-            ],
-            useCases: [
-                'Quality prediction models',
-                'Feature importance analysis',
-                'Multi-class classification',
-                'Ensemble methods comparison'
-            ]
+            useCases: ['Regularization', 'Clustering', 'Dimensionality Reduction']
+        },
+        {
+            id: 'california_housing',
+            name: 'California Housing',
+            library: 'Scikit-Learn',
+            description: 'Large-scale regression data based on 1990 California census. Predict median house values.',
+            source: 'sklearn.datasets.fetch_california_housing()',
+            task: 'Regression',
+            samples: 20640,
+            features: 8,
+            useCases: ['Gradient Descent Optimization', 'Feature Interaction Modelling']
+        },
+        {
+            id: 'breast_cancer',
+            name: 'Breast Cancer',
+            library: 'Scikit-Learn',
+            description: 'Binary classification of tumor masses based on digitized images of fine needle aspirates (FNA).',
+            source: 'sklearn.datasets.load_breast_cancer()',
+            task: 'Classification',
+            samples: 569,
+            features: 30,
+            classes: 2,
+            useCases: ['Risk Factor Modelling', 'Support Vector Machines']
+        },
+        {
+            id: 'diabetes',
+            name: 'Diabetes Progression',
+            library: 'Scikit-Learn',
+            description: 'Ten baseline variables, age, sex, BMI, BP and six blood serum measurements.',
+            source: 'sklearn.datasets.load_diabetes()',
+            task: 'Regression',
+            samples: 442,
+            features: 10,
+            useCases: ['Lasso/Ridge Regularization', 'Predictive Analysis']
+        },
+        {
+            id: 'titanic',
+            name: 'Titanic Survival',
+            library: 'Seaborn',
+            description: 'Classify survival status based on age, gender, cabin, and fare class.',
+            source: 'sns.load_dataset("titanic")',
+            task: 'Classification',
+            samples: 891,
+            features: 15,
+            classes: 2,
+            useCases: ['Categorical Encoding', 'Mixed Data Modelling']
+        },
+        {
+            id: 'tips',
+            name: 'Restaurant Tips',
+            library: 'Seaborn',
+            description: 'Predict tip amounts based on bill amount, day, time, and smoker status.',
+            source: 'sns.load_dataset("tips")',
+            task: 'Regression',
+            samples: 244,
+            features: 7,
+            useCases: ['Bivariate Regression', 'Correlation Analysis']
+        },
+        {
+            id: 'penguins',
+            name: 'Palmer Penguins',
+            library: 'Seaborn',
+            description: 'Modern alternative to Iris. Palmer Archipelago (Antarctica) penguin measurements.',
+            source: 'sns.load_dataset("penguins")',
+            task: 'Classification',
+            samples: 344,
+            features: 7,
+            classes: 3,
+            useCases: ['Cluster Analysis', 'Biometric Classification']
+        },
+        {
+            id: 'diamonds',
+            name: 'Diamond Pricing',
+            library: 'Seaborn',
+            description: 'Predict diamond prices using carat, cut, color, and geometric dimensions.',
+            source: 'sns.load_dataset("diamonds")',
+            task: 'Regression',
+            samples: 53940,
+            features: 10,
+            useCases: ['Non-Linear Price Modelling', 'High Range Variance']
+        },
+        {
+            id: 'macrodata',
+            name: 'US Macroeconomic',
+            library: 'Statsmodels',
+            description: 'Quarterly US macroeconomic metrics from 1959Q1 to 2009Q3 (Unemployment, GDP).',
+            source: 'sm.datasets.macrodata.load_pandas()',
+            task: 'Time Series',
+            samples: 203,
+            features: 14,
+            useCases: ['Econometric Forecasting', 'Vector Autoregression']
+        },
+        {
+            id: 'mnist',
+            name: 'MNIST Digits',
+            library: 'Deep Learning',
+            description: 'Large database of handwritten digits used for training various image processing systems.',
+            source: 'keras.datasets.mnist',
+            task: 'Image',
+            samples: 60000,
+            features: '28x28 Tensors',
+            classes: 10,
+            useCases: ['CNN Architecture Tests', 'Kernel Optimization']
         }
-    };
+    ];
 
-    const currentDataset = datasets[selectedDataset as keyof typeof datasets];
+    const filteredDatasets = filter === 'All' ? datasets : datasets.filter(d => d.library === filter);
+    const currentDataset = datasets.find(d => d.id === selectedDataset) || datasets[0];
 
     if (!mounted) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex items-center justify-center">
-                <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600"></div>
+            <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center gap-6">
+                <div className="w-20 h-20 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+                <div className="font-black text-indigo-400 tracking-[0.3em] text-xs uppercase animate-pulse">Scanning Global Assets</div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
-            {/* Header */}
-            <header className="bg-white shadow-md">
-                <div className="container mx-auto px-4 py-6">
-                    <div className="flex justify-between items-center">
-                        <h1 className="text-3xl font-bold text-blue-600">ML Learning Platform</h1>
-                        <nav className="space-x-6">
-                            <Link href="/" className="text-gray-700 hover:text-blue-600">Home</Link>
-                            <Link href="/datasets" className="text-blue-600 font-semibold">Datasets</Link>
-                            <Link href="/preprocessing" className="text-gray-700 hover:text-blue-600">Data Preprocessing</Link>
-                            <Link href="/feature-selection" className="text-gray-700 hover:text-blue-600">Feature Selection</Link>
-                            <Link href="/eda" className="text-gray-700 hover:text-blue-600">EDA</Link>
-                            <Link href="/instructor" className="text-gray-700 hover:text-blue-600">Instructor</Link>
-                        </nav>
+        <Layout>
+            <main className="container mx-auto px-6 py-20 max-w-7xl">
+                {/* Hero Section */}
+                <div className="bg-slate-900 rounded-[4rem] p-16 md:p-20 mb-20 text-white relative overflow-hidden shadow-[0_64px_128px_-32px_rgba(2,6,23,0.3)]">
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[600px] bg-indigo-600/20 blur-[180px] rounded-full -z-10"></div>
+                    <div className="relative z-10 max-w-3xl">
+                        <span className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-500/10 rounded-full text-[10px] font-black tracking-[0.2em] text-indigo-400 uppercase mb-10 border border-indigo-500/20">
+                            The Data Foundation
+                        </span>
+                        <h1 className="text-6xl md:text-8xl font-black mb-12 leading-[0.9] tracking-tighter">Mastering the <span className="text-indigo-400 italic">Multivariate Tensors.</span></h1>
+                        <p className="text-xl text-slate-300 font-light leading-relaxed max-w-2xl">
+                            Data is a sampled observation of a mathematical function. Explore the standard tensors provided by Python's core libraries to begin your architectural discovery.
+                        </p>
                     </div>
                 </div>
-            </header>
 
-            {/* Main Content */}
-            <div className="container mx-auto px-4 py-8 max-w-7xl">
-                <div className="mb-6">
-                    <h2 className="text-4xl font-bold text-gray-900 mb-2">Dataset Explorer</h2>
-                    <p className="text-gray-600">Explore real-world datasets with EDA and visualizations</p>
+                {/* Library Filters */}
+                <div className="flex flex-wrap gap-3 mb-16 bg-white p-3 rounded-[2.5rem] border border-slate-100 shadow-sm w-max max-w-full">
+                    {['All', 'Scikit-Learn', 'Seaborn', 'Statsmodels', 'Deep Learning'].map(lib => (
+                        <button
+                            key={lib}
+                            onClick={() => setFilter(lib as any)}
+                            className={`px-8 py-4 rounded-[1.5rem] text-[10px] font-black uppercase tracking-widest transition-all ${filter === lib
+                                ? 'bg-indigo-600 text-white shadow-2xl shadow-indigo-100 scale-[1.02]'
+                                : 'bg-transparent text-slate-400 hover:text-slate-900'}`}
+                        >
+                            {lib}
+                        </button>
+                    ))}
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                    {/* Left Sidebar */}
-                    <div className="space-y-4">
-                        {/* Dataset Selection */}
-                        <div className="bg-white p-4 rounded-lg shadow-md">
-                            <h3 className="font-bold text-gray-900 mb-3">📁 Select Dataset</h3>
-                            <div className="space-y-2">
-                                {Object.entries(datasets).map(([key, dataset]) => (
-                                    <button
-                                        key={key}
-                                        onClick={() => setSelectedDataset(key)}
-                                        className={`w-full px-4 py-3 rounded-lg text-left transition ${selectedDataset === key
-                                            ? 'bg-blue-600 text-white font-semibold'
-                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                            }`}
-                                    >
-                                        <div className="font-semibold">{dataset.name}</div>
-                                        <div className="text-xs mt-1 opacity-80">
-                                            {dataset.samples} samples, {dataset.features} features
-                                        </div>
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* View Selection */}
-                        <div className="bg-white p-4 rounded-lg shadow-md">
-                            <h3 className="font-bold text-gray-900 mb-3">📊 View</h3>
-                            <div className="space-y-2">
-                                {['overview', 'statistics', 'correlations', 'usage'].map(v => (
-                                    <button
-                                        key={v}
-                                        onClick={() => setView(v)}
-                                        className={`w-full px-3 py-2 rounded-lg text-sm transition capitalize ${view === v
-                                            ? 'bg-blue-600 text-white'
-                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                            }`}
-                                    >
-                                        {v}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
+                    {/* Sidebar: Dataset List */}
+                    <div className="lg:col-span-4 space-y-4 max-h-[900px] overflow-y-auto pr-4 custom-scrollbar">
+                        {filteredDatasets.map((dataset) => (
+                            <button
+                                key={dataset.id}
+                                onClick={() => setSelectedDataset(dataset.id)}
+                                className={`w-full p-8 rounded-[2.5rem] text-left transition-all duration-500 group border-2 ${selectedDataset === dataset.id
+                                    ? 'bg-white border-indigo-600 shadow-2xl shadow-indigo-100 -translate-y-1'
+                                    : 'bg-white border-slate-50 hover:border-indigo-200 text-slate-500'}`}
+                            >
+                                <div className="flex justify-between items-start mb-6">
+                                    <span className={`text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-lg ${dataset.task === 'Classification' ? 'bg-emerald-50 text-emerald-600' :
+                                        dataset.task === 'Regression' ? 'bg-amber-50 text-amber-600' :
+                                            'bg-purple-50 text-purple-600'
+                                        }`}>
+                                        {dataset.task}
+                                    </span>
+                                    <span className="text-[8px] font-black text-slate-300 uppercase opacity-50">{dataset.library}</span>
+                                </div>
+                                <h3 className={`text-xl font-black leading-tight transition-colors mb-2 ${selectedDataset === dataset.id ? 'text-indigo-600' : 'text-slate-900'}`}>
+                                    {dataset.name}
+                                </h3>
+                                <div className="flex gap-4 text-[10px] font-black uppercase tracking-widest text-slate-300">
+                                    <span>N={dataset.samples}</span>
+                                    <span className="w-1 h-1 bg-slate-200 rounded-full mt-1.5 font-black uppercase tracking-widest text-indigo-400"></span>
+                                    <span>M={dataset.features} Features</span>
+                                </div>
+                            </button>
+                        ))}
                     </div>
 
                     {/* Main Content Area */}
-                    <div className="lg:col-span-3 space-y-6">
-                        {/* Overview */}
-                        {view === 'overview' && (
-                            <>
-                                <div className="bg-white p-6 rounded-lg shadow-md">
-                                    <h3 className="text-2xl font-bold text-gray-900 mb-4">{currentDataset.name}</h3>
-                                    <p className="text-gray-700 mb-4">{currentDataset.description}</p>
+                    <div className="lg:col-span-8">
+                        <div className="bg-white rounded-[4rem] p-12 md:p-16 border border-slate-100 shadow-sm relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 w-48 h-48 bg-indigo-50/50 rounded-bl-[4rem] group-hover:bg-indigo-100/50 transition-colors"></div>
 
-                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-                                        <div className="bg-blue-50 p-4 rounded-lg">
-                                            <div className="text-sm text-blue-600 font-semibold">Samples</div>
-                                            <div className="text-2xl font-bold text-blue-900">{currentDataset.samples}</div>
-                                        </div>
-                                        <div className="bg-green-50 p-4 rounded-lg">
-                                            <div className="text-sm text-green-600 font-semibold">Features</div>
-                                            <div className="text-2xl font-bold text-green-900">{currentDataset.features}</div>
-                                        </div>
-                                        <div className="bg-purple-50 p-4 rounded-lg">
-                                            <div className="text-sm text-purple-600 font-semibold">Classes</div>
-                                            <div className="text-2xl font-bold text-purple-900">{currentDataset.classes}</div>
-                                        </div>
-                                        <div className="bg-orange-50 p-4 rounded-lg">
-                                            <div className="text-sm text-orange-600 font-semibold">Task</div>
-                                            <div className="text-sm font-bold text-orange-900 mt-2">{currentDataset.task}</div>
-                                        </div>
-                                    </div>
+                            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-8 relative z-10">
+                                <div>
+                                    <h2 className="text-5xl font-black text-slate-900 mb-2 tracking-tighter">{currentDataset.name}</h2>
+                                    <p className="text-indigo-500 font-black uppercase text-[10px] tracking-[0.3em]">{currentDataset.library} • {currentDataset.task}</p>
                                 </div>
-
-                                <div className="bg-white p-6 rounded-lg shadow-md">
-                                    <h4 className="font-bold text-gray-900 mb-3">📋 Features</h4>
-                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                                        {currentDataset.featureNames.map(feature => (
-                                            <div key={feature} className="bg-gray-100 px-3 py-2 rounded text-sm">
-                                                {feature.replace(/_/g, ' ')}
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                <div className="bg-white p-6 rounded-lg shadow-md">
-                                    <h4 className="font-bold text-gray-900 mb-3">🎯 Target Classes</h4>
-                                    <div className="flex gap-2 flex-wrap">
-                                        {currentDataset.targetNames.map((target, idx) => (
-                                            <div key={idx} className="bg-blue-100 px-4 py-2 rounded-lg font-semibold text-blue-900">
-                                                {target}
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                <div className="bg-white p-6 rounded-lg shadow-md">
-                                    <h4 className="font-bold text-gray-900 mb-3">💻 How to Load</h4>
-                                    <CodeBlock
-                                        code={`from sklearn.datasets import load_${selectedDataset}
-
-# Load dataset
-data = load_${selectedDataset}()
-X = data.data  # Features
-y = data.target  # Labels
-
-print(f"Shape: {X.shape}")
-print(f"Features: {data.feature_names}")
-print(f"Classes: {data.target_names}")`}
-                                        language="python"
-                                    />
-                                </div>
-                            </>
-                        )}
-
-                        {/* Statistics */}
-                        {view === 'statistics' && (
-                            <div className="bg-white p-6 rounded-lg shadow-md">
-                                <h3 className="text-2xl font-bold text-gray-900 mb-4">📈 Descriptive Statistics</h3>
-                                <div className="overflow-x-auto">
-                                    <table className="w-full text-sm">
-                                        <thead>
-                                            <tr className="bg-gray-100">
-                                                <th className="p-3 border border-gray-300 text-left">Feature</th>
-                                                <th className="p-3 border border-gray-300">Mean</th>
-                                                <th className="p-3 border border-gray-300">Std Dev</th>
-                                                <th className="p-3 border border-gray-300">Min</th>
-                                                <th className="p-3 border border-gray-300">Max</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {Object.entries(currentDataset.statistics).map(([feature, stats]: [string, any]) => (
-                                                <tr key={feature} className="hover:bg-gray-50">
-                                                    <td className="p-3 border border-gray-300 font-semibold">{feature.replace(/_/g, ' ')}</td>
-                                                    <td className="p-3 border border-gray-300 text-center">{stats.mean.toFixed(2)}</td>
-                                                    <td className="p-3 border border-gray-300 text-center">{stats.std.toFixed(2)}</td>
-                                                    <td className="p-3 border border-gray-300 text-center">{stats.min.toFixed(2)}</td>
-                                                    <td className="p-3 border border-gray-300 text-center">{stats.max.toFixed(2)}</td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-
-                                <div className="mt-6">
-                                    <h4 className="font-bold text-gray-900 mb-3">💡 Key Insights</h4>
-                                    <ul className="list-disc list-inside space-y-2 text-gray-700">
-                                        <li>Mean values show the central tendency of each feature</li>
-                                        <li>Standard deviation indicates feature variability</li>
-                                        <li>Min/Max values help identify the feature ranges</li>
-                                        <li>Use these statistics for feature scaling and normalization</li>
-                                    </ul>
+                                <div className="p-6 bg-slate-950 rounded-[2rem] font-mono text-xs text-indigo-400 border border-white/5 shadow-2xl flex items-center gap-3">
+                                    <div className="w-2 h-2 bg-indigo-500 rounded-full animate-pulse"></div>
+                                    {currentDataset.source}
                                 </div>
                             </div>
-                        )}
 
-                        {/* Correlations */}
-                        {view === 'correlations' && (
-                            <div className="bg-white p-6 rounded-lg shadow-md">
-                                <h3 className="text-2xl font-bold text-gray-900 mb-4">🔗 Feature Correlations</h3>
-                                <div className="space-y-4">
-                                    {currentDataset.correlations.map(([feat1, feat2, corr], idx) => {
-                                        const strength = Math.abs(corr);
-                                        const type = corr > 0 ? 'Positive' : 'Negative';
-                                        const color = corr > 0 ? 'blue' : 'red';
-                                        const bgColor = corr > 0 ? 'bg-blue-50' : 'bg-red-50';
+                            <p className="text-2xl text-slate-500 leading-relaxed font-light mb-16 max-w-2xl italic tracking-tight">
+                                "{currentDataset.description}"
+                            </p>
 
-                                        return (
-                                            <div key={idx} className={`${bgColor} p-4 rounded-lg border-2 border-${color}-200`}>
-                                                <div className="flex justify-between items-center">
-                                                    <div>
-                                                        <div className="font-bold text-gray-900">
-                                                            {feat1.replace(/_/g, ' ')} ↔ {feat2.replace(/_/g, ' ')}
-                                                        </div>
-                                                        <div className={`text-sm text-${color}-700 mt-1`}>
-                                                            {type} Correlation: {corr.toFixed(3)}
-                                                        </div>
-                                                    </div>
-                                                    <div className={`text-3xl font-bold text-${color}-600`}>
-                                                        {strength >= 0.8 ? '💪' : strength >= 0.5 ? '👍' : '👌'}
-                                                    </div>
-                                                </div>
-                                                <div className="mt-2">
-                                                    <div className="w-full bg-gray-200 rounded-full h-2">
-                                                        <div
-                                                            className={`bg-${color}-600 h-2 rounded-full`}
-                                                            style={{ width: `${strength * 100}%` }}
-                                                        ></div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-
-                                <div className="mt-6 bg-yellow-50 p-4 rounded-lg border-2 border-yellow-200">
-                                    <h4 className="font-bold text-yellow-900 mb-2">📚 Understanding Correlations</h4>
-                                    <ul className="list-disc list-inside space-y-1 text-sm text-yellow-800">
-                                        <li>+1.0 = Perfect positive correlation (features move together)</li>
-                                        <li>-1.0 = Perfect negative correlation (features move opposite)</li>
-                                        <li>0.0 = No correlation (features are independent)</li>
-                                        <li>|r| &gt; 0.7 = Strong correlation</li>
-                                        <li>|r| 0.3-0.7 = Moderate correlation</li>
-                                        <li>|r| &lt; 0.3 = Weak correlation</li>
-                                    </ul>
-                                </div>
+                            <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 mb-20">
+                                {[
+                                    { label: 'Space Dimension', value: currentDataset.samples, sub: 'Observations', color: 'indigo' },
+                                    { label: 'Feature Tensors', value: currentDataset.features, sub: 'Degrees of Freedom', color: 'emerald' },
+                                    { label: 'Class Labels', value: currentDataset.classes || 'N/A', sub: 'Unique Manifolds', color: 'purple' },
+                                    { label: 'Ideal Algorithm', value: currentDataset.task === 'Classification' ? 'SVM' : 'LASSO', sub: 'Highest Prob.', color: 'rose' }
+                                ].map((stat, i) => (
+                                    <div key={i} className={`bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm hover:border-${stat.color}-300 transition-all duration-300 group`}>
+                                        <span className={`text-[9px] font-black uppercase text-slate-400 mb-4 block tracking-widest`}>{stat.label}</span>
+                                        <div className={`text-4xl font-black text-slate-900 mb-1 group-hover:text-${stat.color}-600 transition-colors`}>{stat.value}</div>
+                                        <span className={`text-[9px] font-black uppercase tracking-tighter text-slate-300`}>{stat.sub}</span>
+                                    </div>
+                                ))}
                             </div>
-                        )}
 
-                        {/* Usage */}
-                        {view === 'usage' && (
-                            <>
-                                <div className="bg-white p-6 rounded-lg shadow-md">
-                                    <h3 className="text-2xl font-bold text-gray-900 mb-4">🎯 Common Use Cases</h3>
-                                    <div className="space-y-3">
-                                        {currentDataset.useCases.map((useCase, idx) => (
-                                            <div key={idx} className="flex items-start gap-3 bg-gray-50 p-4 rounded-lg">
-                                                <span className="text-2xl">{idx + 1}.</span>
-                                                <div className="flex-1">
-                                                    <div className="font-semibold text-gray-900">{useCase}</div>
-                                                </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                                <section>
+                                    <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-8 border-b border-slate-50 pb-4">Architectural Use Cases</h4>
+                                    <div className="space-y-6">
+                                        {currentDataset.useCases.map((use, i) => (
+                                            <div key={i} className="flex gap-6 items-center group">
+                                                <div className="w-10 h-10 bg-slate-50 rounded-2xl flex items-center justify-center text-[10px] font-black text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-all shadow-sm">0{i + 1}</div>
+                                                <span className="text-sm font-bold text-slate-700 tracking-tight">{use}</span>
                                             </div>
                                         ))}
                                     </div>
-                                </div>
+                                </section>
+                                <section className="space-y-8">
+                                    <h4 className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-8 border-b border-indigo-50 pb-4">Stochastic Simulation</h4>
+                                    <div className="bg-slate-900 p-10 rounded-[2.5rem] text-white shadow-2xl border border-white/5 group hover:border-indigo-500/30 transition-all">
+                                        <p className="text-xs font-light text-slate-400 leading-relaxed mb-8">
+                                            Test the boundaries of your models by simulating similar variance-sensitive signals.
+                                        </p>
+                                        <CodeBlock language="python" code={`# Gen Signal\nimport numpy as np\nn = ${currentDataset.samples === 'N/A' ? 1000 : currentDataset.samples}\nx = np.random.randn(n, ${currentDataset.features === 'Sequence Tensors' || currentDataset.features === '28x28 Tensors' ? 10 : currentDataset.features})\ny = 1.4 * x[:,0] + 0.9 * x[:,1] + np.random.normal(0, 0.1, n)`} />
+                                    </div>
+                                </section>
+                            </div>
+                        </div>
 
-                                <div className="bg-white p-6 rounded-lg shadow-md">
-                                    <h4 className="font-bold text-gray-900 mb-3">💻 Complete Example</h4>
-                                    <CodeBlock
-                                        code={`from sklearn.datasets import load_${selectedDataset}
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score, classification_report
-
-# Load dataset
-data = load_${selectedDataset}()
-X, y = data.data, data.target
-
-# Split data
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.3, random_state=42
-)
-
-# Scale features
-scaler = StandardScaler()
-X_train_scaled = scaler.fit_transform(X_train)
-X_test_scaled = scaler.transform(X_test)
-
-# Train model
-model = RandomForestClassifier(n_estimators=100, random_state=42)
-model.fit(X_train_scaled, y_train)
-
-# Evaluate
-y_pred = model.predict(X_test_scaled)
-accuracy = accuracy_score(y_test, y_pred)
-
-print(f"Accuracy: {accuracy:.3f}")
-print("\\nClassification Report:")
-print(classification_report(y_test, y_pred, 
-                          target_names=data.target_names))`}
-                                        language="python"
-                                    />
-                                </div>
-
-                                <div className="bg-blue-50 p-4 rounded-lg border-2 border-blue-200">
-                                    <h4 className="font-bold text-blue-900 mb-2">💡 Tips for Using This Dataset</h4>
-                                    <ul className="list-disc list-inside space-y-1 text-sm text-blue-800">
-                                        <li>Always split data before any preprocessing</li>
-                                        <li>Scale features for distance-based algorithms (KNN, SVM)</li>
-                                        <li>Try different train/test split ratios (70/30, 80/20)</li>
-                                        <li>Use cross-validation for robust evaluation</li>
-                                        <li>Compare multiple algorithms to find the best fit</li>
-                                        <li>Visualize feature distributions and relationships</li>
-                                    </ul>
-                                </div>
-                            </>
-                        )}
+                        {/* CTA Lab Navigation */}
+                        <div className="mt-20 bg-gradient-to-br from-indigo-600 via-indigo-700 to-purple-800 rounded-[4rem] p-16 text-white relative overflow-hidden shadow-2xl group">
+                            <div className="absolute top-0 right-0 w-full h-full bg-[url('/noise.png')] opacity-20"></div>
+                            <div className="absolute bottom-0 left-0 w-96 h-96 bg-white/10 rounded-full -ml-48 -mb-48 blur-3xl group-hover:scale-125 transition-transform duration-700"></div>
+                            <div className="relative z-10 text-center">
+                                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-indigo-200 mb-8 block">Next Structural Phase</span>
+                                <h3 className="text-4xl md:text-6xl font-black mb-12 tracking-tighter leading-tight">Master Exploratory <br />Mathematical Analysis</h3>
+                                <Link
+                                    href="/eda"
+                                    className="bg-white text-indigo-600 px-16 py-6 rounded-[2rem] font-black text-xs uppercase tracking-widest hover:bg-slate-50 transition active:scale-95 shadow-2xl flex items-center justify-center gap-3 w-max mx-auto group"
+                                >
+                                    Activate EDA Lab
+                                    <span className="text-xl transition-transform group-hover:translate-x-2">→</span>
+                                </Link>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </main>
 
-            {/* Footer */}
-            <footer className="bg-gray-900 text-white py-8 mt-16">
-                <div className="container mx-auto px-4 text-center">
-                    <p className="text-gray-400">ML Learning Platform - Dataset Explorer</p>
-                    <p className="text-gray-500 mt-2">Explore real-world datasets for machine learning</p>
-                </div>
-            </footer>
-        </div>
+            <style jsx>{`
+                .custom-scrollbar::-webkit-scrollbar { width: 5px; }
+                .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+                .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+                .custom-scrollbar { scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent; }
+            `}</style>
+        </Layout>
     );
 };
 

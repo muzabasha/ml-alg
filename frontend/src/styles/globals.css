@@ -2,15 +2,117 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100;300;400;500;700;900&display=swap');
+
 :root {
-    --foreground-rgb: 0, 0, 0;
-    --background-start-rgb: 214, 219, 220;
-    --background-end-rgb: 255, 255, 255;
+    --primary: #4f46e5;
+    --primary-hover: #4338ca;
+    --slate-900: #0f172a;
+    --slate-950: #020617;
+    --slate-50: #fcfcfd;
 }
 
-body {
-    color: rgb(var(--foreground-rgb));
-    background: linear-gradient(to bottom,
-            transparent,
-            rgb(var(--background-end-rgb))) rgb(var(--background-start-rgb));
+@layer base {
+    html {
+        font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        scroll-behavior: smooth;
+    }
+
+    body {
+        @apply bg-[#fcfcfd] text-slate-900 antialiased selection:bg-indigo-100 selection:text-indigo-900;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        @apply tracking-tighter text-slate-950;
+    }
+}
+
+@layer components {
+    .glass {
+        @apply bg-white/70 backdrop-blur-2xl border border-white/40 shadow-[0_8px_32px_0_rgba(31, 38, 135, 0.07)];
+    }
+
+    .glass-dark {
+        @apply bg-slate-950/70 backdrop-blur-3xl border border-white/10 shadow-2xl;
+    }
+
+    .btn-premium {
+        @apply relative inline-flex items-center justify-center px-8 py-4 font-black uppercase tracking-widest text-[10px] text-white bg-indigo-600 rounded-2xl transition-all duration-300 hover:bg-indigo-701 hover:scale-[1.02] active:scale-[0.98] shadow-2xl shadow-indigo-200 overflow-hidden group/btn;
+    }
+
+    .card-premium {
+        @apply bg-white rounded-[3rem] border border-slate-100 shadow-[0_32px_64px_-16px_rgba(2, 6, 23, 0.05)] transition-all duration-500 hover:shadow-[0_64px_128px_-32px_rgba(2, 6, 23, 0.1)];
+    }
+
+    .text-gradient-indigo {
+        @apply bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-800;
+    }
+}
+
+/* KaTeX Overrides */
+.katex-display {
+    @apply my-10 p-12 bg-white/50 backdrop-blur-md rounded-[3rem] border border-slate-100 shadow-inner overflow-x-auto no-scrollbar;
+}
+
+.katex {
+    @apply text-indigo-700 font-black;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    @apply bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    @apply bg-slate-200 rounded-full hover:bg-indigo-200 transition-colors;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.animate-fadeIn {
+    animation: fadeIn 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 }

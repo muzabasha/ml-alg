@@ -3,7 +3,7 @@ import dynamic from 'next/dynamic';
 
 const CodeBlock = dynamic(() => import('./CodeBlock'), {
     ssr: false,
-    loading: () => <div className="h-40 bg-gray-900 rounded-xl animate-pulse my-6"></div>
+    loading: () => <div className="h-40 bg-slate-900 rounded-[2.5rem] animate-pulse my-6"></div>
 });
 
 interface EnhancedSampleIOProps {
@@ -13,86 +13,82 @@ interface EnhancedSampleIOProps {
 }
 
 const EnhancedSampleIO: React.FC<EnhancedSampleIOProps> = ({ content, icon, accent }) => {
-    // Wrap everything in try-catch to prevent crashes
     try {
-        // Safety check - if no content, show simple message
         if (!content) {
             return (
-                <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
-                    <p className="text-gray-600">No sample data available for this algorithm.</p>
+                <div className="bg-slate-50 rounded-[3rem] p-12 border border-slate-100 italic text-slate-400 text-center">
+                    Signal buffer empty. No sample data detected.
                 </div>
             );
         }
 
-        // Check if content has input/output structure
         const hasStructuredData = typeof content === 'object' && content !== null && (content.input || content.output);
 
         if (!hasStructuredData) {
-            // Fallback: display as text
             return (
-                <div className="space-y-4">
-                    <div className="flex items-center gap-3">
-                        <span className="text-3xl">{icon}</span>
-                        <h3 className={`text-xl font-bold ${accent}`}>Sample Input & Output</h3>
+                <div className="space-y-8">
+                    <div className="flex items-center gap-4">
+                        <div className="w-14 h-14 bg-indigo-600 rounded-2xl flex items-center justify-center text-3xl shadow-2xl shadow-indigo-100">{icon}</div>
+                        <h3 className="text-3xl font-black text-slate-900 tracking-tighter uppercase tracking-[0.1em]">Signal Manifest</h3>
                     </div>
-                    <div className="bg-white rounded-lg shadow border border-gray-200 overflow-hidden">
-                        <CodeBlock
-                            code={typeof content === 'string' ? content : JSON.stringify(content, null, 2)}
-                            language={typeof content === 'string' ? 'text' : 'json'}
-                        />
-                    </div>
+                    <CodeBlock
+                        code={typeof content === 'string' ? content : JSON.stringify(content, null, 2)}
+                        language={typeof content === 'string' ? 'text' : 'json'}
+                    />
                 </div>
             );
         }
 
-        // Render structured data
         return (
-            <div className="space-y-6">
+            <div className="space-y-16 animate-fadeIn">
                 {/* Header */}
-                <div className="flex items-center gap-3">
-                    <span className="text-4xl">{icon}</span>
+                <div className="flex items-center gap-6">
+                    <div className="w-20 h-20 bg-slate-950 rounded-[2rem] flex items-center justify-center text-4xl shadow-2xl text-white italic transition-transform hover:rotate-12">Σ</div>
                     <div>
-                        <h3 className={`text-2xl font-bold ${accent}`}>
-                            {content.title || 'Sample Input & Output'}
+                        <h3 className="text-4xl font-black text-slate-900 tracking-tighter leading-none">
+                            {content.title || 'Signal Decomposition'}
                         </h3>
                         {content.description && (
-                            <p className="text-gray-600 mt-1">{content.description}</p>
+                            <p className="text-slate-500 mt-3 text-lg font-light italic">{content.description}</p>
                         )}
                     </div>
                 </div>
 
                 {/* Two-column layout */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
                     {/* Input Section */}
                     {content.input && (
-                        <div className="bg-white rounded-xl shadow-lg border-2 border-blue-200 overflow-hidden">
-                            <div className="bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-4">
-                                <div className="flex items-center gap-3">
-                                    <span className="text-2xl">📥</span>
-                                    <h4 className="text-xl font-bold text-white">Input Data</h4>
+                        <div className="bg-white rounded-[4rem] border border-slate-100 shadow-[0_32px_64px_-16px_rgba(2,6,23,0.05)] overflow-hidden group">
+                            <div className="bg-slate-950 px-10 py-8 relative overflow-hidden">
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-1000"></div>
+                                <div className="flex items-center gap-4 relative z-10">
+                                    <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-xl shadow-lg">📥</div>
+                                    <div>
+                                        <h4 className="text-xs font-black text-white uppercase tracking-[0.4em]">Input Manifold</h4>
+                                        {content.input.format && (
+                                            <p className="text-indigo-400 text-[9px] font-black uppercase mt-1 tracking-widest">{String(content.input.format)}</p>
+                                        )}
+                                    </div>
                                 </div>
-                                {content.input.format && (
-                                    <p className="text-blue-100 text-sm mt-1">{String(content.input.format)}</p>
-                                )}
                             </div>
-                            <div className="p-6">
-                                {content.input.table && Array.isArray(content.input.table) && content.input.table.length > 0 ? (
-                                    <div className="overflow-x-auto">
-                                        <table className="min-w-full divide-y divide-gray-200">
-                                            <thead className="bg-gray-50">
-                                                <tr>
+                            <div className="p-10">
+                                {content.input.table && Array.isArray(content.input.table) ? (
+                                    <div className="overflow-x-auto no-scrollbar">
+                                        <table className="w-full text-left">
+                                            <thead>
+                                                <tr className="border-b border-slate-50">
                                                     {Object.keys(content.input.table[0] || {}).map((key: string, idx: number) => (
-                                                        <th key={idx} className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+                                                        <th key={idx} className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">
                                                             {String(key)}
                                                         </th>
                                                     ))}
                                                 </tr>
                                             </thead>
-                                            <tbody className="bg-white divide-y divide-gray-200">
+                                            <tbody className="divide-y divide-slate-50">
                                                 {content.input.table.map((row: any, idx: number) => (
-                                                    <tr key={idx} className="hover:bg-blue-50 transition">
+                                                    <tr key={idx} className="hover:bg-indigo-50/30 transition-all group/row">
                                                         {Object.values(row).map((value: any, vidx: number) => (
-                                                            <td key={vidx} className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                                                            <td key={vidx} className="px-6 py-5 text-sm font-medium text-slate-600 group-hover/row:text-slate-950">
                                                                 {typeof value === 'number' ? value.toLocaleString() : String(value || '')}
                                                             </td>
                                                         ))}
@@ -102,10 +98,7 @@ const EnhancedSampleIO: React.FC<EnhancedSampleIOProps> = ({ content, icon, acce
                                         </table>
                                     </div>
                                 ) : (
-                                    <CodeBlock
-                                        code={JSON.stringify(content.input, null, 2)}
-                                        language="json"
-                                    />
+                                    <CodeBlock code={JSON.stringify(content.input, null, 2)} language="json" />
                                 )}
                             </div>
                         </div>
@@ -113,26 +106,29 @@ const EnhancedSampleIO: React.FC<EnhancedSampleIOProps> = ({ content, icon, acce
 
                     {/* Output Section */}
                     {content.output && (
-                        <div className="bg-white rounded-xl shadow-lg border-2 border-green-200 overflow-hidden">
-                            <div className="bg-gradient-to-r from-green-500 to-green-600 px-6 py-4">
-                                <div className="flex items-center gap-3">
-                                    <span className="text-2xl">📤</span>
-                                    <h4 className="text-xl font-bold text-white">Output/Predictions</h4>
+                        <div className="bg-white rounded-[4rem] border border-slate-100 shadow-[0_32px_64px_-16px_rgba(2,6,23,0.05)] overflow-hidden group">
+                            <div className="bg-indigo-600 px-10 py-8 relative overflow-hidden">
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-1000"></div>
+                                <div className="flex items-center gap-4 relative z-10">
+                                    <div className="w-10 h-10 bg-slate-950 rounded-xl flex items-center justify-center text-xl shadow-lg">📤</div>
+                                    <div>
+                                        <h4 className="text-xs font-black text-white uppercase tracking-[0.4em]">Inference Result</h4>
+                                        <p className="text-indigo-200 text-[9px] font-black uppercase mt-1 tracking-widest">Calculated Convergence</p>
+                                    </div>
                                 </div>
                             </div>
-                            <div className="p-6 space-y-4">
-                                {/* Parameters */}
-                                {content.output.parameters && typeof content.output.parameters === 'object' && (
-                                    <div className="bg-purple-50 rounded-lg p-4 border border-purple-200">
-                                        <h5 className="font-bold text-purple-900 mb-3 flex items-center gap-2">
-                                            <span>⚙️</span>
-                                            Learned Parameters
+                            <div className="p-10 space-y-10">
+                                {content.output.parameters && (
+                                    <div className="bg-slate-50 rounded-[2.5rem] p-8 border border-slate-100">
+                                        <h5 className="text-[10px] font-black text-indigo-600 uppercase tracking-[0.3em] mb-6 flex items-center gap-3">
+                                            <span className="w-2 h-2 bg-indigo-600 rounded-full"></span>
+                                            Learned Weights (β)
                                         </h5>
-                                        <div className="space-y-2">
+                                        <div className="grid grid-cols-1 gap-4">
                                             {Object.entries(content.output.parameters).map(([key, value]: [string, any], idx: number) => (
-                                                <div key={idx} className="flex justify-between items-center">
-                                                    <span className="text-sm font-medium text-gray-700">{String(key)}:</span>
-                                                    <span className="text-sm font-mono bg-white px-3 py-1 rounded border border-purple-200">
+                                                <div key={idx} className="flex justify-between items-center bg-white px-6 py-4 rounded-2xl shadow-sm border border-slate-50 group/item">
+                                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest group-hover/item:text-indigo-600 transition-colors">{String(key)}</span>
+                                                    <span className="text-sm font-black text-slate-950 font-mono italic">
                                                         {typeof value === 'number' ? value.toLocaleString() : String(value)}
                                                     </span>
                                                 </div>
@@ -141,27 +137,24 @@ const EnhancedSampleIO: React.FC<EnhancedSampleIOProps> = ({ content, icon, acce
                                     </div>
                                 )}
 
-                                {/* Predictions Table */}
-                                {content.output.predictions && Array.isArray(content.output.predictions) && content.output.predictions.length > 0 && (
-                                    <div className="overflow-x-auto">
-                                        <table className="min-w-full divide-y divide-gray-200">
-                                            <thead className="bg-gray-50">
-                                                <tr>
+                                {content.output.predictions && (
+                                    <div className="overflow-x-auto no-scrollbar">
+                                        <table className="w-full text-left">
+                                            <thead>
+                                                <tr className="border-b border-slate-50">
                                                     {Object.keys(content.output.predictions[0] || {}).map((key: string, idx: number) => (
-                                                        <th key={idx} className="px-3 py-2 text-left text-xs font-medium text-gray-700 uppercase">
+                                                        <th key={idx} className="px-5 py-3 text-[9px] font-black text-slate-400 uppercase tracking-widest">
                                                             {String(key)}
                                                         </th>
                                                     ))}
                                                 </tr>
                                             </thead>
-                                            <tbody className="bg-white divide-y divide-gray-200">
+                                            <tbody className="divide-y divide-slate-50">
                                                 {content.output.predictions.map((row: any, idx: number) => (
-                                                    <tr key={idx} className="hover:bg-green-50 transition">
+                                                    <tr key={idx} className="hover:bg-emerald-50/30 transition-all font-medium">
                                                         {Object.values(row).map((value: any, vidx: number) => (
-                                                            <td key={vidx} className="px-3 py-2 whitespace-nowrap text-sm text-gray-900">
-                                                                {typeof value === 'number' ?
-                                                                    (value < 1 && value > 0 ? value.toFixed(2) : value.toLocaleString())
-                                                                    : String(value || '')}
+                                                            <td key={vidx} className="px-5 py-4 text-sm text-slate-600">
+                                                                {typeof value === 'number' ? value.toFixed(3) : String(value || '')}
                                                             </td>
                                                         ))}
                                                     </tr>
@@ -171,25 +164,17 @@ const EnhancedSampleIO: React.FC<EnhancedSampleIOProps> = ({ content, icon, acce
                                     </div>
                                 )}
 
-                                {/* Metrics */}
-                                {content.output.metrics && typeof content.output.metrics === 'object' && (
-                                    <div className="bg-amber-50 rounded-lg p-4 border border-amber-200">
-                                        <h5 className="font-bold text-amber-900 mb-3 flex items-center gap-2">
-                                            <span>📊</span>
-                                            Performance Metrics
-                                        </h5>
-                                        <div className="grid grid-cols-2 gap-3">
-                                            {Object.entries(content.output.metrics).map(([key, value]: [string, any], idx: number) => (
-                                                <div key={idx} className="bg-white rounded p-3 border border-amber-200">
-                                                    <div className="text-xs text-gray-600 mb-1">{String(key)}</div>
-                                                    <div className="text-lg font-bold text-gray-900">
-                                                        {typeof value === 'number' ?
-                                                            (value < 1 && value > 0 ? value.toFixed(4) : value.toLocaleString())
-                                                            : String(value)}
-                                                    </div>
+                                {content.output.metrics && (
+                                    <div className="grid grid-cols-2 gap-4">
+                                        {Object.entries(content.output.metrics).map(([key, value]: [string, any], idx: number) => (
+                                            <div key={idx} className="bg-emerald-50 rounded-[2rem] p-6 border border-emerald-100 relative group/stat overflow-hidden">
+                                                <div className="absolute top-0 right-0 w-16 h-16 bg-white/20 rounded-full blur-xl group-hover/stat:scale-150 transition-transform"></div>
+                                                <div className="text-[9px] font-black text-emerald-800 uppercase tracking-widest mb-2 opacity-60">{String(key)}</div>
+                                                <div className="text-2xl font-black text-emerald-950 tracking-tighter">
+                                                    {typeof value === 'number' ? value.toFixed(4) : String(value)}
                                                 </div>
-                                            ))}
-                                        </div>
+                                            </div>
+                                        ))}
                                     </div>
                                 )}
                             </div>
@@ -199,74 +184,21 @@ const EnhancedSampleIO: React.FC<EnhancedSampleIOProps> = ({ content, icon, acce
 
                 {/* Visualization Note */}
                 {content.visualization && (
-                    <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg p-6 border-2 border-indigo-200">
-                        <div className="flex items-start gap-3">
-                            <span className="text-3xl">📈</span>
+                    <div className="bg-indigo-600 rounded-[3rem] p-12 text-white relative overflow-hidden shadow-2xl group">
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-[100px] group-hover:scale-150 transition-transform duration-1000"></div>
+                        <div className="flex items-start gap-6 relative z-10">
+                            <div className="w-16 h-16 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center text-3xl">📈</div>
                             <div>
-                                <h5 className="font-bold text-indigo-900 mb-2">Visualization</h5>
-                                <p className="text-indigo-800">{String(content.visualization)}</p>
+                                <h5 className="text-xs font-black uppercase tracking-[0.4em] mb-4 text-indigo-200">Architectural Note</h5>
+                                <p className="text-2xl font-light italic leading-relaxed text-indigo-50">"{String(content.visualization)}"</p>
                             </div>
                         </div>
                     </div>
                 )}
-
-                {/* Info Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-                    <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4 border border-blue-200">
-                        <div className="flex items-center gap-2 mb-2">
-                            <span className="text-2xl">💡</span>
-                            <h5 className="font-bold text-blue-900">Tip</h5>
-                        </div>
-                        <p className="text-sm text-blue-800">
-                            Study the input format carefully to understand the data structure
-                        </p>
-                    </div>
-
-                    <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4 border border-green-200">
-                        <div className="flex items-center gap-2 mb-2">
-                            <span className="text-2xl">🎯</span>
-                            <h5 className="font-bold text-green-900">Practice</h5>
-                        </div>
-                        <p className="text-sm text-green-800">
-                            Try modifying the input values to see how the output changes
-                        </p>
-                    </div>
-
-                    <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4 border border-purple-200">
-                        <div className="flex items-center gap-2 mb-2">
-                            <span className="text-2xl">🔬</span>
-                            <h5 className="font-bold text-purple-900">Experiment</h5>
-                        </div>
-                        <p className="text-sm text-purple-800">
-                            Use the playground below to test with your own data
-                        </p>
-                    </div>
-                </div>
             </div>
         );
     } catch (error) {
-        // If anything fails, return a safe fallback
-        console.error('EnhancedSampleIO error:', error);
-        return (
-            <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                    <span className="text-3xl">{icon || '📊'}</span>
-                    <h3 className={`text-xl font-bold ${accent || 'text-gray-900'}`}>Sample Input & Output</h3>
-                </div>
-                <div className="bg-white rounded-lg shadow p-6 border border-gray-200">
-                    <p className="text-gray-600 mb-4">Sample data is available but could not be displayed in enhanced format.</p>
-                    <details>
-                        <summary className="cursor-pointer text-blue-600 hover:text-blue-800 font-medium">
-                            View raw data
-                        </summary>
-                        <CodeBlock
-                            code={JSON.stringify(content, null, 2)}
-                            language="json"
-                        />
-                    </details>
-                </div>
-            </div>
-        );
+        return <div className="p-12 bg-rose-50 rounded-[3rem] text-rose-900 font-black text-center">Rendering Core Exception. Signal corrupted.</div>;
     }
 };
 

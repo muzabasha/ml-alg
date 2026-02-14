@@ -1,272 +1,93 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import 'katex/dist/katex.min.css';
+import { InlineMath, BlockMath } from 'react-katex';
+import Layout from '../../components/Layout';
 
-// Dynamic import for DataVisualization to avoid SSR issues with Chart.js
-const DataVisualization = dynamic(() => import('../../components/DataVisualization'), {
-    ssr: false,
-    loading: () => (
-        <div className="my-6 p-6 bg-white rounded-xl shadow-lg border-2 border-green-200">
-            <div className="flex items-center justify-center h-64">
-                <span className="text-green-600 animate-pulse">Loading visualization...</span>
-            </div>
-        </div>
-    )
-});
+// Dynamic imports for Interactive Components
+const NeuralNetworkPlayground = dynamic(() => import('../../components/NeuralNetworkPlayground'), { ssr: false });
+const MLPlayground = dynamic(() => import('../../components/MLPlayground'), { ssr: false });
+const TransformerPlayground = dynamic(() => import('../../components/TransformerPlayground'), { ssr: false });
+const CodeBlock = dynamic(() => import('../../components/CodeBlock'), { ssr: false });
 
-// Dynamic import for Enhanced Sample I/O
-const EnhancedSampleIO = dynamic(() => import('../../components/EnhancedSampleIO'), {
-    ssr: false,
-    loading: () => (
-        <div className="my-6 p-6 bg-white rounded-xl shadow-lg">
-            <div className="flex items-center justify-center h-32">
-                <span className="text-gray-600 animate-pulse">Loading sample data...</span>
-            </div>
-        </div>
-    )
-});
-
-// Dynamic import for Neural Network Playground
-const NeuralNetworkPlayground = dynamic(() => import('../../components/NeuralNetworkPlayground'), {
-    ssr: false,
-    loading: () => (
-        <div className="my-8 p-6 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl shadow-2xl border-2 border-indigo-200">
-            <div className="flex items-center justify-center h-96">
-                <span className="text-indigo-600 animate-pulse text-lg">Loading Neural Network Playground...</span>
-            </div>
-        </div>
-    )
-});
-// Dynamic import for ML Playground
-const MLPlayground = dynamic(() => import('../../components/MLPlayground'), {
-    ssr: false,
-    loading: () => (
-        <div className="my-8 p-6 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl shadow-2xl border-2 border-blue-200">
-            <div className="flex items-center justify-center h-96">
-                <span className="text-blue-600 animate-pulse text-lg">Loading ML Playground...</span>
-            </div>
-        </div>
-    )
-});
-
-// Dynamic import for Transformer Playground
-const TransformerPlayground = dynamic(() => import('../../components/TransformerPlayground'), {
-    ssr: false,
-    loading: () => (
-        <div className="my-8 p-6 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl shadow-2xl border-2 border-purple-200">
-            <div className="flex items-center justify-center h-96">
-                <span className="text-purple-600 animate-pulse text-lg">Loading Transformer Playground...</span>
-            </div>
-        </div>
-    )
-});
-
-// Dynamic import for CodeBlock
-const CodeBlock = dynamic(() => import('../../components/CodeBlock'), {
-    ssr: false,
-    loading: () => <div className="h-40 bg-gray-900 rounded-xl animate-pulse my-6"></div>
-});
-
-// Type definition for KaTeX
-interface KaTeXStatic {
-    renderToString(tex: string, options?: any): string;
-}
-
-// LaTeX renderer component
-const LaTeXRenderer = ({ latex }: { latex: string }) => {
-    const [rendered, setRendered] = useState<string>('');
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-
-    useEffect(() => {
-        const renderLatex = async () => {
-            try {
-                setLoading(true);
-                setError(null);
-
-                // Dynamic import with proper typing
-                const katexModule = await import('katex' as any);
-                const katex: KaTeXStatic = katexModule.default || katexModule;
-
-                const html = katex.renderToString(latex, {
-                    throwOnError: false,
-                    displayMode: true,
-                    output: 'html',
-                    strict: false
-                });
-
-                setRendered(html);
-                setLoading(false);
-            } catch (err) {
-                console.error('LaTeX rendering error:', err);
-                setError('Failed to render equation');
-                setLoading(false);
-                // Fallback: show formatted LaTeX code
-                setRendered(`<code class="text-purple-900">${latex}</code>`);
-            }
-        };
-        renderLatex();
-    }, [latex]);
-
-    if (loading) {
-        return (
-            <div className="my-6 p-6 bg-purple-50 rounded-xl border-2 border-purple-200 overflow-x-auto">
-                <div className="flex items-center justify-center text-purple-600">
-                    <span className="animate-pulse">Rendering equation...</span>
-                </div>
-            </div>
-        );
+const InnovationContent: Record<string, { challenge: string; caseStudy: string; thoughtExperiment: string }> = {
+    linear_regression: {
+        challenge: "Derive the Partial Derivative of the MSE loss with respect to weight $w_j$. If we add a cost term $\\Omega(w) = |w|$, how does the gradient update change?",
+        caseStudy: "Predicting Crop Yield with Heteroscedastic Noise.",
+        thoughtExperiment: "What happens to the OLS solution if the features are perfectly correlated (Multi-collinearity)?"
+    },
+    logistic_regression: {
+        challenge: "Explain why we use Binary Cross-Entropy instead of MSE for classification. Derive the gradient of the Sigmoid function.",
+        caseStudy: "Loan Default Risk with Imbalanced Probability Thresholds.",
+        thoughtExperiment: "Can a single neuron solve the XOR problem? If not, why geometrically?"
+    },
+    svm: {
+        challenge: "Formulate the Dual Lagrangian for the SVM optimization. Why do we want to maximize the margin distance $2/||w||$?",
+        caseStudy: "Face Detection in High-Dimensional Pixel Tensors.",
+        thoughtExperiment: "If the data is non-linearly separable, can you design a Kernel function that maps 2D points to a 3D parabolic surface?"
+    },
+    knn: {
+        challenge: "Design a weighted distance function $d(x,y) = \\sqrt{\\sum w_i (x_i - y_i)^2}$. How would you optimize $w_i$ for feature importance?",
+        caseStudy: "Rare Disease Diagnosis using Patient Similarity Networks.",
+        thoughtExperiment: "Does KNN suffer from the 'Curse of Dimensionality'? How does volume grow as $d \\to \\infty$?"
+    },
+    kmeans: {
+        challenge: "Prove that K-Means is a coordinate descent algorithm. Why is it not guaranteed to find the global optimum?",
+        caseStudy: "Customer Segmentation using Purchase Tensors.",
+        thoughtExperiment: "What happens if you use Manhattan distance instead of Euclidean in the assignment step?"
+    },
+    decision_tree: {
+        challenge: "Calculate the Information Gain for a split. If we use Gini Impurity $1 - \\sum p_i^2$, how does it differ from Entropy mathematically?",
+        caseStudy: "Churn Prediction with High-Cardinality Categorical Features.",
+        thoughtExperiment: "Can a Decision Tree represent a diagonal boundary $y = x$? How many levels would it need?"
+    },
+    naive_bayes: {
+        challenge: "Derive the Maximum Likelihood Estimate (MLE) for the Gaussian Mean $\\mu$. Why do we use log-probabilities in implementation?",
+        caseStudy: "Spam Detection with Laplace Smoothing for Rare Tokens.",
+        thoughtExperiment: "If the 'Independence Assumption' is violated, does the model overestimate or underestimate the certainty of predictions?"
+    },
+    ann: {
+        challenge: "Perform a manual Backpropagation step for a 3-layer network. Apply the chain rule to find $\\partial L / \\partial w^{(1)}$.",
+        caseStudy: "Signal Reconstruction from Noisy Time-Series.",
+        thoughtExperiment: "Why do Deep Networks prefer ReLU over Sigmoid for hidden layers? (Vanishing Gradient Proof)."
+    },
+    cnn: {
+        challenge: "Calculate the output dimension for a convolution with kernel size $k$, stride $s$, and padding $p$.",
+        caseStudy: "Satellite Imagery Classification with Translation Invariance.",
+        thoughtExperiment: "Does a 1x1 convolution perform spatial learning or channel-wise feature mixing?"
+    },
+    rnn: {
+        challenge: "Explain the BPTT (Backpropagation Through Time) gradient explosion mathematically.",
+        caseStudy: "Stock Price Forecasting with Long-Term Memory Gating.",
+        thoughtExperiment: "Why does LSTM have a 'Constant Error Carousel'? How does it avoid $0^T$ multiplications?"
+    },
+    transformer: {
+        challenge: "Derive the Scaled Dot-Product Attention. Why do we divide by $\\sqrt{d_k}$?",
+        caseStudy: "Large Language Models: The Math of Predictable Sequences.",
+        thoughtExperiment: "Is self-attention $O(n^2)$? Can you design a linear-time attention mechanism?"
     }
-
-    if (error) {
-        return (
-            <div className="my-6 p-6 bg-yellow-50 rounded-xl border-2 border-yellow-200 overflow-x-auto">
-                <div className="text-yellow-800">
-                    <p className="font-semibold mb-2">⚠️ Equation Display</p>
-                    <code className="text-sm">{latex}</code>
-                </div>
-            </div>
-        );
-    }
-
-    return (
-        <div
-            className="my-6 p-6 bg-purple-50 rounded-xl border-2 border-purple-200 overflow-x-auto"
-            dangerouslySetInnerHTML={{ __html: rendered }}
-        />
-    );
 };
 
-// Enhanced content renderer with section-specific styling and LaTeX support
-const SectionRenderer = ({ sectionKey, content, algorithmId }: { sectionKey: string; content: any; algorithmId?: string }) => {
-    const sectionStyles: Record<string, { bg: string; border: string; icon: string; accent: string }> = {
-        introduction: {
-            bg: 'bg-gradient-to-br from-blue-50 to-indigo-50',
-            border: 'border-l-4 border-blue-500',
-            icon: '📚',
-            accent: 'text-blue-600'
-        },
-        mathematical_model: {
-            bg: 'bg-gradient-to-br from-purple-50 to-pink-50',
-            border: 'border-l-4 border-purple-500',
-            icon: '🔢',
-            accent: 'text-purple-600'
-        },
-        sample_input_output: {
-            bg: 'bg-gradient-to-br from-green-50 to-emerald-50',
-            border: 'border-l-4 border-green-500',
-            icon: '📊',
-            accent: 'text-green-600'
-        },
-        sample_io: {
-            bg: 'bg-gradient-to-br from-green-50 to-emerald-50',
-            border: 'border-l-4 border-green-500',
-            icon: '📊',
-            accent: 'text-green-600'
-        },
-        interpretation_of_output: {
-            bg: 'bg-gradient-to-br from-yellow-50 to-orange-50',
-            border: 'border-l-4 border-yellow-500',
-            icon: '🔍',
-            accent: 'text-yellow-600'
-        },
-        implementation_from_scratch: {
-            bg: 'bg-gradient-to-br from-gray-50 to-slate-50',
-            border: 'border-l-4 border-gray-500',
-            icon: '⚙️',
-            accent: 'text-gray-600'
-        },
-        implementation_with_api: {
-            bg: 'bg-gradient-to-br from-cyan-50 to-teal-50',
-            border: 'border-l-4 border-cyan-500',
-            icon: '🚀',
-            accent: 'text-cyan-600'
-        },
-        model_evaluation: {
-            bg: 'bg-gradient-to-br from-red-50 to-rose-50',
-            border: 'border-l-4 border-red-500',
-            icon: '📈',
-            accent: 'text-red-600'
-        },
-        performance_interpretation: {
-            bg: 'bg-gradient-to-br from-amber-50 to-yellow-50',
-            border: 'border-l-4 border-amber-500',
-            icon: '💡',
-            accent: 'text-amber-600'
-        },
-        ways_to_improve: {
-            bg: 'bg-gradient-to-br from-emerald-50 to-green-50',
-            border: 'border-l-4 border-emerald-500',
-            icon: '🎯',
-            accent: 'text-emerald-600'
-        }
-    };
-
-    const style = sectionStyles[sectionKey] || sectionStyles.introduction;
-
-    const renderContent = (data: any, depth: number = 0): JSX.Element => {
+const SectionRenderer = ({ sectionKey, content, algorithmId }: { sectionKey: string; content: any; algorithmId: string }) => {
+    const renderContent = (data: any): JSX.Element => {
         if (typeof data === 'string') {
-            // Check if it's code
-            if (data.includes('import ') || data.includes('def ') || data.includes('class ') ||
-                (data.split('\n').length > 3 && data.includes('    '))) {
-                return (
-                    <CodeBlock code={data} language="python" />
-                );
+            if (data.includes('import ') || data.includes('def ')) {
+                return <CodeBlock code={data} language="python" />;
             }
 
-            // Regular text with formatting
             const lines = data.split('\n');
             return (
-                <div className="space-y-3">
+                <div className="space-y-6">
                     {lines.map((line, idx) => {
-                        if (line.startsWith('**') && line.endsWith('**')) {
-                            const text = line.replace(/\*\*/g, '');
-                            return (
-                                <h4 key={idx} className={`text-xl font-bold ${style.accent} mt-6 mb-3 flex items-center gap-2`}>
-                                    <span className="text-2xl">{style.icon}</span>
-                                    {text}
-                                </h4>
-                            );
-                        }
-
-                        if (line.startsWith('•') || line.startsWith('✓') || line.startsWith('✗') || line.startsWith('-')) {
-                            const symbol = line.charAt(0);
-                            const text = line.substring(1).trim();
-                            const iconColor = symbol === '✓' ? 'text-green-500' :
-                                symbol === '✗' ? 'text-red-500' :
-                                    'text-blue-500';
-                            return (
-                                <li key={idx} className="flex items-start ml-4 my-3 text-gray-700 hover:bg-gray-50 p-2 rounded transition">
-                                    <span className={`mr-3 text-lg ${iconColor} font-bold`}>{symbol}</span>
-                                    <span className="flex-1">{text}</span>
-                                </li>
-                            );
-                        }
-
-                        if (line.trim() === '') {
-                            return <div key={idx} className="h-3" />;
-                        }
-
-                        if (line.includes('`') && line.split('`').length === 3) {
-                            const parts = line.split('`');
-                            return (
-                                <p key={idx} className="text-gray-700 leading-relaxed my-2">
-                                    {parts[0]}
-                                    <code className="bg-gray-100 px-2 py-1 rounded text-sm font-mono text-gray-800 border border-gray-300">
-                                        {parts[1]}
-                                    </code>
-                                    {parts[2]}
-                                </p>
-                            );
-                        }
-
-                        return (
-                            <p key={idx} className="text-gray-700 leading-relaxed my-2 text-justify">
-                                {line}
-                            </p>
+                        if (line.startsWith('**')) return <h4 key={idx} className="text-2xl font-black text-slate-900 mt-12 mb-6 tracking-tight">{line.replace(/\*\*/g, '')}</h4>;
+                        if (line.startsWith('•')) return (
+                            <div key={idx} className="flex gap-4 items-start bg-slate-50 p-4 rounded-2xl border border-slate-100 group hover:border-indigo-200 transition-colors">
+                                <span className="w-2 h-2 bg-indigo-500 rounded-full mt-2 group-hover:scale-125 transition-transform"></span>
+                                <span className="text-slate-600 font-medium leading-relaxed">{line.substring(1).trim()}</span>
+                            </div>
                         );
+                        return <p key={idx} className="text-lg text-slate-500 leading-relaxed font-light">{line}</p>;
                     })}
                 </div>
             );
@@ -274,10 +95,10 @@ const SectionRenderer = ({ sectionKey, content, algorithmId }: { sectionKey: str
 
         if (Array.isArray(data)) {
             return (
-                <div className="space-y-4">
+                <div className="space-y-10">
                     {data.map((item, idx) => (
-                        <div key={idx} className={`${style.bg} p-6 rounded-lg ${style.border} shadow-sm`}>
-                            {renderContent(item, depth + 1)}
+                        <div key={idx} className="bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-sm">
+                            {renderContent(item)}
                         </div>
                     ))}
                 </div>
@@ -286,46 +107,29 @@ const SectionRenderer = ({ sectionKey, content, algorithmId }: { sectionKey: str
 
         if (typeof data === 'object' && data !== null) {
             return (
-                <div className="space-y-6">
+                <div className="space-y-12">
                     {Object.entries(data).map(([key, value]: [string, any]) => {
-                        const formattedKey = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                        if (key === 'title') return null;
 
-                        // Special handling for LaTeX equations
-                        if (key === 'latex') {
-                            return (
-                                <div key={key} className="my-4">
-                                    <LaTeXRenderer latex={String(value)} />
-                                </div>
-                            );
-                        }
+                        const formattedKey = key.replace(/_/g, ' ').toUpperCase();
 
-                        // Special handling for equations array
                         if (key === 'equations' && Array.isArray(value)) {
                             return (
-                                <div key={key} className="my-6">
-                                    <h5 className={`font-bold ${style.accent} mb-4 text-lg flex items-center gap-2`}>
-                                        <span>📐</span> {formattedKey}
-                                    </h5>
-                                    <div className="space-y-6">
-                                        {value.map((eq: any, eqIdx: number) => (
-                                            <div key={eqIdx} className="bg-white p-6 rounded-xl shadow-md border-2 border-purple-100">
-                                                {eq.name && (
-                                                    <h6 className="text-lg font-bold text-purple-700 mb-3 flex items-center gap-2">
-                                                        <span>📌</span> {eq.name}
-                                                    </h6>
-                                                )}
-                                                {eq.latex && <LaTeXRenderer latex={eq.latex} />}
-                                                {eq.formula && !eq.latex && (
-                                                    <div className="font-mono bg-purple-50 px-4 py-3 rounded-lg text-purple-900 border border-purple-200 my-3">
-                                                        {eq.formula}
-                                                    </div>
-                                                )}
-                                                {eq.explanation && (
-                                                    <p className="text-gray-700 mt-4 leading-relaxed bg-gray-50 p-4 rounded-lg border-l-4 border-purple-400">
-                                                        <span className="font-semibold text-purple-700">Explanation: </span>
-                                                        {eq.explanation}
-                                                    </p>
-                                                )}
+                                <div key={key} className="space-y-8">
+                                    <h5 className="text-[10px] font-black tracking-[0.2em] text-indigo-400 mb-6">{formattedKey}</h5>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                        {value.map((eq, i) => (
+                                            <div key={i} className="bg-slate-50 border border-slate-100 p-8 rounded-[2.5rem] group hover:border-indigo-300 hover:bg-white hover:shadow-2xl hover:shadow-indigo-100 transition-all duration-500">
+                                                <h6 className="font-black text-slate-900 mb-6 flex items-center gap-3">
+                                                    <div className="w-8 h-8 bg-indigo-100 rounded-xl flex items-center justify-center text-indigo-600 text-xs italic">f</div>
+                                                    {eq.name}
+                                                </h6>
+                                                <div className="py-10 bg-white/50 backdrop-blur-sm rounded-3xl mb-8 border border-white flex items-center justify-center">
+                                                    {eq.latex ? <BlockMath math={eq.latex} /> : <div className="text-center font-mono text-indigo-600 font-bold">{eq.formula}</div>}
+                                                </div>
+                                                <div className="p-5 bg-indigo-600 text-white rounded-[1.5rem] shadow-xl shadow-indigo-100">
+                                                    <p className="text-xs font-medium leading-relaxed italic"><span className="font-black uppercase tracking-widest mr-2 text-indigo-200">Engineer's Lab Note:</span> {eq.explanation}</p>
+                                                </div>
                                             </div>
                                         ))}
                                     </div>
@@ -333,336 +137,235 @@ const SectionRenderer = ({ sectionKey, content, algorithmId }: { sectionKey: str
                             );
                         }
 
-                        if (key === 'code' || key === 'implementation') {
-                            return (
-                                <div key={key} className="my-6">
-                                    <h5 className={`font-bold ${style.accent} mb-3 text-lg flex items-center gap-2`}>
-                                        <span>💻</span> {formattedKey}
-                                    </h5>
-                                    {renderContent(value, depth + 1)}
-                                </div>
-                            );
-                        }
-
-                        if (key === 'metrics' && Array.isArray(value)) {
-                            return (
-                                <div key={key} className="my-6">
-                                    <h5 className={`font-bold ${style.accent} mb-4 text-lg flex items-center gap-2`}>
-                                        <span>📊</span> {formattedKey}
-                                    </h5>
-                                    <div className="grid gap-4">
-                                        {value.map((metric: any, mIdx: number) => (
-                                            <div key={mIdx} className="bg-white p-5 rounded-xl shadow-md border-2 border-red-100">
-                                                {metric.name && (
-                                                    <h6 className="text-lg font-bold text-red-700 mb-2">
-                                                        {metric.name}
-                                                    </h6>
-                                                )}
-                                                {metric.formula && (
-                                                    <div className="font-mono bg-red-50 px-3 py-2 rounded text-red-900 border border-red-200 my-2 text-sm">
-                                                        {metric.formula}
-                                                    </div>
-                                                )}
-                                                {metric.interpretation && (
-                                                    <p className="text-gray-700 mt-2 text-sm">
-                                                        <span className="font-semibold">Interpretation: </span>
-                                                        {metric.interpretation}
-                                                    </p>
-                                                )}
-                                                {metric.example && (
-                                                    <p className="text-gray-600 mt-2 text-sm italic">
-                                                        <span className="font-semibold">Example: </span>
-                                                        {metric.example}
-                                                    </p>
-                                                )}
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            );
-                        }
-
-                        if (key === 'name' || key === 'formula') {
-                            return (
-                                <div key={key} className="mb-2">
-                                    <span className="font-semibold text-gray-900">{formattedKey}: </span>
-                                    <span className="font-mono bg-purple-50 px-3 py-1 rounded text-purple-900 border border-purple-200">
-                                        {String(value)}
-                                    </span>
-                                </div>
-                            );
-                        }
+                        if (key === 'code') return (
+                            <div key={key}>
+                                <h5 className="text-[10px] font-black tracking-[0.2em] text-slate-400 mb-6 uppercase">Source Implementation</h5>
+                                <CodeBlock code={value} language="python" />
+                            </div>
+                        );
 
                         return (
-                            <div key={key} className="mb-6">
-                                <h5 className={`font-bold ${style.accent} mb-3 text-lg capitalize`}>
-                                    {formattedKey}
-                                </h5>
-                                <div className={`${style.bg} p-4 rounded-lg ${style.border} shadow-sm`}>
-                                    {renderContent(value, depth + 1)}
-                                </div>
+                            <div key={key}>
+                                <h5 className="text-[10px] font-black tracking-[0.2em] text-slate-400 mb-6">{formattedKey}</h5>
+                                <div className="p-2">{renderContent(value)}</div>
                             </div>
                         );
                     })}
                 </div>
             );
         }
-
-        return <p className="text-gray-700">{String(data)}</p>;
+        return <p>{String(data)}</p>;
     };
 
-    return (
-        <div className="space-y-6">
-            {/* Use Enhanced Sample I/O for sample input/output sections */}
-            {(sectionKey === 'sample_io' || sectionKey === 'sample_input_output') && content ? (
-                <>
-                    <EnhancedSampleIO
-                        content={content}
-                        icon={style.icon}
-                        accent={style.accent}
-                    />
-                    {/* Only show DataVisualization for algorithms other than linear_regression and logistic_regression */}
-                    {algorithmId !== 'linear_regression' && algorithmId !== 'logistic_regression' && (
-                        <DataVisualization data={content} algorithmType={sectionKey} />
-                    )}
-                </>
-            ) : (
-                renderContent(content)
-            )}
-        </div>
-    );
+    return <div className="animate-fadeIn">{renderContent(content)}</div>;
 };
 
 const AlgorithmPage: React.FC = () => {
     const router = useRouter();
-    const [mounted, setMounted] = useState(false);
-    const [activeSection, setActiveSection] = useState('introduction');
-    const [algorithmData, setAlgorithmData] = useState<any>(null);
-    const [loading, setLoading] = useState(true);
-    const [showPlayground, setShowPlayground] = useState(false);
-
-    useEffect(() => {
-        setMounted(true);
-    }, []);
-
-    useEffect(() => {
-        if (mounted && router.query.id) {
-            const algorithmId = router.query.id as string;
-
-            fetch(`/data/${algorithmId}.json`)
-                .then(res => res.json())
-                .then(data => {
-                    setAlgorithmData(data);
-                    setLoading(false);
-                })
-                .catch(err => {
-                    console.error('Error loading algorithm data:', err);
-                    setLoading(false);
-                });
-        }
-    }, [mounted, router.query.id]);
-
-    if (!mounted || loading) {
-        return (
-            <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex items-center justify-center">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 mx-auto mb-4"></div>
-                    <p className="text-gray-600 text-lg">Loading algorithm content...</p>
-                </div>
-            </div>
-        );
-    }
-
     const { id } = router.query;
+    const [mounted, setMounted] = useState(false);
+    const [algorithmData, setAlgorithmData] = useState<any>(null);
+    const [activeSection, setActiveSection] = useState('introduction');
+    const [showPlayground, setShowPlayground] = useState(false);
+    const [loading, setLoading] = useState(true);
 
-    if (!algorithmData) {
+    useEffect(() => { setMounted(true); }, []);
+
+    useEffect(() => {
+        if (mounted && id) {
+            fetch(`/data/${id}.json`)
+                .then(res => res.json())
+                .then(data => { setAlgorithmData(data); setLoading(false); })
+                .catch(() => setLoading(false));
+        }
+    }, [mounted, id]);
+
+    if (!mounted || loading || !algorithmData) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
-                <header className="bg-white shadow-md">
-                    <div className="container mx-auto px-4 py-6">
-                        <div className="flex justify-between items-center">
-                            <h1 className="text-3xl font-bold text-blue-600">ML Learning Platform</h1>
-                            <nav className="space-x-6">
-                                <Link href="/" className="text-gray-700 hover:text-blue-600 transition">Home</Link>
-                                <Link href="/instructor" className="text-gray-700 hover:text-blue-600 transition">Instructor</Link>
-                            </nav>
-                        </div>
-                    </div>
-                </header>
-                <div className="container mx-auto px-4 py-16 text-center">
-                    <div className="text-6xl mb-4">😕</div>
-                    <h2 className="text-4xl font-bold text-gray-900 mb-4">Algorithm Not Found</h2>
-                    <p className="text-gray-600 mb-8">The algorithm content could not be loaded.</p>
-                    <Link href="/" className="inline-block bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition shadow-lg">
-                        Back to Home
-                    </Link>
-                </div>
+            <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center gap-6">
+                <div className="w-20 h-20 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+                <div className="font-black text-indigo-400 tracking-[0.3em] text-xs uppercase animate-pulse">Initializing Lab Environment</div>
             </div>
         );
     }
 
     const sections = algorithmData.sections || {};
     const sectionKeys = Object.keys(sections);
+    const innovation = InnovationContent[id as string] || InnovationContent.linear_regression;
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
-            <header className="bg-white shadow-md sticky top-0 z-50">
-                <div className="container mx-auto px-4 py-6">
-                    <div className="flex justify-between items-center">
-                        <h1 className="text-3xl font-bold text-blue-600">ML Learning Platform</h1>
-                        <nav className="space-x-6">
-                            <Link href="/" className="text-gray-700 hover:text-blue-600 transition">Home</Link>
-                            <Link href="/datasets" className="text-gray-700 hover:text-blue-600 transition">Datasets</Link>
-                            <Link href="/preprocessing" className="text-gray-700 hover:text-blue-600 transition">Data Preprocessing</Link>
-                            <Link href="/feature-selection" className="text-gray-700 hover:text-blue-600 transition">Feature Selection</Link>
-                            <Link href="/eda" className="text-gray-700 hover:text-blue-600 transition">EDA</Link>
-                            <Link href="/instructor" className="text-gray-700 hover:text-blue-600 transition">Instructor</Link>
-                        </nav>
-                    </div>
-                </div>
-            </header>
-
-            <div className="container mx-auto px-4 py-8 max-w-7xl">
-                <div className="mb-6 flex items-center gap-2 text-sm">
-                    <Link href="/" className="text-blue-600 hover:underline">Home</Link>
-                    <span className="text-gray-400">›</span>
-                    <span className="text-gray-700">{algorithmData.name}</span>
-                </div>
-
-                <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl shadow-2xl p-8 mb-6 text-white">
-                    <h1 className="text-4xl font-bold mb-3">{algorithmData.name}</h1>
-                    <div className="flex gap-3 mb-4 flex-wrap">
-                        <span className="px-4 py-2 bg-white bg-opacity-20 backdrop-blur-sm rounded-full text-sm font-semibold">
-                            {algorithmData.category}
-                        </span>
-                        <span className={`px-4 py-2 rounded-full text-sm font-semibold ${algorithmData.difficulty === 'Beginner' ? 'bg-green-500' :
-                            algorithmData.difficulty === 'Intermediate' ? 'bg-yellow-500' :
-                                'bg-red-500'
-                            }`}>
-                            {algorithmData.difficulty}
-                        </span>
-                        {algorithmData.estimatedTime && (
-                            <span className="px-4 py-2 bg-white bg-opacity-20 backdrop-blur-sm rounded-full text-sm font-semibold">
-                                ⏱️ {algorithmData.estimatedTime}
+        <Layout>
+            <main className="container mx-auto px-6 py-20 max-w-7xl">
+                {/* Hero Header */}
+                <div className="bg-slate-900 rounded-[4rem] p-16 md:p-20 mb-20 text-white relative overflow-hidden shadow-[0_64px_128px_-32px_rgba(2,6,23,0.3)]">
+                    <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-indigo-600 opacity-20 blur-[150px] rounded-full -mr-72 -mt-72 animate-pulse"></div>
+                    <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+                        <div>
+                            <span className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-500/10 rounded-full text-[10px] font-black tracking-[0.2em] text-indigo-400 uppercase mb-8 border border-indigo-500/20">
+                                <span className="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
+                                Architecture: {algorithmData.category}
                             </span>
-                        )}
-                        {/* Show playground button for neural network algorithms */}
-                        {(algorithmData.id === 'ann' || algorithmData.id === 'cnn' || algorithmData.id === 'rnn') && (
-                            <button
-                                onClick={() => setShowPlayground(!showPlayground)}
-                                className="px-4 py-2 bg-white text-indigo-600 rounded-full text-sm font-semibold hover:bg-opacity-90 transition flex items-center gap-2"
-                            >
-                                <span>🧠</span>
-                                {showPlayground ? 'Hide' : 'Show'} Interactive Playground
-                            </button>
-                        )}
-                        {/* Show playground button for Transformer */}
-                        {algorithmData.id === 'transformer' && (
-                            <button
-                                onClick={() => setShowPlayground(!showPlayground)}
-                                className="px-4 py-2 bg-white text-purple-600 rounded-full text-sm font-semibold hover:bg-opacity-90 transition flex items-center gap-2"
-                            >
-                                <span>🤖</span>
-                                {showPlayground ? 'Hide' : 'Show'} Attention Playground
-                            </button>
-                        )}
-                        {/* Show playground button for ML algorithms */}
-                        {(algorithmData.id === 'linear_regression' || algorithmData.id === 'logistic_regression' ||
-                            algorithmData.id === 'knn' || algorithmData.id === 'kmeans' || algorithmData.id === 'naive_bayes' ||
-                            algorithmData.id === 'decision_tree' || algorithmData.id === 'svm') && (
-                                <button
-                                    onClick={() => setShowPlayground(!showPlayground)}
-                                    className="px-4 py-2 bg-white text-blue-600 rounded-full text-sm font-semibold hover:bg-opacity-90 transition flex items-center gap-2"
-                                >
-                                    <span>🎮</span>
-                                    {showPlayground ? 'Hide' : 'Show'} Interactive Playground
-                                </button>
-                            )}
+                            <h2 className="text-6xl md:text-7xl font-black mb-10 leading-[0.9] tracking-tighter">{algorithmData.name}</h2>
+                            <div className="flex flex-wrap gap-6">
+                                <div className="flex flex-col">
+                                    <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Complexity</span>
+                                    <span className="text-lg font-bold text-indigo-300">{algorithmData.difficulty}</span>
+                                </div>
+                                <div className="w-px h-12 bg-slate-700 hidden sm:block"></div>
+                                <div className="flex flex-col">
+                                    <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Est. Mastery Time</span>
+                                    <span className="text-lg font-bold text-emerald-400">{algorithmData.estimatedTime}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="bg-white/5 backdrop-blur-3xl p-10 rounded-[3rem] border border-white/10 shadow-2xl">
+                            <h3 className="text-[10px] font-black uppercase text-indigo-400 mb-8 tracking-[0.3em]">Theoretical Objectives</h3>
+                            <ul className="space-y-6">
+                                {[
+                                    { id: "01", text: "Deconstruct the mathematical objective function." },
+                                    { id: "02", text: "Implement core optimization logic from scratch." },
+                                    { id: "03", text: "Engineer constraints for real-world noise." }
+                                ].map(obj => (
+                                    <li key={obj.id} className="flex gap-5 items-start group">
+                                        <span className="text-xs font-black text-indigo-500 bg-indigo-500/10 w-8 h-8 rounded-lg flex items-center justify-center shrink-0 group-hover:bg-indigo-500 group-hover:text-white transition-all">{obj.id}</span>
+                                        <p className="text-base font-light text-slate-300 leading-tight">{obj.text}</p>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
                     </div>
                 </div>
 
-                {/* Neural Network Playground */}
-                {showPlayground && (algorithmData.id === 'ann' || algorithmData.id === 'cnn' || algorithmData.id === 'rnn') && (
-                    <NeuralNetworkPlayground />
-                )}
-
-                {/* Transformer Playground */}
-                {showPlayground && algorithmData.id === 'transformer' && (
-                    <TransformerPlayground />
-                )}
-
-                {/* ML Playground */}
-                {showPlayground && (algorithmData.id === 'linear_regression' || algorithmData.id === 'logistic_regression' ||
-                    algorithmData.id === 'knn' || algorithmData.id === 'kmeans' || algorithmData.id === 'naive_bayes' ||
-                    algorithmData.id === 'decision_tree' || algorithmData.id === 'svm') && (
-                        <MLPlayground algorithmType={algorithmData.id as any} />
-                    )}
-
-                <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                    <div className="lg:col-span-1">
-                        <div className="bg-white rounded-xl shadow-lg p-6 sticky top-24">
-                            <h3 className="font-bold text-gray-900 mb-4 text-lg">📑 Sections</h3>
-                            <nav className="space-y-2">
-                                {sectionKeys.map((key, index) => (
+                {/* Main Content Layout */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
+                    {/* Sidebar Navigation */}
+                    <div className="lg:col-span-3 space-y-12">
+                        <section className="bg-white p-10 rounded-[3rem] shadow-sm border border-slate-100">
+                            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-10">Learning Path</h4>
+                            <div className="space-y-4">
+                                {sectionKeys.map((key, i) => (
                                     <button
                                         key={key}
                                         onClick={() => setActiveSection(key)}
-                                        className={`w-full text-left px-4 py-3 rounded-lg text-sm transition-all duration-200 ${activeSection === key
-                                            ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-semibold shadow-md transform scale-105'
-                                            : 'text-gray-700 hover:bg-gray-100 hover:shadow-sm'
-                                            }`}
+                                        className={`w-full text-left p-6 rounded-[1.5rem] transition-all duration-500 group ${activeSection === key
+                                            ? 'bg-indigo-600 text-white shadow-2xl shadow-indigo-200 -translate-y-1'
+                                            : 'bg-slate-50 text-slate-400 hover:bg-white hover:shadow-lg hover:text-slate-900'}`}
                                     >
-                                        <span className="font-semibold">{index + 1}.</span> {sections[key].title || key.replace(/_/g, ' ')}
+                                        <div className="flex items-center gap-4">
+                                            <span className={`text-[10px] font-black italic ${activeSection === key ? 'text-indigo-200' : 'text-slate-300 group-hover:text-indigo-600'}`}>0{i + 1}</span>
+                                            <span className="text-[10px] font-black uppercase tracking-widest">{key.replace(/_/g, ' ')}</span>
+                                        </div>
                                     </button>
                                 ))}
-                            </nav>
-                        </div>
+                            </div>
+                        </section>
+
+                        <section className="bg-slate-900 p-10 rounded-[3rem] text-white shadow-2xl relative overflow-hidden group">
+                            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-indigo-500/10 to-transparent"></div>
+                            <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-indigo-500 mb-8">Innovation Challenge</h4>
+                            <div className="space-y-8 relative z-10">
+                                <div>
+                                    <span className="text-[10px] font-black text-rose-500 uppercase tracking-widest block mb-4">THE PROBLEM</span>
+                                    <p className="text-sm text-slate-400 leading-relaxed font-light italic">{innovation.challenge}</p>
+                                </div>
+                                <div className="h-px bg-slate-800"></div>
+                                <div>
+                                    <span className="text-[10px] font-black text-teal-400 uppercase tracking-widest block mb-4">ENGINEERING CASE</span>
+                                    <p className="text-sm text-slate-400 leading-relaxed font-light">{innovation.caseStudy}</p>
+                                </div>
+                                <button className="w-full py-4 bg-white/5 border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition">Solve in Scratchpad →</button>
+                            </div>
+                        </section>
                     </div>
 
-                    <div className="lg:col-span-3">
-                        <div className="bg-white rounded-xl shadow-xl p-8 lg:p-10">
-                            <h2 className="text-3xl font-bold text-gray-900 mb-6 pb-4 border-b-2 border-gray-200">
-                                {sections[activeSection]?.title || activeSection.replace(/_/g, ' ')}
-                            </h2>
+                    {/* Content Area */}
+                    <div className="lg:col-span-9">
+                        {/* Action Bar */}
+                        <div className="mb-12 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
+                            <h3 className="text-4xl font-black text-slate-900 capitalize tracking-tighter">
+                                {activeSection.replace(/_/g, ' ')}
+                            </h3>
+                            <button
+                                onClick={() => setShowPlayground(!showPlayground)}
+                                className={`px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all shadow-xl active:scale-95 ${showPlayground
+                                        ? 'bg-rose-600 text-white hover:bg-rose-700'
+                                        : 'bg-slate-900 text-white hover:bg-slate-800 shadow-slate-201'
+                                    }`}
+                            >
+                                {showPlayground ? 'Close Laboratory' : 'Open Innovation Lab 🔬'}
+                            </button>
+                        </div>
 
-                            <div className="prose prose-lg max-w-none">
-                                <SectionRenderer
-                                    sectionKey={activeSection}
-                                    content={sections[activeSection]}
-                                    algorithmId={algorithmData.id}
-                                />
+                        {/* Playground Container */}
+                        {showPlayground && (
+                            <div className="mb-20 animate-slideDown overflow-hidden rounded-[4rem] shadow-2xl border border-slate-100">
+                                {(id === 'ann' || id === 'cnn' || id === 'rnn') && <NeuralNetworkPlayground />}
+                                {id === 'transformer' && <TransformerPlayground />}
+                                {['linear_regression', 'logistic_regression', 'knn', 'kmeans', 'naive_bayes', 'decision_tree', 'svm'].includes(id as string) && (
+                                    <MLPlayground algorithmType={id as any} />
+                                )}
                             </div>
+                        )}
 
-                            <div className="mt-10 pt-6 border-t-2 border-gray-200 flex justify-between items-center">
-                                <button
-                                    onClick={() => {
-                                        const currentIndex = sectionKeys.indexOf(activeSection);
-                                        if (currentIndex > 0) setActiveSection(sectionKeys[currentIndex - 1]);
-                                    }}
-                                    disabled={sectionKeys.indexOf(activeSection) === 0}
-                                    className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-semibold shadow-md hover:shadow-lg"
-                                >
-                                    ← Previous
-                                </button>
-                                <span className="text-gray-500 text-sm">
-                                    {sectionKeys.indexOf(activeSection) + 1} / {sectionKeys.length}
-                                </span>
-                                <button
-                                    onClick={() => {
-                                        const currentIndex = sectionKeys.indexOf(activeSection);
-                                        if (currentIndex < sectionKeys.length - 1) setActiveSection(sectionKeys[currentIndex + 1]);
-                                    }}
-                                    disabled={sectionKeys.indexOf(activeSection) === sectionKeys.length - 1}
-                                    className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-semibold shadow-md hover:shadow-lg"
-                                >
-                                    Next →
-                                </button>
+                        {/* Main Section Content */}
+                        <div className="bg-transparent">
+                            <SectionRenderer
+                                sectionKey={activeSection}
+                                content={sections[activeSection]}
+                                algorithmId={id as string}
+                            />
+                        </div>
+
+                        {/* Pagination */}
+                        <div className="mt-20 flex justify-between items-center bg-white p-8 rounded-[3rem] border border-slate-100 shadow-sm">
+                            <button
+                                onClick={() => {
+                                    const idx = sectionKeys.indexOf(activeSection);
+                                    if (idx > 0) setActiveSection(sectionKeys[idx - 1]);
+                                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                                }}
+                                disabled={sectionKeys.indexOf(activeSection) === 0}
+                                className="px-10 py-5 bg-slate-50 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-400 disabled:opacity-30 hover:bg-slate-100 transition active:scale-95 flex items-center gap-3"
+                            >
+                                <span>←</span> Back
+                            </button>
+                            <div className="flex flex-col items-center">
+                                <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-1">Module Progress</span>
+                                <div className="flex gap-1">
+                                    {sectionKeys.map((k, i) => (
+                                        <div key={k} className={`h-1 rounded-full transition-all duration-500 ${i <= sectionKeys.indexOf(activeSection) ? 'w-6 bg-indigo-600' : 'w-2 bg-slate-100'}`}></div>
+                                    ))}
+                                </div>
                             </div>
+                            <button
+                                onClick={() => {
+                                    const idx = sectionKeys.indexOf(activeSection);
+                                    if (idx < sectionKeys.length - 1) setActiveSection(sectionKeys[idx + 1]);
+                                    window.scrollTo({ top: 400, behavior: 'smooth' });
+                                }}
+                                disabled={sectionKeys.indexOf(activeSection) === sectionKeys.length - 1}
+                                className="px-10 py-5 bg-indigo-600 rounded-2xl text-[10px] font-black uppercase tracking-widest text-white disabled:opacity-30 hover:bg-indigo-701 transition active:scale-95 shadow-2xl shadow-indigo-200 flex items-center gap-3"
+                            >
+                                Continue <span>→</span>
+                            </button>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
+            </main>
+
+            <style jsx>{`
+                @keyframes fadeIn {
+                    from { opacity: 0; transform: translateY(20px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+                @keyframes slideDown {
+                    from { opacity: 0; height: 0; transform: translateY(-40px); }
+                    to { opacity: 1; height: auto; transform: translateY(0); }
+                }
+                .animate-fadeIn { animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+                .animate-slideDown { animation: slideDown 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+            `}</style>
+        </Layout>
     );
 };
 

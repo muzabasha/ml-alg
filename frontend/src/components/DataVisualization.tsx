@@ -27,13 +27,6 @@ ChartJS.register(
     ScatterController
 );
 
-// Data visualization component for algorithm sample I/O
-interface DataPoint {
-    x: number;
-    y: number;
-    label?: string;
-}
-
 interface VisualizationProps {
     data: any;
     algorithmType: string;
@@ -46,36 +39,50 @@ const DataVisualization: React.FC<VisualizationProps> = ({ data, algorithmType }
 
     useEffect(() => {
         if (!canvasRef.current || !data) {
-            setError('No data available for visualization');
+            setError('No signal data available for rendering');
             return;
         }
 
-        // Destroy existing chart
         if (chartRef.current) {
             chartRef.current.destroy();
         }
 
         const ctx = canvasRef.current.getContext('2d');
         if (!ctx) {
-            setError('Unable to get canvas context');
+            setError('Canvas core initialization failed');
             return;
         }
 
         try {
-            // Parse data based on structure
             const chartData = parseDataForVisualization(data, algorithmType);
 
             if (!chartData) {
-                setError('Unable to parse data for visualization');
+                setError('Signal decomposition failed');
                 return;
             }
 
-            // Create new chart
+            // Apply premium styling to chart config
+            chartData.options = {
+                ...chartData.options,
+                font: { family: 'Outfit' },
+                plugins: {
+                    ...chartData.options.plugins,
+                    legend: {
+                        ...chartData.options.plugins.legend,
+                        labels: {
+                            font: { family: 'Outfit', weight: '900', size: 10 },
+                            usePointStyle: true,
+                            padding: 20
+                        }
+                    }
+                }
+            };
+
             chartRef.current = new ChartJS(ctx, chartData);
             setError(null);
         } catch (err) {
             console.error('Chart creation error:', err);
-            setError('Failed to create visualization');
+            setError('Rendering engine overflow');
         }
 
         return () => {
@@ -87,23 +94,25 @@ const DataVisualization: React.FC<VisualizationProps> = ({ data, algorithmType }
 
     if (error) {
         return (
-            <div className="my-6 p-6 bg-yellow-50 rounded-xl border-2 border-yellow-200">
-                <div className="flex items-center gap-2 mb-2">
-                    <span className="text-2xl">⚠️</span>
-                    <h4 className="text-xl font-bold text-yellow-700">Visualization Unavailable</h4>
-                </div>
-                <p className="text-yellow-800">{error}</p>
+            <div className="my-12 p-12 bg-rose-50 rounded-[3rem] border border-rose-100 flex flex-col items-center justify-center text-center group">
+                <div className="w-16 h-16 bg-white rounded-2xl shadow-xl flex items-center justify-center text-3xl mb-6 group-hover:rotate-12 transition-transform">⚠️</div>
+                <h4 className="text-xs font-black text-rose-900 uppercase tracking-[0.4em] mb-4">Signal Lost</h4>
+                <p className="text-sm text-rose-700 italic opacity-70">{error}</p>
             </div>
         );
     }
 
     return (
-        <div className="my-6 p-6 bg-white rounded-xl shadow-lg border-2 border-green-200">
-            <div className="flex items-center gap-2 mb-4">
-                <span className="text-2xl">📊</span>
-                <h4 className="text-xl font-bold text-green-700">Data Visualization</h4>
+        <div className="my-12 p-12 bg-white rounded-[4rem] border border-slate-100 shadow-[0_64px_128px_-32px_rgba(2,6,23,0.05)] relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50 rounded-bl-[4rem] group-hover:bg-indigo-100 transition-colors"></div>
+            <div className="flex items-center gap-4 mb-10">
+                <div className="w-12 h-12 bg-slate-950 rounded-2xl shadow-xl flex items-center justify-center text-2xl group-hover:scale-110 transition-transform italic text-white">Σ</div>
+                <div>
+                    <h4 className="text-xs font-black text-slate-900 uppercase tracking-[0.4em]">Tensor Visualization</h4>
+                    <p className="text-[10px] text-indigo-600 font-black uppercase tracking-widest mt-1">High-Precision Signal Map</p>
+                </div>
             </div>
-            <div className="relative" style={{ height: '400px' }}>
+            <div className="relative" style={{ height: '500px' }}>
                 <canvas ref={canvasRef}></canvas>
             </div>
         </div>
@@ -112,62 +121,44 @@ const DataVisualization: React.FC<VisualizationProps> = ({ data, algorithmType }
 
 function parseDataForVisualization(data: any, algorithmType: string): any {
     try {
-        // Handle different data structures
-        if (data && data.input && data.input.table && Array.isArray(data.input.table) && data.input.table.length > 0) {
+        if (data && data.input && data.input.table && Array.isArray(data.input.table)) {
             return createScatterPlotWithLine(data.input.table, data.output);
         }
-
-        if (data && data.table && Array.isArray(data.table) && data.table.length > 0) {
+        if (data && data.table && Array.isArray(data.table)) {
             return createScatterPlotWithLine(data.table, null);
         }
-
         return null;
     } catch (error) {
-        console.error('Error parsing data for visualization:', error);
         return null;
     }
 }
 
 function createScatterPlotWithLine(tableData: any[], outputData: any): any {
     try {
-        // Validate input
-        if (!tableData || !Array.isArray(tableData) || tableData.length === 0) {
-            return null;
-        }
-
-        // Extract x and y values from table
         const keys = Object.keys(tableData[0] || {});
-        if (keys.length < 2) {
-            return null;
-        }
-
-        const xKey = keys[0]; // First column as X
-        const yKey = keys[1]; // Second column as Y
+        if (keys.length < 2) return null;
+        const xKey = keys[0];
+        const yKey = keys[1];
 
         const dataPoints = tableData.map(row => ({
             x: Number(row[xKey]) || 0,
             y: Number(row[yKey]) || 0
         }));
 
-        // Prepare datasets
-        const datasets: any[] = [
-            {
-                label: 'Actual Data',
-                data: dataPoints,
-                backgroundColor: 'rgba(59, 130, 246, 0.8)',
-                borderColor: 'rgba(59, 130, 246, 1)',
-                borderWidth: 2,
-                pointRadius: 8,
-                pointHoverRadius: 10,
-                type: 'scatter'
-            }
-        ];
+        const datasets: any[] = [{
+            label: 'Actual Tensors',
+            data: dataPoints,
+            backgroundColor: 'rgba(79, 70, 229, 0.8)',
+            borderColor: 'rgba(79, 70, 229, 1)',
+            borderWidth: 2,
+            pointRadius: 8,
+            pointHoverRadius: 12,
+            type: 'scatter'
+        }];
 
-        // Add prediction line if output data exists
-        if (outputData && outputData.predictions && Array.isArray(outputData.predictions) && outputData.predictions.length > 0) {
-            // Try to find matching keys in predictions
+        if (outputData && outputData.predictions && Array.isArray(outputData.predictions)) {
             const predKeys = Object.keys(outputData.predictions[0] || {});
-            const predXKey = predKeys.find(k => k.toLowerCase().includes('square') || k.toLowerCase().includes('hours') || k.toLowerCase().includes('hour')) || predKeys[0];
+            const predXKey = predKeys.find(k => k.toLowerCase().includes('square') || k.toLowerCase().includes('hours')) || predKeys[0];
             const predYKey = predKeys.find(k => k.toLowerCase().includes('predicted')) || predKeys[1];
 
             if (predXKey && predYKey) {
@@ -178,29 +169,26 @@ function createScatterPlotWithLine(tableData: any[], outputData: any): any {
 
                 if (predictionPoints.length > 0) {
                     datasets.push({
-                        label: 'Predictions',
+                        label: 'Model Predictions',
                         data: predictionPoints,
-                        backgroundColor: 'rgba(239, 68, 68, 0.2)',
-                        borderColor: 'rgba(239, 68, 68, 1)',
+                        backgroundColor: 'rgba(124, 58, 237, 0.4)',
+                        borderColor: 'rgba(124, 58, 237, 1)',
                         borderWidth: 3,
                         pointRadius: 6,
-                        pointHoverRadius: 8,
                         type: 'scatter',
                         pointStyle: 'triangle'
                     });
 
-                    // Add fitted line
                     const sortedPoints = [...predictionPoints].sort((a, b) => a.x - b.x);
                     datasets.push({
-                        label: 'Fitted Line',
+                        label: 'Fitted Signal',
                         data: sortedPoints,
-                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                        borderColor: 'rgba(239, 68, 68, 0.8)',
-                        borderWidth: 2,
+                        borderColor: 'rgba(124, 58, 237, 0.8)',
+                        borderWidth: 4,
                         fill: false,
                         type: 'line',
                         pointRadius: 0,
-                        tension: 0.1
+                        tension: 0.4
                     });
                 }
             }
@@ -213,104 +201,35 @@ function createScatterPlotWithLine(tableData: any[], outputData: any): any {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: {
-                        display: true,
-                        position: 'top' as const,
-                        labels: {
-                            font: {
-                                size: 14,
-                                weight: 'bold'
-                            },
-                            padding: 15,
-                            usePointStyle: true
-                        }
-                    },
+                    legend: { display: true, position: 'top' },
                     title: {
                         display: true,
-                        text: `${xKey} vs ${yKey}`,
-                        font: {
-                            size: 18,
-                            weight: 'bold'
-                        },
-                        padding: 20,
-                        color: '#1f2937'
+                        text: `${xKey} vs ${yKey} Projection`,
+                        font: { family: 'Outfit', size: 24, weight: '900' },
+                        color: '#0f172a',
+                        padding: 30
                     },
                     tooltip: {
-                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                        padding: 12,
-                        titleFont: {
-                            size: 14,
-                            weight: 'bold'
-                        },
-                        bodyFont: {
-                            size: 13
-                        },
-                        callbacks: {
-                            label: function (context: any) {
-                                const label = context.dataset.label || '';
-                                const x = context.parsed.x;
-                                const y = context.parsed.y;
-                                return `${label}: (${x.toLocaleString()}, ${y.toLocaleString()})`;
-                            }
-                        }
+                        backgroundColor: '#0f172a',
+                        padding: 16,
+                        titleFont: { family: 'Outfit', weight: '900' },
+                        bodyFont: { family: 'Outfit' },
+                        cornerRadius: 16
                     }
                 },
                 scales: {
                     x: {
-                        type: 'linear',
-                        position: 'bottom',
-                        title: {
-                            display: true,
-                            text: xKey,
-                            font: {
-                                size: 14,
-                                weight: 'bold'
-                            },
-                            color: '#4b5563'
-                        },
-                        grid: {
-                            color: 'rgba(0, 0, 0, 0.05)'
-                        },
-                        ticks: {
-                            font: {
-                                size: 12
-                            }
-                        }
+                        grid: { color: 'rgba(0,0,0,0.03)' },
+                        title: { display: true, text: xKey, font: { weight: '900', family: 'Outfit' }, color: '#64748b' }
                     },
                     y: {
-                        type: 'linear',
-                        title: {
-                            display: true,
-                            text: yKey,
-                            font: {
-                                size: 14,
-                                weight: 'bold'
-                            },
-                            color: '#4b5563'
-                        },
-                        grid: {
-                            color: 'rgba(0, 0, 0, 0.05)'
-                        },
-                        ticks: {
-                            font: {
-                                size: 12
-                            },
-                            callback: function (value: any) {
-                                return value.toLocaleString();
-                            }
-                        }
+                        grid: { color: 'rgba(0,0,0,0.03)' },
+                        title: { display: true, text: yKey, font: { weight: '900', family: 'Outfit' }, color: '#64748b' }
                     }
-                },
-                interaction: {
-                    mode: 'nearest' as const,
-                    intersect: false
                 }
             }
         };
-    } catch (error) {
-        console.error('Error creating scatter plot:', error);
-        return null;
-    }
+    } catch (error) { return null; }
 }
 
 export default DataVisualization;

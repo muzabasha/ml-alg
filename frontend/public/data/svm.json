@@ -7,97 +7,107 @@
     "sections": {
         "introduction": {
             "title": "Introduction to Support Vector Machines",
-            "plainLanguage": "SVM finds the best boundary (hyperplane) that separates different classes with maximum margin. It's like drawing a line between two groups of points, but making sure the line is as far as possible from both groups.",
-            "realWorldAnalogy": "Imagine you're a referee separating two arguing teams. You position yourself exactly in the middle, maximizing distance from both sides.",
-            "whereAndWhy": "Used for text classification, image recognition, bioinformatics.",
-            "learningType": "Supervised Learning",
+            "plainLanguage": "Support Vector Machines (SVM) are powerful supervised learning models used for classification and regression. The core objective is to find a hyperplane in an N-dimensional space that distinctly classifies the data points with the maximum possible margin. It doesn't just separate classes; it finds the most robust separation possible.",
+            "realWorldAnalogy": "Imagine a DMZ (Demilitarized Zone) between two countries. A 'good' DMZ isn't just a line; it's a wide buffer zone where the border line is placed exactly in the center to keep both sides as far apart as possible for safety.",
+            "whereAndWhy": "Highly effective for High-Dimensional data (Image/Text), Bioinformatics (Gene Classification), and Face detection where the number of features often exceeds the number of samples.",
+            "learningType": "Supervised Learning (Geometric Optimization)",
             "strengths": [
-                "Effective in high-dimensional spaces",
-                "Memory efficient",
-                "Versatile kernels"
+                "Mathematically guaranteed to find the global optimum (Convex Optimization)",
+                "Extremely effective in high-dimensional spaces (even if dim > samples)",
+                "Memory efficient: only uses a subset of training points (Support Vectors)"
             ],
             "limitations": [
-                "Slow to train on large datasets",
-                "Sensitive to scaling"
+                "Does not provide probability estimates directly (requires Platt scaling)",
+                "Computationally expensive $O(n^3)$ for very large datasets",
+                "Highly sensitive to data noise and overlapping classes"
             ]
         },
         "mathematical_model": {
-            "title": "Mathematical Formulation",
-            "introduction": "SVM maximizes the margin between classes.",
+            "title": "Mathematical Formulation & Optimization",
+            "introduction": "The SVM search is a Constrained Quadratic Programming problem. We seek to minimize $||w||^2$ subject to specific distance constraints.",
             "equations": [
                 {
-                    "name": "Decision Boundary",
-                    "latex": "f(x) = w^T x + b",
-                    "explanation": "Points where f(x)=0 form the boundary."
+                    "name": "The Primal Objective (Hard Margin)",
+                    "latex": "\\min_{w,b} \\frac{1}{2} ||w||^2 \\quad \\text{s.t. } y_i(w^T x_i + b) \\geq 1",
+                    "explanation": "We minimize the norm of weights (which maximizes the margin $2/||w||$) while ensuring every point is on the correct side of the boundary."
                 },
                 {
-                    "name": "Margin",
-                    "latex": "\\frac{2}{||w||}",
-                    "explanation": "Distance to nearest points."
+                    "name": "Soft Margin with Slack Variables (Robustness)",
+                    "latex": "\\min_{w,b,\\xi} \\frac{1}{2} ||w||^2 + C \\sum_{i=1}^n \\xi_i",
+                    "explanation": "Introduces $\\xi_i \\geq 0$, allow some points to violate the margin. The parameter $C$ controls the tradeoff between margin width and classification error."
+                },
+                {
+                    "name": "The Kernel Trick (Non-Linearity)",
+                    "latex": "K(x_i, x_j) = \\exp(-\\gamma ||x_i - x_j||^2)",
+                    "explanation": "Maps data into high-dimensional space without explicitly computing coordinates. RBF (Gaussian) kernel shown here allows for complex, circular boundaries."
                 }
             ],
             "keyTerms": {
-                "Support Vectors": "Training points closest to boundary",
-                "Kernel": "Function for non-linear boundaries"
+                "Hyperplane": "A subspace of one dimension less than its ambient space (line in 2D, plane in 3D).",
+                "Support Vectors": "The critical data points that lie exactly on the margin boundaries. Removing them changes the model.",
+                "Hinge Loss": "The loss function $max(0, 1 - y_i f(x_i))$ used to train SVMs."
             },
-            "intuition": "SVM finds the widest 'street' separating neighborhoods."
+            "intuition": "SVM is like building a 'Safety Corridor'. It doesn't care about points far away from the border; it only listens to the 'Support Vectors' that are most likely to be misclassified."
         },
         "sample_io": {
-            "title": "Sample Input & Output",
-            "description": "Binary classification of points.",
+            "title": "Illustration: Linearly Separable vs Non-Separable",
+            "description": "Determining class based on geometric positioning.",
             "input": {
-                "format": "2D points",
+                "format": "Tensor [Sample_size, Features]",
                 "table": [
                     {
-                        "X1": 1,
-                        "X2": 2,
-                        "Class": -1
+                        "X1": 2.0,
+                        "X2": 3.0,
+                        "Label": "-1 (Class A)"
                     },
                     {
-                        "X1": 5,
-                        "X2": 5,
-                        "Class": 1
+                        "X1": 2.1,
+                        "X2": 2.9,
+                        "Label": "-1 (Class A)"
+                    },
+                    {
+                        "X1": 8.0,
+                        "X2": 7.0,
+                        "Label": "+1 (Class B)"
+                    },
+                    {
+                        "X1": 8.2,
+                        "X2": 7.1,
+                        "Label": "+1 (Class B)"
                     }
                 ]
             },
             "output": {
-                "margin": 1.25,
-                "n_support_vectors": 2
+                "Weights (w)": "[0.58, 0.42]",
+                "Bias (b)": "-5.2",
+                "Margin Width": "2.14 units",
+                "Support Vectors": "Indices [0, 2]"
             },
-            "visualization": "Scatter plot with decision boundary and margin."
+            "interpretation": "The model has identified that any point where $0.58 X_1 + 0.42 X_2 - 5.2 > 0$ belongs to Class B. The margin is large, suggesting a high-confidence separation."
         },
         "implementation_scratch": {
-            "title": "Python Implementation (From Scratch)",
-            "description": "Simplified SVM using gradient descent.",
-            "code": "import numpy as np\nclass SVM:\n    def fit(self, X, y):\n        self.w = np.zeros(X.shape[1])\n        self.b = 0\n        for _ in range(1000):\n            for i, x_i in enumerate(X):\n                if y[i] * (np.dot(x_i, self.w) - self.b) >= 1:\n                    self.w -= 0.001 * (2 * 0.01 * self.w)\n                else:\n                    self.w -= 0.001 * (2 * 0.01 * self.w - np.dot(x_i, y[i]))\n                    self.b -= 0.001 * y[i]"
+            "title": "Deconstructed Implementation (Gradient Descent)",
+            "description": "Manually optimizing the Hinge Loss with L2 Regularization.",
+            "code": "import numpy as np\n\nclass SVMModeller:\n    def __init__(self, learning_rate=0.001, lambda_param=0.01, n_iters=1000):\n        self.lr = learning_rate\n        self.lambda_param = lambda_param\n        self.n_iters = n_iters\n        self.w = None\n        self.b = None\n\n    def fit(self, X, y):\n        n_samples, n_features = X.shape\n        y_ = np.where(y <= 0, -1, 1)\n        self.w = np.zeros(n_features)\n        self.b = 0\n\n        for _ in range(self.n_iters):\n            for idx, x_i in enumerate(X):\n                condition = y_[idx] * (np.dot(x_i, self.w) - self.b) >= 1\n                if condition:\n                    # Gradient of Regularization term: lambda * w\n                    self.w -= self.lr * (2 * self.lambda_param * self.w)\n                else:\n                    # Gradient of (Regularization + Hinge Loss)\n                    self.w -= self.lr * (2 * self.lambda_param * self.w - np.dot(x_i, y_[idx]))\n                    self.b -= self.lr * y_[idx]\n\n    def predict(self, X):\n        return np.sign(np.dot(X, self.w) - self.b)"
         },
         "implementation_api": {
-            "title": "Python Implementation (Using scikit-learn)",
-            "description": "Production-ready SVM.",
-            "code": "from sklearn.svm import SVC\nmodel = SVC(kernel='linear')\nmodel.fit(X, y)"
-        },
-        "evaluation": {
-            "title": "Model Evaluation",
-            "why": "Generalization is key for SVM.",
-            "metrics": [
-                {
-                    "name": "Accuracy",
-                    "formula": "Correct / Total",
-                    "interpretation": "Overall correctness."
-                }
-            ]
+            "title": "Production Implementation (Scikit-Learn)",
+            "description": "Utilizing the highly optimized LIBSVM library.",
+            "code": "from sklearn.svm import SVC\nfrom sklearn.preprocessing import StandardScaler\n\n# 1. Scaling is MANDATORY for SVM\nscaler = StandardScaler()\nX_scaled = scaler.fit_transform(X)\n\n# 2. Fit model with RBF Kernel for non-linear separation\n# C=1.0 (Standard), gamma='scale' (Heuristic for RBF spread)\nmodel = SVC(kernel='rbf', C=1.0, gamma='scale')\nmodel.fit(X_scaled, y)\n\n# 3. Extract Support Vectors count\nprint(f'Support Vectors: {model.n_support_}')"
         },
         "improvements": {
-            "title": "Ways to Improve Performance",
+            "title": "Modelling Innovation: Maximizing SVM Performance",
             "featureEngineering": [
-                "Scaling (Critical!)"
+                "Polynomial Features: Convert $[x_1, x_2]$ to $[x_1, x_2, x_1^2, x_2^2, x_1 x_2]$ to find linear boundaries in high dimensions.",
+                "Feature Scaling: Crucial because SVM calculates distances. A feature with scale 1000 will dominate a feature with scale 1."
             ],
             "hyperparameterTuning": [
-                "C parameter",
-                "Kernel choice"
+                "C (Penalty): Large C = Hard Margin (Overfit risk), Small C = Soft Margin (Underfit risk).",
+                "Gamma (RBF Only): Large Gamma = Far reach (Smooth boundary), Small Gamma = Close reach (Jagged, complex boundary)."
             ],
             "dataPreprocessing": [
-                "Handle class imbalance"
+                "Addressing Class Imbalance: Use `class_weight='balanced'` in sklearn to prevent the hyperplane from 'pushing' into the minority class.",
+                "Outlier Removal: One bad 'support vector' can significantly rotate the entire hyperplane."
             ]
         }
     }
