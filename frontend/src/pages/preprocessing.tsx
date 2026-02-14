@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
+import 'katex/dist/katex.min.css';
+import { InlineMath, BlockMath } from 'react-katex';
 
 const CodeBlock = dynamic(() => import('../components/CodeBlock'), {
     ssr: false,
@@ -196,6 +198,14 @@ data_imputed = imputer.fit_transform(data)`}
                                 <div>
                                     <h3 className="text-2xl font-bold text-gray-900 mb-4">Solution 1: Normalization (Min-Max Scaling)</h3>
                                     <p className="text-gray-700 mb-4">Scales everything to a range between 0 and 1.</p>
+
+                                    <div className="bg-slate-50 p-6 rounded-xl mb-6 flex justify-center">
+                                        <div className="text-center">
+                                            <p className="text-xs text-gray-500 mb-2 uppercase tracking-widest font-bold">Min-Max Formula</p>
+                                            <BlockMath math={`x_{norm} = \\frac{x - x_{min}}{x_{max} - x_{min}}`} />
+                                        </div>
+                                    </div>
+
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="bg-green-50 p-4 rounded-lg border-l-4 border-green-500">
                                             <h4 className="font-bold text-green-800">Advantages</h4>
@@ -223,6 +233,14 @@ data_scaled = scaler.fit_transform(data)`}
                                 <div>
                                     <h3 className="text-2xl font-bold text-gray-900 mb-4">Solution 2: Standardization (Z-Score Scaling)</h3>
                                     <p className="text-gray-700 mb-4">Rescales data to have a mean of 0 and standard deviation of 1.</p>
+
+                                    <div className="bg-slate-50 p-6 rounded-xl mb-6 flex justify-center">
+                                        <div className="text-center">
+                                            <p className="text-xs text-gray-500 mb-2 uppercase tracking-widest font-bold">Z-Score Formula</p>
+                                            <BlockMath math={`z = \\frac{x - \\mu}{\\sigma}`} />
+                                        </div>
+                                    </div>
+
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="bg-green-50 p-4 rounded-lg border-l-4 border-green-500">
                                             <h4 className="font-bold text-green-800">Advantages</h4>
@@ -340,6 +358,14 @@ data['Salary'] = np.where(data['Salary'] > p95, p95, data['Salary'])`}
                             <div className="space-y-12">
                                 <div>
                                     <h3 className="text-2xl font-bold text-gray-900 mb-4">Solution 1: Log Transformation</h3>
+
+                                    <div className="bg-slate-50 p-6 rounded-xl mb-6 flex justify-center">
+                                        <div className="text-center">
+                                            <p className="text-xs text-gray-500 mb-2 uppercase tracking-widest font-bold">Log Correction Formula</p>
+                                            <BlockMath math={`y = \\ln(1 + x)`} />
+                                        </div>
+                                    </div>
+
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="bg-green-50 p-4 rounded-lg border-l-4 border-green-500">
                                             <h4 className="font-bold text-green-800">Advantages</h4>

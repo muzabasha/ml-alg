@@ -121,7 +121,7 @@ const FeatureSelectionPage: React.FC = () => {
                                     <div className="bg-white p-6 rounded-2xl border border-indigo-100 shadow-sm mb-8">
                                         <h3 className="text-lg font-bold text-indigo-900 mb-4">Mathematical Model</h3>
                                         <div className="bg-slate-50 p-6 rounded-xl overflow-x-auto">
-                                            <BlockMath math={`r = \\frac{\\sum (x_i - \\bar{x})(y_i - \\bar{y})}{\\sqrt{\\sum (x_i - \\bar{x})^2 \\sum (y_i - \\bar{y})^2}`} />
+                                            <BlockMath math={`r = \\frac{\\sum_{i=1}^{n} (x_i - \\bar{x})(y_i - \\bar{y})}{\\sqrt{\\sum_{i=1}^{n} (x_i - \\bar{x})^2 \\cdot \\sum_{i=1}^{n} (y_i - \\bar{y})^2}}`} />
                                         </div>
                                         <div className="mt-6 space-y-3">
                                             <h4 className="text-sm font-bold text-gray-500 uppercase tracking-widest">Term Interpretation</h4>
