@@ -36,7 +36,7 @@
 
 @layer components {
     .glass {
-        @apply bg-white/70 backdrop-blur-2xl border border-white/40 shadow-[0_8px_32px_0_rgba(31, 38, 135, 0.07)];
+        @apply bg-white/70 backdrop-blur-2xl border border-white/40 shadow-xl;
     }
 
     .glass-dark {
@@ -44,11 +44,11 @@
     }
 
     .btn-premium {
-        @apply relative inline-flex items-center justify-center px-8 py-4 font-black uppercase tracking-widest text-[10px] text-white bg-indigo-600 rounded-2xl transition-all duration-300 hover:bg-indigo-701 hover:scale-[1.02] active:scale-[0.98] shadow-2xl shadow-indigo-200 overflow-hidden group/btn;
+        @apply relative inline-flex items-center justify-center px-8 py-4 font-black uppercase tracking-widest text-[10px] text-white bg-indigo-600 rounded-2xl transition-all duration-300 hover:bg-indigo-700 hover:scale-[1.02] active:scale-[0.98] shadow-2xl shadow-indigo-200 overflow-hidden;
     }
 
     .card-premium {
-        @apply bg-white rounded-[3rem] border border-slate-100 shadow-[0_32px_64px_-16px_rgba(2, 6, 23, 0.05)] transition-all duration-500 hover:shadow-[0_64px_128px_-32px_rgba(2, 6, 23, 0.1)];
+        @apply bg-white rounded-[3rem] border border-slate-100 shadow-2xl shadow-slate-200 transition-all duration-500 hover:shadow-indigo-100;
     }
 
     .text-gradient-indigo {
@@ -58,7 +58,7 @@
 
 /* KaTeX Overrides */
 .katex-display {
-    @apply my-10 p-12 bg-white/50 backdrop-blur-md rounded-[3rem] border border-slate-100 shadow-inner overflow-x-auto no-scrollbar;
+    @apply my-10 p-12 bg-white/50 backdrop-blur-md rounded-[3rem] border border-slate-100 shadow-inner overflow-x-auto;
 }
 
 .katex {

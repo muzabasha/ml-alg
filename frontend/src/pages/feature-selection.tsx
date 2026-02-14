@@ -182,7 +182,7 @@ const FeatureSelectionPage: React.FC = () => {
                                                 </div>
                                                 <div className="flex gap-4">
                                                     <span className="text-purple-600 font-black">03</span>
-                                                    <span>Prune feature with lowest ranking: $S = S - \{i\}$.</span>
+                                                    <span>Prune feature with lowest ranking: $S = S - {"{i}"}$.</span>
                                                 </div>
                                                 <div className="flex gap-4">
                                                     <span className="text-purple-600 font-black">04</span>
@@ -193,7 +193,7 @@ const FeatureSelectionPage: React.FC = () => {
                                         <div className="p-8 bg-slate-950 text-white rounded-[2.5rem] shadow-2xl relative overflow-hidden group/tip">
                                             <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-500/20 rounded-full blur-2xl group-hover/tip:scale-150 transition-transform"></div>
                                             <h5 className="text-[10px] font-black text-indigo-400 mb-4 uppercase tracking-widest">Architect's Warning</h5>
-                                            <p className="text-xs leading-relaxed opacity-80 italic">"RFE is highly effective but computationally expensive. It assumes that greedy elimination leads to the global optimum. For $N > 10,000$, use Batch Pruning to maintain latency bounds."</p>
+                                            <p className="text-xs leading-relaxed opacity-80 italic">"RFE is highly effective but computationally expensive. It assumes that greedy elimination leads to the global optimum. For $N \gt 10,000$, use Batch Pruning to maintain latency bounds."</p>
                                         </div>
                                     </div>
                                 </div>

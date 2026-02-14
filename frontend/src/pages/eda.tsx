@@ -234,7 +234,7 @@ const EDAPage: React.FC = () => {
                             <span className="text-[10px] font-black text-indigo-500 uppercase tracking-[0.5em] mb-12 block">Advanced Statistical Lab</span>
                             <h3 className="text-5xl md:text-7xl font-black mb-12 leading-[0.9] tracking-tighter">Hypothesis <br /><span className="text-indigo-400 italic">Validation.</span></h3>
                             <p className="text-slate-400 text-xl font-light leading-relaxed mb-16 max-w-xl">
-                                Don't rely on intuition. Run an **ANOVA** between groups. If $p < 0.05$, the signal is statistically distinct for your chosen architecture.
+                                Don't rely on intuition. Run an **ANOVA** between groups. If $p \lt 0.05$, the signal is statistically distinct for your chosen architecture.
                             </p>
                             <div className="flex flex-wrap gap-6">
                                 <Link href="/preprocessing" className="bg-indigo-600 text-white px-12 py-6 rounded-[2rem] font-black text-[10px] uppercase tracking-[0.2em] hover:bg-indigo-500 transition-all shadow-2xl shadow-indigo-600/20 active:scale-95">Enter Stage 3: Preprocessing →</Link>
