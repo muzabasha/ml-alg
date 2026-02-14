@@ -32,6 +32,12 @@ const HomePage: React.FC = () => {
                             <Link href="/datasets" className="text-gray-700 hover:text-blue-600">
                                 Datasets
                             </Link>
+                            <Link href="/preprocessing" className="text-gray-700 hover:text-blue-600">
+                                Data Preprocessing
+                            </Link>
+                            <Link href="/feature-selection" className="text-gray-700 hover:text-blue-600">
+                                Feature Selection
+                            </Link>
                             <Link href="/eda" className="text-gray-700 hover:text-blue-600">
                                 EDA
                             </Link>

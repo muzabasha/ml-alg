@@ -6,6 +6,11 @@ import dynamic from 'next/dynamic';
 const Bar = dynamic(() => import('react-chartjs-2').then(mod => mod.Bar), { ssr: false });
 const Scatter = dynamic(() => import('react-chartjs-2').then(mod => mod.Scatter), { ssr: false });
 
+const CodeBlock = dynamic(() => import('../components/CodeBlock'), {
+    ssr: false,
+    loading: () => <div className="h-40 bg-gray-900 rounded-xl animate-pulse my-6"></div>
+});
+
 // Type definitions
 interface Statistics {
     mean: number;
@@ -119,6 +124,8 @@ const DatasetsPage: React.FC = () => {
                         <nav className="space-x-6">
                             <Link href="/" className="text-gray-700 hover:text-blue-600">Home</Link>
                             <Link href="/datasets" className="text-blue-600 font-semibold">Datasets</Link>
+                            <Link href="/preprocessing" className="text-gray-700 hover:text-blue-600">Data Preprocessing</Link>
+                            <Link href="/feature-selection" className="text-gray-700 hover:text-blue-600">Feature Selection</Link>
                             <Link href="/eda" className="text-gray-700 hover:text-blue-600">EDA</Link>
                             <Link href="/instructor" className="text-gray-700 hover:text-blue-600">Instructor</Link>
                         </nav>
@@ -231,8 +238,8 @@ const DatasetsPage: React.FC = () => {
 
                                 <div className="bg-white p-6 rounded-lg shadow-md">
                                     <h4 className="font-bold text-gray-900 mb-3">💻 How to Load</h4>
-                                    <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto">
-                                        <code>{`from sklearn.datasets import load_${selectedDataset}
+                                    <CodeBlock
+                                        code={`from sklearn.datasets import load_${selectedDataset}
 
 # Load dataset
 data = load_${selectedDataset}()
@@ -241,8 +248,9 @@ y = data.target  # Labels
 
 print(f"Shape: {X.shape}")
 print(f"Features: {data.feature_names}")
-print(f"Classes: {data.target_names}")`}</code>
-                                    </pre>
+print(f"Classes: {data.target_names}")`}
+                                        language="python"
+                                    />
                                 </div>
                             </>
                         )}
@@ -360,8 +368,8 @@ print(f"Classes: {data.target_names}")`}</code>
 
                                 <div className="bg-white p-6 rounded-lg shadow-md">
                                     <h4 className="font-bold text-gray-900 mb-3">💻 Complete Example</h4>
-                                    <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-sm">
-                                        <code>{`from sklearn.datasets import load_${selectedDataset}
+                                    <CodeBlock
+                                        code={`from sklearn.datasets import load_${selectedDataset}
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import RandomForestClassifier
@@ -392,8 +400,9 @@ accuracy = accuracy_score(y_test, y_pred)
 print(f"Accuracy: {accuracy:.3f}")
 print("\\nClassification Report:")
 print(classification_report(y_test, y_pred, 
-                          target_names=data.target_names))`}</code>
-                                    </pre>
+                          target_names=data.target_names))`}
+                                        language="python"
+                                    />
                                 </div>
 
                                 <div className="bg-blue-50 p-4 rounded-lg border-2 border-blue-200">

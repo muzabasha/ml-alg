@@ -1,4 +1,10 @@
 import React from 'react';
+import dynamic from 'next/dynamic';
+
+const CodeBlock = dynamic(() => import('./CodeBlock'), {
+    ssr: false,
+    loading: () => <div className="h-40 bg-gray-900 rounded-xl animate-pulse my-6"></div>
+});
 
 interface EnhancedSampleIOProps {
     content: any;
@@ -29,10 +35,11 @@ const EnhancedSampleIO: React.FC<EnhancedSampleIOProps> = ({ content, icon, acce
                         <span className="text-3xl">{icon}</span>
                         <h3 className={`text-xl font-bold ${accent}`}>Sample Input & Output</h3>
                     </div>
-                    <div className="bg-white rounded-lg shadow p-6 border border-gray-200">
-                        <pre className="whitespace-pre-wrap text-sm text-gray-700">
-                            {typeof content === 'string' ? content : JSON.stringify(content, null, 2)}
-                        </pre>
+                    <div className="bg-white rounded-lg shadow border border-gray-200 overflow-hidden">
+                        <CodeBlock
+                            code={typeof content === 'string' ? content : JSON.stringify(content, null, 2)}
+                            language={typeof content === 'string' ? 'text' : 'json'}
+                        />
                     </div>
                 </div>
             );
@@ -95,9 +102,10 @@ const EnhancedSampleIO: React.FC<EnhancedSampleIOProps> = ({ content, icon, acce
                                         </table>
                                     </div>
                                 ) : (
-                                    <pre className="bg-gray-50 p-4 rounded-lg border border-gray-200 overflow-x-auto text-sm font-mono text-gray-800">
-                                        {JSON.stringify(content.input, null, 2)}
-                                    </pre>
+                                    <CodeBlock
+                                        code={JSON.stringify(content.input, null, 2)}
+                                        language="json"
+                                    />
                                 )}
                             </div>
                         </div>
@@ -251,9 +259,10 @@ const EnhancedSampleIO: React.FC<EnhancedSampleIOProps> = ({ content, icon, acce
                         <summary className="cursor-pointer text-blue-600 hover:text-blue-800 font-medium">
                             View raw data
                         </summary>
-                        <pre className="mt-4 bg-gray-50 p-4 rounded text-xs overflow-auto max-h-96 border border-gray-200">
-                            {JSON.stringify(content, null, 2)}
-                        </pre>
+                        <CodeBlock
+                            code={JSON.stringify(content, null, 2)}
+                            language="json"
+                        />
                     </details>
                 </div>
             </div>

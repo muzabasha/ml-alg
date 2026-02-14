@@ -63,6 +63,12 @@ const TransformerPlayground = dynamic(() => import('../../components/Transformer
     )
 });
 
+// Dynamic import for CodeBlock
+const CodeBlock = dynamic(() => import('../../components/CodeBlock'), {
+    ssr: false,
+    loading: () => <div className="h-40 bg-gray-900 rounded-xl animate-pulse my-6"></div>
+});
+
 // Type definition for KaTeX
 interface KaTeXStatic {
     renderToString(tex: string, options?: any): string;
@@ -206,9 +212,7 @@ const SectionRenderer = ({ sectionKey, content, algorithmId }: { sectionKey: str
             if (data.includes('import ') || data.includes('def ') || data.includes('class ') ||
                 (data.split('\n').length > 3 && data.includes('    '))) {
                 return (
-                    <pre className="bg-gray-900 text-gray-100 p-6 rounded-xl overflow-x-auto my-6 shadow-lg border border-gray-700">
-                        <code className="text-sm leading-relaxed font-mono">{data}</code>
-                    </pre>
+                    <CodeBlock code={data} language="python" />
                 );
             }
 
@@ -508,6 +512,10 @@ const AlgorithmPage: React.FC = () => {
                         <h1 className="text-3xl font-bold text-blue-600">ML Learning Platform</h1>
                         <nav className="space-x-6">
                             <Link href="/" className="text-gray-700 hover:text-blue-600 transition">Home</Link>
+                            <Link href="/datasets" className="text-gray-700 hover:text-blue-600 transition">Datasets</Link>
+                            <Link href="/preprocessing" className="text-gray-700 hover:text-blue-600 transition">Data Preprocessing</Link>
+                            <Link href="/feature-selection" className="text-gray-700 hover:text-blue-600 transition">Feature Selection</Link>
+                            <Link href="/eda" className="text-gray-700 hover:text-blue-600 transition">EDA</Link>
                             <Link href="/instructor" className="text-gray-700 hover:text-blue-600 transition">Instructor</Link>
                         </nav>
                     </div>

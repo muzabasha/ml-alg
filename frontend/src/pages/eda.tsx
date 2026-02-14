@@ -203,6 +203,8 @@ const EDAPage: React.FC = () => {
                         <nav className="space-x-6">
                             <Link href="/" className="text-gray-700 hover:text-blue-600 transition">Home</Link>
                             <Link href="/datasets" className="text-gray-700 hover:text-blue-600 transition">Datasets</Link>
+                            <Link href="/preprocessing" className="text-gray-700 hover:text-blue-600 transition">Data Preprocessing</Link>
+                            <Link href="/feature-selection" className="text-gray-700 hover:text-blue-600 transition">Feature Selection</Link>
                             <Link href="/eda" className="text-blue-600 font-semibold">EDA</Link>
                             <Link href="/instructor" className="text-gray-700 hover:text-blue-600 transition">Instructor</Link>
                         </nav>
