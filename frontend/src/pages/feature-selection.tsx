@@ -129,8 +129,14 @@ const FeatureSelectionPage: React.FC = () => {
                                                 <li className="flex items-center gap-4"><code className="bg-indigo-50 px-2 py-1 rounded text-indigo-700 font-bold min-w-[3rem] text-center">r</code> <span className="text-gray-600">Correlation Coefficient (-1 to +1)</span></li>
                                                 <li className="flex items-center gap-4"><code className="bg-indigo-50 px-2 py-1 rounded text-indigo-700 font-bold min-w-[3rem] text-center">x_i</code> <span className="text-gray-600">Individual predictor value</span></li>
                                                 <li className="flex items-center gap-4"><code className="bg-indigo-100 px-2 py-1 rounded text-indigo-700 font-bold min-w-[3rem] text-center">{"\\bar{x}"}</code> <span className="text-gray-600">Mean of the predictor feature</span></li>
-                                                <li className="flex items-center gap-4"><code className="bg-indigo-50 px-2 py-1 rounded text-indigo-700 font-bold min-w-[3rem] text-center">y_i</code> <span className="text-gray-600">Individual target value</span></li>
+                                                <li className="flex items-center gap-4"><code className="bg-indigo-50 px-2 py-1 rounded text-indigo-700 font-bold min-w-[3rem] text-center">{"y_i - \\bar{y}"}</code> <span className="text-gray-600">Centralization: Measures how much the target deviates from its average.</span></li>
                                             </ul>
+                                        </div>
+                                        <div className="mt-6 pt-4 border-t border-indigo-100">
+                                            <h4 className="text-xs font-bold text-indigo-800 uppercase mb-2">🔭 Engineer's Perspective</h4>
+                                            <p className="text-xs text-indigo-900 leading-relaxed italic">
+                                                "Pearson assumes <strong>linearity</strong>. If you multiply the numerator, you are measuring how much X and Y 'move together'. If you have a parabolic relationship ($y = x^2$), $r$ will be 0 even though there is a perfect relationship. As a modeller, you might improve this by moving to <strong>Spearman Correlation</strong> which uses ranks instead of raw values."
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
@@ -199,6 +205,13 @@ print(relevant_features.index)`} />
                                                 <p>3. Remove feature with smallest ranking criterion: <InlineMath math="S = S - \{i\}" /></p>
                                                 <p>4. Repeat until desired number of features remains.</p>
                                             </div>
+                                            <div className="mt-4 p-3 bg-purple-900 text-white rounded-lg">
+                                                <h5 className="text-[10px] font-bold uppercase text-purple-300">🏗️ Modelling Insight</h5>
+                                                <p className="text-[10px] leading-tight">
+                                                    RFE is "Greedy". It assumes that removing the worst feature <em>right now</em> is the best path.
+                                                    <strong>Innovation:</strong> Could you modify this to remove 10% of features at each step to speed up complexity while maintaining selection quality?
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -256,16 +269,21 @@ print(rfe.ranking_)`} />
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <div className="border border-teal-100 p-3 rounded-lg">
                                                     <span className="block font-bold text-teal-700 text-xs">SSE Term</span>
-                                                    <span className="text-xs text-gray-600">Sum of Squared Errors (Model Fit)</span>
+                                                    <span className="text-xs text-gray-600">Minimizing this ensures the model 'remembers' the training data correctly.</span>
                                                 </div>
                                                 <div className="border border-orange-100 p-3 rounded-lg bg-orange-50 bg-opacity-30">
-                                                    <span className="block font-bold text-orange-700 text-xs">Penalty Term</span>
-                                                    <span className="text-xs text-gray-600">Forces smaller coefficients to absolute ZERO.</span>
+                                                    <span className="block font-bold text-orange-700 text-xs">L1 Penalty $\lambda ||\beta||_1$</span>
+                                                    <span className="text-xs text-gray-600">The "Modeller's Budget": It taxes the number of features. Only those that 'pay off' in accuracy survive.</span>
                                                 </div>
-                                                <div className="border border-teal-100 p-3 rounded-lg md:col-span-2 flex justify-between items-center">
-                                                    <span className="font-bold text-teal-800 text-xs"><InlineMath math={"\\lambda"} /> (Lambda)</span>
-                                                    <span className="text-[10px] text-gray-500 italic">Hyperparameter that controls selection strength</span>
-                                                </div>
+                                            </div>
+                                            <div className="bg-teal-900 text-white p-4 rounded-xl mt-4">
+                                                <h5 className="text-xs font-bold text-teal-300 uppercase mb-2">💡 Why L1 leads to Selection?</h5>
+                                                <p className="text-[11px] leading-relaxed">
+                                                    In L2 (Ridge), weights become small but rarely zero. In L1, the "diamond-shaped" constraint hit the axes first during optimization. This <strong>mathematical geometry</strong> is why LASSO is a feature selection technique.
+                                                </p>
+                                                <p className="text-[10px] mt-2 text-teal-200 italic">
+                                                    <strong>Challenge:</strong> Can you design a "Group Lasso" equation that selects or rejects groups of related features together (e.g., all pixels of one eye)?
+                                                </p>
                                             </div>
                                         </div>
                                     </div>
@@ -456,6 +474,80 @@ print('Selected:', len(selected_feat))`} />
                                             </tr>
                                         </tbody>
                                     </table>
+                                </div>
+                            </div>
+
+                            {/* Modelling Innovation Lab */}
+                            <div className="bg-slate-900 rounded-3xl p-10 text-white shadow-2xl relative overflow-hidden mb-16 mt-20">
+                                <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-600 opacity-20 blur-3xl -mr-32 -mt-32 rounded-full"></div>
+                                <div className="relative z-10">
+                                    <h2 className="text-3xl font-bold mb-6 flex items-center gap-3">
+                                        <span className="p-2 bg-indigo-500 rounded-xl text-white">🧪</span> Mathematical Modelling Innovation Lab
+                                    </h2>
+                                    <p className="text-indigo-200 text-lg mb-10 max-w-3xl">
+                                        Traditional equations are just the starting point. High-performance ML Engineers modify equations to suit specific data challenges.
+                                    </p>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                        <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700">
+                                            <h3 className="text-xl font-bold text-indigo-400 mb-4">Case Study: Noise-Robust Correlation</h3>
+                                            <p className="text-sm text-slate-300 mb-4">
+                                                Standard Pearson Correlation is highly sensitive to outliers. A single extreme value can flip $r$ from 0.9 to 0.1.
+                                            </p>
+                                            <div className="space-y-4">
+                                                <div className="p-3 bg-slate-900 rounded-lg border border-indigo-500/30">
+                                                    <span className="text-xs text-indigo-300 font-bold block mb-1">Traditional Approach</span>
+                                                    <InlineMath math={"r = \\frac{\\sum (x_i - \\bar{x})(y_i - \\bar{y})}{\\sqrt{\\dots}}"} />
+                                                </div>
+                                                <div className="p-3 bg-indigo-900/40 rounded-lg border border-indigo-500">
+                                                    <span className="text-xs text-indigo-300 font-bold block mb-1">Your Innovation Task</span>
+                                                    <p className="text-xs leading-relaxed text-indigo-100">
+                                                        Design a modified equation that uses a <strong>Weighting Function</strong> $w_i$ where $w_i$ is small for points far from the median.
+                                                    </p>
+                                                    <div className="mt-3 p-2 bg-slate-900 rounded font-mono text-[10px] text-teal-400">
+                                                        <span className="text-white mr-1">Propose:</span> <InlineMath math={"r_{robust} = \\frac{\\sum w_i(x_i - \\hat{x})(y_i - \\hat{y})}{\\dots}"} />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700">
+                                            <h3 className="text-xl font-bold text-teal-400 mb-4">Case Study: Complexity-Aware Selection</h3>
+                                            <p className="text-sm text-slate-300 mb-4">
+                                                LASSO ($L1$) treats all features equally. But in production, some features are "expensive" to collect (e.g., medical lab tests vs patient age).
+                                            </p>
+                                            <div className="space-y-4">
+                                                <div className="p-3 bg-slate-900 rounded-lg border border-teal-500/30">
+                                                    <span className="text-xs text-teal-300 font-bold block mb-1">Standard LASSO</span>
+                                                    <InlineMath math={"\\lambda \\sum |\\beta_j|"} />
+                                                </div>
+                                                <div className="p-3 bg-teal-900/40 rounded-lg border border-teal-400">
+                                                    <span className="text-xs text-teal-300 font-bold block mb-1">Your Innovation Task</span>
+                                                    <p className="text-xs leading-relaxed text-teal-100">
+                                                        Integrate a <strong>Cost Vector</strong> $C_j$ into the penalty term to discourage expensive features more than cheap ones.
+                                                    </p>
+                                                    <div className="mt-3 p-2 bg-slate-900 rounded font-mono text-[10px] text-teal-400">
+                                                        <span className="text-white mr-1">Design:</span> <InlineMath math={"\\text{Penalty} = \\lambda \\sum C_j |\\beta_j|"} />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="mt-10 p-6 bg-gradient-to-r from-indigo-900 to-slate-900 rounded-2xl border border-indigo-500/50">
+                                        <h4 className="text-lg font-bold text-white mb-2">How to justify your models?</h4>
+                                        <ul className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs text-indigo-200">
+                                            <li className="flex items-center gap-2">
+                                                <span className="text-lg">⚖️</span>
+                                                Bias-Variance Tradeoff Analysis
+                                            </li>
+                                            <li className="flex items-center gap-2">
+                                                <span className="text-lg">📉</span>
+                                                Sensitivity to Outliers
+                                            </li>
+                                            <li className="flex items-center gap-2">
+                                                <span className="text-lg">🏎️</span>
+                                                Computational Complexity (O-notation)
+                                            </li>
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
                         </div>

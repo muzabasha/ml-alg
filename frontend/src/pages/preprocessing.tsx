@@ -206,6 +206,25 @@ data_imputed = imputer.fit_transform(data)`}
                                         </div>
                                     </div>
 
+                                    <div className="bg-blue-50 p-6 rounded-xl mb-8 border border-blue-100">
+                                        <h4 className="text-sm font-bold text-blue-800 uppercase tracking-widest mb-4">Mathematical Interpretation</h4>
+                                        <ul className="space-y-3 text-sm">
+                                            <li className="flex items-center gap-3">
+                                                <code className="bg-blue-100 px-2 py-0.5 rounded font-bold text-blue-700">x - x_min</code>
+                                                <span className="text-gray-600">The <strong>Translation</strong>: It shifts the entire distribution so that the minimum value starts exactly at zero.</span>
+                                            </li>
+                                            <li className="flex items-center gap-3">
+                                                <code className="bg-blue-100 px-2 py-0.5 rounded font-bold text-blue-700">x_max - x_min</code>
+                                                <span className="text-gray-600">The <strong>Scaling Factor</strong>: It represents the total range. Dividing by this "squeezes" the data into a unit range.</span>
+                                            </li>
+                                        </ul>
+                                        <div className="mt-6 pt-4 border-t border-blue-200">
+                                            <p className="text-xs text-blue-800 italic">
+                                                <strong>🛠️ Modeling Challenge:</strong> How would you modify this equation to scale data between [-1, 1] instead of [0, 1]? Hint: You need to introduce a multiplier and a bias.
+                                            </p>
+                                        </div>
+                                    </div>
+
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="bg-green-50 p-4 rounded-lg border-l-4 border-green-500">
                                             <h4 className="font-bold text-green-800">Advantages</h4>
@@ -238,6 +257,25 @@ data_scaled = scaler.fit_transform(data)`}
                                         <div className="text-center">
                                             <p className="text-xs text-gray-500 mb-2 uppercase tracking-widest font-bold">Z-Score Formula</p>
                                             <BlockMath math={`z = \\frac{x - \\mu}{\\sigma}`} />
+                                        </div>
+                                    </div>
+
+                                    <div className="bg-purple-50 p-6 rounded-xl mb-8 border border-purple-100">
+                                        <h4 className="text-sm font-bold text-purple-800 uppercase tracking-widest mb-4">Mathematical Interpretation</h4>
+                                        <ul className="space-y-3 text-sm">
+                                            <li className="flex items-center gap-3">
+                                                <code className="bg-purple-100 px-2 py-0.5 rounded font-bold text-purple-700">x - \mu</code>
+                                                <span className="text-gray-600">The <strong>Deviation</strong>: Measures how far each point is from the average. Positive means above average; negative means below.</span>
+                                            </li>
+                                            <li className="flex items-center gap-3">
+                                                <code className="bg-purple-100 px-2 py-0.5 rounded font-bold text-purple-700">\sigma</code>
+                                                <span className="text-gray-600">The <strong>Unit of Spread</strong>: We divide by standard deviation to express the distance in "number of sigmas".</span>
+                                            </li>
+                                        </ul>
+                                        <div className="mt-6 pt-4 border-t border-purple-200">
+                                            <p className="text-xs text-purple-800 italic">
+                                                <strong>🛠️ Modeling Challenge:</strong> If your data has massive outliers, $\mu$ and $\sigma$ will be skewed. Can you design a "Robust Scaler" using Medians and Interquartile Range (IQR)?
+                                            </p>
                                         </div>
                                     </div>
 
@@ -366,6 +404,21 @@ data['Salary'] = np.where(data['Salary'] > p95, p95, data['Salary'])`}
                                         </div>
                                     </div>
 
+                                    <div className="bg-emerald-50 p-6 rounded-xl mb-8 border border-emerald-100">
+                                        <h4 className="text-sm font-bold text-emerald-800 uppercase tracking-widest mb-4">Mathematical Interpretation</h4>
+                                        <ul className="space-y-3 text-sm">
+                                            <li className="flex items-center gap-3">
+                                                <code className="bg-emerald-100 px-2 py-0.5 rounded font-bold text-emerald-700">\ln(1 + x)</code>
+                                                <span className="text-gray-600">The <strong>Compression</strong>: Logarithms compress large values much more than small ones. Adding 1 ensures we don't calculate $\ln(0)$ which is undefined.</span>
+                                            </li>
+                                        </ul>
+                                        <div className="mt-6 pt-4 border-t border-emerald-200">
+                                            <p className="text-xs text-emerald-800 italic">
+                                                <strong>🛠️ Modeling Challenge:</strong> Log transform is a specific case of the Power Transform. Can you design a more flexible equation like $x^\lambda$ where you can tune $\lambda$ to find the perfect distribution? (This is the basis of Box-Cox).
+                                            </p>
+                                        </div>
+                                    </div>
+
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="bg-green-50 p-4 rounded-lg border-l-4 border-green-500">
                                             <h4 className="font-bold text-green-800">Advantages</h4>
@@ -480,6 +533,62 @@ data_transformed = pt.fit_transform(data)`}
                             </div>
                         </section>
                     )}
+                    {/* Modelling Innovation Lab */}
+                    <div className="bg-slate-900 rounded-3xl p-10 text-white shadow-2xl relative overflow-hidden mb-16 mt-20">
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-teal-600 opacity-20 blur-3xl -mr-32 -mt-32 rounded-full"></div>
+                        <div className="relative z-10">
+                            <h2 className="text-3xl font-bold mb-6 flex items-center gap-3">
+                                <span className="p-2 bg-teal-500 rounded-xl text-white">🔬</span> Data Modelling Innovation Lab
+                            </h2>
+                            <p className="text-teal-200 text-lg mb-10 max-w-3xl">
+                                Being a Data Scientist means knowing when to break standard equations. How would you handle real-world messy data?
+                            </p>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700">
+                                    <h3 className="text-xl font-bold text-teal-400 mb-4">Case Study: The Outlier Crisis</h3>
+                                    <p className="text-sm text-slate-300 mb-4">
+                                        Your dataset has 1,000 users with income $50k, but one user is a billionaire ($1B). Min-Max Scaling will put 999 users at 0.00005 and one user at 1.0.
+                                    </p>
+                                    <div className="space-y-4">
+                                        <div className="p-3 bg-slate-900 rounded-lg border border-teal-500/30">
+                                            <span className="text-xs text-teal-300 font-bold block mb-1">Traditional Min-Max</span>
+                                            <InlineMath math={"x_{norm} = \\frac{x - min}{max - min}"} />
+                                        </div>
+                                        <div className="p-3 bg-teal-900/40 rounded-lg border border-teal-500">
+                                            <span className="text-xs text-teal-300 font-bold block mb-1">Your Innovation Task</span>
+                                            <p className="text-xs leading-relaxed text-teal-100">
+                                                Design a <strong>"Clipped Scaler"</strong> that replaces $max$ and $min$ with fixed percentiles (e.g., 5th and 95th) to protect the distribution.
+                                            </p>
+                                            <div className="mt-3 p-2 bg-slate-900 rounded font-mono text-[10px] text-teal-400">
+                                                Design: <InlineMath math={"x_{clipped} = \\frac{x - P_{05}}{P_{95} - P_{05}}"} />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700">
+                                    <h3 className="text-xl font-bold text-blue-400 mb-4">Case Study: Categorical Distance</h3>
+                                    <p className="text-sm text-slate-300 mb-4">
+                                        Label Encoding (1, 2, 3) suggests that Color 3 is "further" from Color 1 than Color 2. This is mathematically false for independent categories.
+                                    </p>
+                                    <div className="space-y-4">
+                                        <div className="p-3 bg-slate-900 rounded-lg border border-blue-500/30">
+                                            <span className="text-xs text-blue-300 font-bold block mb-1">Traditional Encoding</span>
+                                            <span className="text-xs">Red=1, Blue=2, Green=3</span>
+                                        </div>
+                                        <div className="p-3 bg-blue-900/40 rounded-lg border border-blue-500">
+                                            <span className="text-xs text-blue-300 font-bold block mb-1">Your Innovation Task</span>
+                                            <p className="text-xs leading-relaxed text-blue-100">
+                                                Design a <strong>"One-Hot Tensor"</strong> where each category gets its own dimension, making the distance between any two colors exactly $\sqrt{2}$.
+                                            </p>
+                                            <div className="mt-3 p-2 bg-slate-900 rounded font-mono text-[10px] text-blue-400">
+                                                Propose: <InlineMath math={"\\text{dist}(A, B) = 1 \\text{ if } A \\neq B"} />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
