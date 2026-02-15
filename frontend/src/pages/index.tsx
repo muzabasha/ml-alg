@@ -40,12 +40,12 @@ const HomePage: React.FC = () => {
                     </p>
 
                     <div className="flex flex-col sm:flex-row justify-center gap-8">
-                        <Link href="/datasets" className="btn-premium px-16 py-8 text-xs group">
+                        <Link href="/datasets" className="btn-premium btn-ripple px-16 py-8 text-xs group">
                             Enter the Data Lab
-                            <span className="text-2xl ml-4 transition-transform group-hover:translate-x-3">→</span>
+                            <span className="text-2xl ml-4 transition-transform group-hover:translate-x-3 inline-block">→</span>
                         </Link>
-                        <Link href="/algorithm/transformer" className="bg-white text-slate-950 px-16 py-8 rounded-2xl font-black text-xs uppercase tracking-widest border border-slate-100 hover:border-indigo-600 hover:shadow-2xl transition-all active:scale-95 shadow-xl flex items-center justify-center gap-4">
-                            <span className="text-2xl text-indigo-600">🤖</span>
+                        <Link href="/algorithm/transformer" className="bg-white text-slate-950 px-16 py-8 rounded-2xl font-black text-xs uppercase tracking-widest border border-slate-100 hover:border-indigo-600 hover:shadow-2xl transition-all active:scale-95 shadow-xl flex items-center justify-center gap-4 hover-lift">
+                            <span className="text-2xl text-indigo-600 transition-transform hover:scale-110 inline-block">🤖</span>
                             Attention Projection
                         </Link>
                     </div>
@@ -89,7 +89,8 @@ const HomePage: React.FC = () => {
                         <Link
                             key={algo.id}
                             href={`/algorithm/${algo.id}`}
-                            className="group bg-white rounded-[3.5rem] p-12 border border-slate-100 hover:border-indigo-600 hover:shadow-[0_80px_160px_-40px_rgba(79,70,229,0.15)] transition-all duration-700 relative overflow-hidden"
+                            className="group bg-white rounded-[3.5rem] p-12 border border-slate-100 hover:border-indigo-600 hover:shadow-[0_80px_160px_-40px_rgba(79,70,229,0.15)] transition-all duration-700 relative overflow-hidden hover-lift"
+                            aria-label={`Learn about ${algo.name}`}
                         >
                             <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50 rounded-bl-[4rem] group-hover:bg-indigo-600 transition-all duration-700 opacity-20 group-hover:opacity-100"></div>
 

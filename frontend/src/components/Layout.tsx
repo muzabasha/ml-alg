@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import dynamic from 'next/dynamic';
+
+const MobileNav = dynamic(() => import('./MobileNav'), { ssr: false });
 
 interface LayoutProps {
     children: React.ReactNode;
@@ -9,6 +12,7 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ children }) => {
     const router = useRouter();
     const [scrolled, setScrolled] = useState(false);
+    const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -31,6 +35,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
     return (
         <div className="min-h-screen bg-white flex flex-col font-sans selection:bg-indigo-100 selection:text-indigo-900">
+            {/* Skip to content link for accessibility */}
+            <a href="#main-content" className="skip-to-content">
+                Skip to main content
+            </a>
+
             {/* Header */}
             <header className={`sticky top-0 z-[100] transition-all duration-500 ${scrolled ? 'bg-white/95 backdrop-blur-2xl border-b border-slate-200 py-3' : 'bg-white py-6'}`}>
                 <div className="container mx-auto px-8">
@@ -67,10 +76,15 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                                 Attention Lab
                             </Link>
 
-                            <button className="xl:hidden w-12 h-12 flex flex-col items-center justify-center gap-1.5 rounded-2xl bg-white border border-slate-100 shadow-sm active:scale-90 transition-all">
-                                <div className="w-5 h-0.5 bg-slate-900 rounded-full"></div>
+                            <button
+                                onClick={() => setMobileNavOpen(true)}
+                                className="xl:hidden w-12 h-12 flex flex-col items-center justify-center gap-1.5 rounded-2xl bg-white border border-slate-100 shadow-sm active:scale-90 transition-all hover:border-indigo-600 group"
+                                aria-label="Open navigation menu"
+                                aria-expanded={mobileNavOpen}
+                            >
+                                <div className="w-5 h-0.5 bg-slate-900 rounded-full transition-all group-hover:bg-indigo-600"></div>
                                 <div className="w-5 h-0.5 bg-indigo-600 rounded-full"></div>
-                                <div className="w-3 h-0.5 bg-slate-900 rounded-full self-start ml-3.5"></div>
+                                <div className="w-3 h-0.5 bg-slate-900 rounded-full self-start ml-3.5 transition-all group-hover:bg-indigo-600"></div>
                             </button>
                         </div>
                     </div>
@@ -78,9 +92,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             </header>
 
             {/* Main Content */}
-            <main className="flex-grow">
+            <main id="main-content" className="flex-grow" role="main">
                 {children}
             </main>
+
+            {/* Mobile Navigation */}
+            <MobileNav isOpen={mobileNavOpen} onClose={() => setMobileNavOpen(false)} />
 
             {/* Premium Footer */}
             <footer className="bg-white border-t border-slate-200 pt-32 pb-16 text-slate-900 relative overflow-hidden">
