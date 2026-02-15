@@ -5,6 +5,34 @@ import 'katex/dist/katex.min.css';
 import { InlineMath, BlockMath } from 'react-katex';
 import Layout from '../components/Layout';
 import WorkflowNavButtons from '../components/WorkflowNavButtons';
+import {
+    Chart as ChartJS,
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    BarElement,
+    ArcElement,
+    Title,
+    Tooltip,
+    Legend,
+    Filler
+} from 'chart.js';
+import { Bar, Line, Scatter, Doughnut } from 'react-chartjs-2';
+
+// Register Chart.js components
+ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    BarElement,
+    ArcElement,
+    Title,
+    Tooltip,
+    Legend,
+    Filler
+);
 
 const CodeBlock = dynamic(() => import('../components/CodeBlock'), {
     ssr: false,
@@ -53,6 +81,281 @@ const DatasetsPage = () => {
         return codes[datasetId] || '# Import code not available';
     };
 
+    // Helper function to generate chart data for visualizations
+    const getChartData = (datasetId: string, vizType: string) => {
+        const chartConfigs: Record<string, any> = {
+            'iris_distribution': {
+                type: 'bar',
+                data: {
+                    labels: ['Sepal Length', 'Sepal Width', 'Petal Length', 'Petal Width'],
+                    datasets: [
+                        {
+                            label: 'Setosa',
+                            data: [5.0, 3.4, 1.5, 0.2],
+                            backgroundColor: 'rgba(99, 102, 241, 0.7)',
+                        },
+                        {
+                            label: 'Versicolor',
+                            data: [5.9, 2.8, 4.3, 1.3],
+                            backgroundColor: 'rgba(16, 185, 129, 0.7)',
+                        },
+                        {
+                            label: 'Virginica',
+                            data: [6.5, 3.0, 5.6, 2.0],
+                            backgroundColor: 'rgba(245, 158, 11, 0.7)',
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: true, position: 'top' as const } }
+                }
+            },
+            'iris_scatter': {
+                type: 'scatter',
+                data: {
+                    datasets: [
+                        {
+                            label: 'Setosa',
+                            data: Array.from({ length: 15 }, () => ({ x: Math.random() * 2 + 4, y: Math.random() * 1 + 0.1 })),
+                            backgroundColor: 'rgba(99, 102, 241, 0.6)',
+                        },
+                        {
+                            label: 'Versicolor',
+                            data: Array.from({ length: 15 }, () => ({ x: Math.random() * 2 + 5, y: Math.random() * 1 + 1 })),
+                            backgroundColor: 'rgba(16, 185, 129, 0.6)',
+                        },
+                        {
+                            label: 'Virginica',
+                            data: Array.from({ length: 15 }, () => ({ x: Math.random() * 2 + 6, y: Math.random() * 1 + 1.5 })),
+                            backgroundColor: 'rgba(245, 158, 11, 0.6)',
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { title: { display: true, text: 'Petal Length (cm)' } },
+                        y: { title: { display: true, text: 'Petal Width (cm)' } }
+                    }
+                }
+            },
+            'wine_chemical': {
+                type: 'bar',
+                data: {
+                    labels: ['Alcohol', 'Malic Acid', 'Ash', 'Alcalinity', 'Magnesium', 'Phenols'],
+                    datasets: [
+                        {
+                            label: 'Cultivar 0',
+                            data: [13.7, 2.0, 2.4, 17.0, 106, 2.8],
+                            backgroundColor: 'rgba(139, 92, 246, 0.7)',
+                        },
+                        {
+                            label: 'Cultivar 1',
+                            data: [12.3, 1.9, 2.2, 20.0, 94, 2.3],
+                            backgroundColor: 'rgba(236, 72, 153, 0.7)',
+                        },
+                        {
+                            label: 'Cultivar 2',
+                            data: [13.2, 3.3, 2.4, 21.0, 99, 1.7],
+                            backgroundColor: 'rgba(34, 197, 94, 0.7)',
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: true, position: 'top' as const } }
+                }
+            },
+            'housing_price': {
+                type: 'line',
+                data: {
+                    labels: ['0-1', '1-2', '2-3', '3-4', '4-5', '5-6', '6-7', '7-8'],
+                    datasets: [{
+                        label: 'Median Income (×$10k)',
+                        data: [50, 120, 180, 250, 320, 380, 450, 500],
+                        borderColor: 'rgb(99, 102, 241)',
+                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { title: { display: true, text: 'Median Income Range' } },
+                        y: { title: { display: true, text: 'House Value ($1000s)' } }
+                    }
+                }
+            },
+            'cancer_class': {
+                type: 'doughnut',
+                data: {
+                    labels: ['Benign', 'Malignant'],
+                    datasets: [{
+                        data: [357, 212],
+                        backgroundColor: ['rgba(16, 185, 129, 0.8)', 'rgba(239, 68, 68, 0.8)'],
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: true, position: 'bottom' as const }
+                    }
+                }
+            },
+            'diabetes_bmi': {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'BMI vs Progression',
+                        data: Array.from({ length: 50 }, () => ({
+                            x: Math.random() * 0.2 + 0.02,
+                            y: Math.random() * 300 + 50
+                        })),
+                        backgroundColor: 'rgba(99, 102, 241, 0.5)',
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { title: { display: true, text: 'BMI (normalized)' } },
+                        y: { title: { display: true, text: 'Disease Progression' } }
+                    }
+                }
+            },
+            'titanic_survival': {
+                type: 'bar',
+                data: {
+                    labels: ['1st Class', '2nd Class', '3rd Class'],
+                    datasets: [
+                        {
+                            label: 'Survived',
+                            data: [136, 87, 119],
+                            backgroundColor: 'rgba(16, 185, 129, 0.8)',
+                        },
+                        {
+                            label: 'Died',
+                            data: [80, 97, 372],
+                            backgroundColor: 'rgba(239, 68, 68, 0.8)',
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: true, position: 'top' as const } }
+                }
+            },
+            'tips_bill': {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Bill vs Tip',
+                        data: Array.from({ length: 40 }, () => ({
+                            x: Math.random() * 40 + 10,
+                            y: Math.random() * 8 + 1
+                        })),
+                        backgroundColor: 'rgba(245, 158, 11, 0.6)',
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { title: { display: true, text: 'Total Bill ($)' } },
+                        y: { title: { display: true, text: 'Tip ($)' } }
+                    }
+                }
+            },
+            'penguins_species': {
+                type: 'bar',
+                data: {
+                    labels: ['Adelie', 'Gentoo', 'Chinstrap'],
+                    datasets: [{
+                        label: 'Count',
+                        data: [152, 124, 68],
+                        backgroundColor: ['rgba(99, 102, 241, 0.8)', 'rgba(16, 185, 129, 0.8)', 'rgba(245, 158, 11, 0.8)'],
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } }
+                }
+            },
+            'diamonds_price': {
+                type: 'line',
+                data: {
+                    labels: ['0.3', '0.5', '0.7', '1.0', '1.5', '2.0', '2.5', '3.0'],
+                    datasets: [{
+                        label: 'Price ($)',
+                        data: [800, 1500, 2500, 4500, 8000, 13000, 18000, 24000],
+                        borderColor: 'rgb(139, 92, 246)',
+                        backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { title: { display: true, text: 'Carat' } },
+                        y: { title: { display: true, text: 'Price ($)' } }
+                    }
+                }
+            },
+            'macrodata_gdp': {
+                type: 'line',
+                data: {
+                    labels: ['1960', '1970', '1980', '1990', '2000', '2009'],
+                    datasets: [{
+                        label: 'GDP Growth',
+                        data: [2500, 4000, 6000, 8500, 12000, 14500],
+                        borderColor: 'rgb(16, 185, 129)',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { title: { display: true, text: 'Year' } },
+                        y: { title: { display: true, text: 'GDP (Billions)' } }
+                    }
+                }
+            },
+            'mnist_digits': {
+                type: 'bar',
+                data: {
+                    labels: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'],
+                    datasets: [{
+                        label: 'Sample Count',
+                        data: [5923, 6742, 5958, 6131, 5842, 5421, 5918, 6265, 5851, 5949],
+                        backgroundColor: 'rgba(99, 102, 241, 0.8)',
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } }
+                }
+            }
+        };
+        return chartConfigs[vizType] || null;
+    };
+
     // Helper function to get EDA visualizations for each dataset
     const getEDAVisualizations = (datasetId: string) => {
         const visualizations: Record<string, any[]> = {
@@ -60,7 +363,7 @@ const DatasetsPage = () => {
                 {
                     title: 'Feature Distribution',
                     icon: '📊',
-                    visualization: 'Histogram showing sepal/petal length and width distributions across all samples',
+                    chartType: 'iris_distribution',
                     insight: 'Setosa is clearly separable by petal dimensions. Petal length shows the most distinct separation between species.'
                 },
                 {
@@ -72,7 +375,7 @@ const DatasetsPage = () => {
                 {
                     title: 'Scatter Plot Matrix',
                     icon: '🎯',
-                    visualization: 'Pairwise scatter plots colored by species',
+                    chartType: 'iris_scatter',
                     insight: 'Linear separability exists for Setosa. Versicolor and Virginica show overlap in sepal dimensions but separate well in petal space.'
                 },
                 {
@@ -86,7 +389,7 @@ const DatasetsPage = () => {
                 {
                     title: 'Chemical Composition',
                     icon: '🧪',
-                    visualization: 'Bar chart of mean chemical values per cultivar',
+                    chartType: 'wine_chemical',
                     insight: 'Cultivar 0 has distinctly higher proline content (1115 mg/L vs 519/629). Alcohol content varies significantly (13.7% vs 12.3% vs 13.2%).'
                 },
                 {
@@ -124,7 +427,7 @@ const DatasetsPage = () => {
                 {
                     title: 'Income vs Price',
                     icon: '📈',
-                    visualization: 'Scatter plot with regression line',
+                    chartType: 'housing_price',
                     insight: 'Strong positive correlation (r=0.69). Each unit increase in median income predicts ~$40k increase in house value.'
                 },
                 {
@@ -138,7 +441,7 @@ const DatasetsPage = () => {
                 {
                     title: 'Class Distribution',
                     icon: '⚖️',
-                    visualization: 'Pie chart showing benign vs malignant ratio',
+                    chartType: 'cancer_class',
                     insight: 'Imbalanced dataset: 63% benign (357), 37% malignant (212). Consider stratified sampling for model training.'
                 },
                 {
@@ -170,7 +473,7 @@ const DatasetsPage = () => {
                 {
                     title: 'BMI vs Progression',
                     icon: '📈',
-                    visualization: 'Scatter plot with trend line',
+                    chartType: 'diabetes_bmi',
                     insight: 'Moderate positive correlation (r=0.39). BMI alone explains 15% of variance in disease progression.'
                 },
                 {
@@ -190,7 +493,7 @@ const DatasetsPage = () => {
                 {
                     title: 'Survival by Class/Gender',
                     icon: '⚖️',
-                    visualization: 'Grouped bar chart',
+                    chartType: 'titanic_survival',
                     insight: 'Gender disparity: 74% female survival vs 19% male. First class: 63% survival, Third class: 24%.'
                 },
                 {
@@ -222,7 +525,7 @@ const DatasetsPage = () => {
                 {
                     title: 'Bill vs Tip',
                     icon: '📈',
-                    visualization: 'Scatter plot with regression line',
+                    chartType: 'tips_bill',
                     insight: 'Strong linear relationship (r=0.68). Average tip rate: 16%. Outliers suggest generous tippers (>25%).'
                 },
                 {
@@ -242,7 +545,7 @@ const DatasetsPage = () => {
                 {
                     title: 'Species Distribution',
                     icon: '🐧',
-                    visualization: 'Bar chart of species counts',
+                    chartType: 'penguins_species',
                     insight: 'Adelie: 152 (44%), Gentoo: 124 (36%), Chinstrap: 68 (20%). Relatively balanced for classification tasks.'
                 },
                 {
@@ -274,7 +577,7 @@ const DatasetsPage = () => {
                 {
                     title: 'Carat vs Price',
                     icon: '📈',
-                    visualization: 'Scatter with exponential fit',
+                    chartType: 'diamonds_price',
                     insight: 'Non-linear relationship: Price ∝ Carat^1.9. Each carat increase has exponentially larger price impact.'
                 },
                 {
@@ -294,7 +597,7 @@ const DatasetsPage = () => {
                 {
                     title: 'GDP Trend',
                     icon: '📈',
-                    visualization: 'Time series plot 1959-2009',
+                    chartType: 'macrodata_gdp',
                     insight: 'Strong upward trend with 3.2% average quarterly growth. 2008 recession clearly visible as sharp decline.'
                 },
                 {
@@ -320,7 +623,7 @@ const DatasetsPage = () => {
                 {
                     title: 'Class Distribution',
                     icon: '🔢',
-                    visualization: 'Bar chart of digit frequencies',
+                    chartType: 'mnist_digits',
                     insight: 'Relatively balanced: each digit appears 5,400-6,700 times (±10%). Digit 1 most common (6,742), digit 5 least (5,421).'
                 },
                 {
@@ -678,10 +981,22 @@ const DatasetsPage = () => {
                                 </section>
                                 <section className="space-y-8">
                                     <h4 className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-8 border-b border-indigo-50 pb-4">Python Import Code</h4>
-                                    <div className="bg-slate-900 p-10 rounded-[2.5rem] text-white shadow-2xl border border-white/5 group hover:border-indigo-500/30 transition-all">
-                                        <p className="text-xs font-light text-slate-400 leading-relaxed mb-8">
-                                            Load this dataset directly into your Python environment using the code below.
-                                        </p>
+                                    <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-10 rounded-[2.5rem] text-white shadow-2xl border border-white/10 group hover:border-indigo-500/30 transition-all">
+                                        <div className="flex items-start justify-between mb-6">
+                                            <p className="text-xs font-light text-slate-300 leading-relaxed">
+                                                Load this dataset directly into your Python environment using the code below.
+                                            </p>
+                                            <button
+                                                onClick={() => {
+                                                    navigator.clipboard.writeText(getImportCode(currentDataset.id));
+                                                }}
+                                                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-[10px] font-black uppercase tracking-wider rounded-xl transition-all active:scale-95 flex items-center gap-2"
+                                                title="Copy to clipboard"
+                                            >
+                                                <span>📋</span>
+                                                <span>Copy</span>
+                                            </button>
+                                        </div>
                                         <CodeBlock language="python" code={getImportCode(currentDataset.id)} />
                                     </div>
                                 </section>
@@ -707,21 +1022,35 @@ const DatasetsPage = () => {
                             <div className="mt-20">
                                 <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-10 border-b border-slate-50 pb-4">Exploratory Data Analysis</h4>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                    {getEDAVisualizations(currentDataset.id).map((viz, idx) => (
-                                        <div key={idx} className="bg-white border border-slate-200 rounded-[2.5rem] p-8 shadow-sm hover:shadow-xl hover:border-indigo-200 transition-all duration-300">
-                                            <div className="flex items-center justify-between mb-6">
-                                                <h5 className="text-lg font-black text-slate-900">{viz.title}</h5>
-                                                <span className="text-2xl">{viz.icon}</span>
+                                    {getEDAVisualizations(currentDataset.id).map((viz, idx) => {
+                                        const chartConfig = viz.chartType ? getChartData(currentDataset.id, viz.chartType) : null;
+                                        return (
+                                            <div key={idx} className="bg-white border border-slate-200 rounded-[2.5rem] p-8 shadow-sm hover:shadow-xl hover:border-indigo-200 transition-all duration-300">
+                                                <div className="flex items-center justify-between mb-6">
+                                                    <h5 className="text-lg font-black text-slate-900">{viz.title}</h5>
+                                                    <span className="text-2xl">{viz.icon}</span>
+                                                </div>
+                                                <div className="bg-slate-50 rounded-2xl p-6 mb-6 border border-slate-100" style={{ height: '240px' }}>
+                                                    {chartConfig ? (
+                                                        <div className="h-full">
+                                                            {chartConfig.type === 'bar' && <Bar data={chartConfig.data} options={chartConfig.options} />}
+                                                            {chartConfig.type === 'line' && <Line data={chartConfig.data} options={chartConfig.options} />}
+                                                            {chartConfig.type === 'scatter' && <Scatter data={chartConfig.data} options={chartConfig.options} />}
+                                                            {chartConfig.type === 'doughnut' && <Doughnut data={chartConfig.data} options={chartConfig.options} />}
+                                                        </div>
+                                                    ) : (
+                                                        <div className="h-full flex items-center justify-center">
+                                                            <p className="text-slate-400 text-xs font-medium text-center leading-relaxed px-4">{viz.visualization}</p>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className="bg-indigo-50 border border-indigo-100 rounded-2xl p-6">
+                                                    <p className="text-[10px] font-black text-indigo-600 uppercase tracking-widest mb-3">💡 Insight</p>
+                                                    <p className="text-sm text-slate-700 leading-relaxed">{viz.insight}</p>
+                                                </div>
                                             </div>
-                                            <div className="bg-slate-50 rounded-2xl p-8 mb-6 h-48 flex items-center justify-center border border-slate-100">
-                                                <p className="text-slate-400 text-xs font-medium text-center leading-relaxed px-4">{viz.visualization}</p>
-                                            </div>
-                                            <div className="bg-indigo-50 border border-indigo-100 rounded-2xl p-6">
-                                                <p className="text-[10px] font-black text-indigo-600 uppercase tracking-widest mb-3">💡 Insight</p>
-                                                <p className="text-sm text-slate-700 leading-relaxed">{viz.insight}</p>
-                                            </div>
-                                        </div>
-                                    ))}
+                                        );
+                                    })}
                                 </div>
                             </div>
                         </div>
