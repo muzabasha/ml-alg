@@ -4,6 +4,9 @@ import dynamic from 'next/dynamic';
 import 'katex/dist/katex.min.css';
 import { InlineMath, BlockMath } from 'react-katex';
 import Layout from '../../components/Layout';
+import { renderTextWithMath } from '../../utils/mathRenderer';
+import WorkflowNavButtons from '../../components/WorkflowNavButtons';
+import MLWorkflowNav from '../../components/MLWorkflowNav';
 
 // Dynamic imports for Interactive Components
 const NeuralNetworkPlayground = dynamic(() => import('../../components/NeuralNetworkPlayground'), { ssr: false });
@@ -266,12 +269,12 @@ const AlgorithmPage: React.FC = () => {
                             <div className="space-y-8 relative z-10">
                                 <div>
                                     <span className="text-[10px] font-black text-rose-500 uppercase tracking-widest block mb-4">THE PROBLEM</span>
-                                    <p className="text-sm text-slate-400 leading-relaxed font-light italic">{innovation.challenge}</p>
+                                    <p className="text-sm text-slate-400 leading-relaxed font-light italic">{renderTextWithMath(innovation.challenge)}</p>
                                 </div>
                                 <div className="h-px bg-slate-800"></div>
                                 <div>
                                     <span className="text-[10px] font-black text-teal-400 uppercase tracking-widest block mb-4">ENGINEERING CASE</span>
-                                    <p className="text-sm text-slate-400 leading-relaxed font-light">{innovation.caseStudy}</p>
+                                    <p className="text-sm text-slate-400 leading-relaxed font-light">{renderTextWithMath(innovation.caseStudy)}</p>
                                 </div>
                                 <button className="w-full py-4 bg-white/5 border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition">Solve in Scratchpad →</button>
                             </div>
@@ -288,8 +291,8 @@ const AlgorithmPage: React.FC = () => {
                             <button
                                 onClick={() => setShowPlayground(!showPlayground)}
                                 className={`px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all shadow-xl active:scale-95 ${showPlayground
-                                        ? 'bg-rose-600 text-white hover:bg-rose-700'
-                                        : 'bg-slate-900 text-white hover:bg-slate-800 shadow-slate-201'
+                                    ? 'bg-rose-600 text-white hover:bg-rose-700'
+                                    : 'bg-slate-900 text-white hover:bg-slate-800 shadow-slate-201'
                                     }`}
                             >
                                 {showPlayground ? 'Close Laboratory' : 'Open Innovation Lab 🔬'}
@@ -348,6 +351,23 @@ const AlgorithmPage: React.FC = () => {
                             >
                                 Continue <span>→</span>
                             </button>
+                        </div>
+
+                        {/* ML Workflow Navigation */}
+                        <div className="mt-20">
+                            <WorkflowNavButtons
+                                currentStep="algorithm"
+                                algorithmId={id as string}
+                            />
+                        </div>
+
+                        {/* Complete Workflow Overview */}
+                        <div className="mt-20">
+                            <MLWorkflowNav
+                                currentStep="algorithm"
+                                algorithmId={id as string}
+                                variant="compact"
+                            />
                         </div>
                     </div>
                 </div>

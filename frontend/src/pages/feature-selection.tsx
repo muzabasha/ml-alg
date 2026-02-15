@@ -4,6 +4,7 @@ import dynamic from 'next/dynamic';
 import 'katex/dist/katex.min.css';
 import { InlineMath, BlockMath } from 'react-katex';
 import Layout from '../components/Layout';
+import WorkflowNavButtons from '../components/WorkflowNavButtons';
 
 const CodeBlock = dynamic(() => import('../components/CodeBlock'), {
     ssr: false,
@@ -451,6 +452,11 @@ const FeatureSelectionPage: React.FC = () => {
                 .no-scrollbar::-webkit-scrollbar { display: none; }
                 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
             `}</style>
+
+            {/* ML Workflow Navigation */}
+            <div className="container mx-auto px-6 pb-20">
+                <WorkflowNavButtons currentStep="feature-selection" />
+            </div>
         </Layout>
     );
 };

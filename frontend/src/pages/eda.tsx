@@ -4,6 +4,7 @@ import dynamic from 'next/dynamic';
 import 'katex/dist/katex.min.css';
 import { InlineMath, BlockMath } from 'react-katex';
 import Layout from '../components/Layout';
+import WorkflowNavButtons from '../components/WorkflowNavButtons';
 
 const Chart = dynamic(() => import('react-chartjs-2').then(mod => mod.Chart), {
     ssr: false,
@@ -257,6 +258,11 @@ const EDAPage: React.FC = () => {
                     </div>
                 </section>
             </main>
+
+            {/* ML Workflow Navigation */}
+            <div className="container mx-auto px-6 pb-20">
+                <WorkflowNavButtons currentStep="eda" />
+            </div>
 
             <style jsx>{`
                 @keyframes fadeIn {

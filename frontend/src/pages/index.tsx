@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Layout from '../components/Layout';
+import MLWorkflowNav from '../components/MLWorkflowNav';
 
 const HomePage: React.FC = () => {
     const algorithms = [
@@ -49,6 +50,21 @@ const HomePage: React.FC = () => {
                         </Link>
                     </div>
                 </div>
+            </section>
+
+            {/* ML Workflow Pipeline Section */}
+            <section className="container mx-auto px-6 py-32">
+                <div className="text-center mb-20">
+                    <span className="text-[10px] font-black text-indigo-500 uppercase tracking-[0.5em] mb-4 block">Learning Path</span>
+                    <h2 className="text-5xl md:text-6xl font-black text-slate-950 tracking-tighter leading-tight mb-6">
+                        Your <span className="text-indigo-600 italic">Step-by-Step</span> Journey
+                    </h2>
+                    <p className="text-slate-500 text-xl font-light italic max-w-3xl mx-auto">
+                        Follow the complete machine learning workflow from theory to deployment
+                    </p>
+                </div>
+
+                <MLWorkflowNav currentStep="algorithm" algorithmId="linear_regression" variant="full" />
             </section>
 
             {/* Algorithm Registry */}
