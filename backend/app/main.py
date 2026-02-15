@@ -35,11 +35,12 @@ async def health_check():
     return {"status": "healthy", "message": "ML Learning Platform API is running"}
 
 # Import routes
-from routes import algorithms, execution
+from routes import algorithms, execution, learning_path
 
 # Include routers
 app.include_router(algorithms.router, prefix="/api/algorithms", tags=["algorithms"])
 app.include_router(execution.router, prefix="/api/execute", tags=["execution"])
+app.include_router(learning_path.router, prefix="/api/learning-path", tags=["learning-path"])
 
 # Global exception handler
 @app.exception_handler(Exception)

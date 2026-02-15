@@ -24,6 +24,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
     const navLinks = [
         { href: '/', label: 'Home' },
+        { href: '/dashboard', label: 'Dashboard' },
         { href: '/datasets', label: 'Data Lab' },
         { href: '/preprocessing', label: 'Eng' },
         { href: '/feature-selection', label: 'Select' },
