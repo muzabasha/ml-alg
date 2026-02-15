@@ -16,6 +16,8 @@ interface AttentionWeight {
 
 const TransformerPlayground: React.FC = () => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
+    const containerRef = useRef<HTMLDivElement>(null);
+    const [canvasSize, setCanvasSize] = useState({ width: 800, height: 400 });
     const [activeTab, setActiveTab] = useState<'visualizer' | 'context' | 'architecture'>('visualizer');
     const [inputText, setInputText] = useState('The cat sat on the mat');
     const [tokens, setTokens] = useState<Token[]>([]);
@@ -76,6 +78,20 @@ const TransformerPlayground: React.FC = () => {
             setSelectedToken(0);
         }
     }, [inputText, embeddingDim]);
+
+    // Handle canvas resizing
+    useEffect(() => {
+        const updateCanvasSize = () => {
+            if (!containerRef.current) return;
+            const { width } = containerRef.current.getBoundingClientRect();
+            const height = Math.min(400, width * 0.5); // 2:1 aspect ratio with max height
+            setCanvasSize({ width, height });
+        };
+
+        updateCanvasSize();
+        window.addEventListener('resize', updateCanvasSize);
+        return () => window.removeEventListener('resize', updateCanvasSize);
+    }, []);
 
     // Calculate attention weights using simplified self-attention
     const calculateAttention = () => {
@@ -221,7 +237,7 @@ const TransformerPlayground: React.FC = () => {
             ctx.fillText(token.text, x, y);
         });
 
-    }, [tokens, attentionWeights, selectedToken, activeTab]);
+    }, [tokens, attentionWeights, selectedToken, activeTab, canvasSize]);
 
     const handleCanvasClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
         const canvas = canvasRef.current;
@@ -307,13 +323,14 @@ const TransformerPlayground: React.FC = () => {
                     </div>
 
                     <div className="lg:col-span-3 space-y-8">
-                        <div className="bg-slate-900 rounded-[2.5rem] p-1 shadow-2xl overflow-hidden">
+                        <div ref={containerRef} className="bg-slate-900 rounded-[2.5rem] p-1 shadow-2xl overflow-hidden">
                             <canvas
                                 ref={canvasRef}
-                                width={800}
-                                height={400}
+                                width={canvasSize.width}
+                                height={canvasSize.height}
                                 onClick={handleCanvasClick}
                                 className="w-full cursor-crosshair bg-slate-900"
+                                style={{ display: 'block' }}
                             />
                         </div>
                         <div className="bg-indigo-50 border border-indigo-100 p-6 rounded-[2rem]">

@@ -12,6 +12,8 @@ interface DataPoint {
 
 const NeuralNetworkPlayground: React.FC = () => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
+    const containerRef = useRef<HTMLDivElement>(null);
+    const [canvasSize, setCanvasSize] = useState({ width: 600, height: 400 });
     const [layers, setLayers] = useState<Layer[]>([
         { neurons: 2 }, // Input layer
         { neurons: 4 }, // Hidden layer 1
@@ -70,6 +72,20 @@ const NeuralNetworkPlayground: React.FC = () => {
         generateDataset(datasetType);
     }, [datasetType]);
 
+    // Handle canvas resizing
+    useEffect(() => {
+        const updateCanvasSize = () => {
+            if (!containerRef.current) return;
+            const { width } = containerRef.current.getBoundingClientRect();
+            const height = Math.min(400, width * 0.67); // Maintain aspect ratio with max height
+            setCanvasSize({ width, height });
+        };
+
+        updateCanvasSize();
+        window.addEventListener('resize', updateCanvasSize);
+        return () => window.removeEventListener('resize', updateCanvasSize);
+    }, []);
+
     // Draw neural network visualization
     useEffect(() => {
         if (!canvasRef.current) return;
@@ -83,7 +99,7 @@ const NeuralNetworkPlayground: React.FC = () => {
 
         // Draw network
         drawNetwork(ctx, canvas.width, canvas.height);
-    }, [layers, epoch]);
+    }, [layers, epoch, canvasSize]);
 
     const drawNetwork = (ctx: CanvasRenderingContext2D, width: number, height: number) => {
         const layerSpacing = width / (layers.length + 1);
@@ -241,8 +257,8 @@ const NeuralNetworkPlayground: React.FC = () => {
                                     key={type}
                                     onClick={() => setDatasetType(type as any)}
                                     className={`w-full px-4 py-2 rounded-lg font-semibold transition ${datasetType === type
-                                            ? 'bg-indigo-600 text-white'
-                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                        ? 'bg-indigo-600 text-white'
+                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                         }`}
                                 >
                                     {type.charAt(0).toUpperCase() + type.slice(1)}
@@ -396,15 +412,16 @@ const NeuralNetworkPlayground: React.FC = () => {
 
                 {/* Center Panel - Network Visualization */}
                 <div className="lg:col-span-2 space-y-6">
-                    <div className="bg-white p-6 rounded-lg shadow-md">
+                    <div ref={containerRef} className="bg-white p-6 rounded-lg shadow-md">
                         <h4 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
                             <span>🕸️</span> Network Architecture
                         </h4>
                         <canvas
                             ref={canvasRef}
-                            width={600}
-                            height={400}
+                            width={canvasSize.width}
+                            height={canvasSize.height}
                             className="w-full border-2 border-gray-200 rounded-lg"
+                            style={{ display: 'block' }}
                         />
                     </div>
 

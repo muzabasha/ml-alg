@@ -12,9 +12,11 @@ interface MLPlaygroundProps {
 
 const MLPlayground: React.FC<MLPlaygroundProps> = ({ algorithmType }) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
+    const containerRef = useRef<HTMLDivElement>(null);
     const [dataPoints, setDataPoints] = useState<DataPoint[]>([]);
     const [isTraining, setIsTraining] = useState(false);
     const [modelTrained, setModelTrained] = useState(false);
+    const [canvasSize, setCanvasSize] = useState({ width: 800, height: 600 });
 
     // Algorithm-specific parameters
     const [learningRate, setLearningRate] = useState(0.01);
@@ -79,6 +81,20 @@ const MLPlayground: React.FC<MLPlaygroundProps> = ({ algorithmType }) => {
     useEffect(() => {
         if (datasetType !== 'manual') generateDataset(datasetType);
     }, [datasetType]);
+
+    // Handle canvas resizing
+    useEffect(() => {
+        const updateCanvasSize = () => {
+            if (!containerRef.current) return;
+            const { width } = containerRef.current.getBoundingClientRect();
+            const height = width * 0.75; // 4:3 aspect ratio
+            setCanvasSize({ width, height });
+        };
+
+        updateCanvasSize();
+        window.addEventListener('resize', updateCanvasSize);
+        return () => window.removeEventListener('resize', updateCanvasSize);
+    }, []);
 
     const handleCanvasClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
         if (datasetType !== 'manual') return;
@@ -202,7 +218,7 @@ const MLPlayground: React.FC<MLPlaygroundProps> = ({ algorithmType }) => {
             ctx.fillStyle = '#4f46e5';
             ctx.fillRect(0, canvas.height - 4, canvas.width * (iterations / 100), 4);
         }
-    }, [dataPoints, modelTrained, slope, intercept, isTraining, iterations, algorithmType, kValue]);
+    }, [dataPoints, modelTrained, slope, intercept, isTraining, iterations, algorithmType, kValue, canvasSize]);
 
     return (
         <div className="my-16 bg-white rounded-[4rem] border border-slate-100 shadow-[0_64px_128px_-32px_rgba(2,6,23,0.08)] overflow-hidden animate-fadeIn">
@@ -281,11 +297,11 @@ const MLPlayground: React.FC<MLPlaygroundProps> = ({ algorithmType }) => {
                 </div>
 
                 <div className="lg:col-span-8 space-y-10">
-                    <div className="bg-white rounded-[3rem] border border-slate-100 shadow-inner p-1 overflow-hidden relative group">
+                    <div ref={containerRef} className="bg-white rounded-[3rem] border border-slate-100 shadow-inner p-1 overflow-hidden relative group">
                         <div className="absolute top-8 left-12 z-20 pointer-events-none">
                             <h5 className="text-[10px] font-black text-slate-300 uppercase tracking-[0.5em]">Interactive Manifold</h5>
                         </div>
-                        <canvas ref={canvasRef} width={800} height={600} onClick={handleCanvasClick} className="w-full aspect-[4/3] cursor-crosshair transition-all" />
+                        <canvas ref={canvasRef} width={canvasSize.width} height={canvasSize.height} onClick={handleCanvasClick} className="w-full cursor-crosshair transition-all" style={{ display: 'block' }} />
                         {datasetType === 'manual' && (
                             <div className="absolute bottom-8 left-1/2 -translate-x-1/2 px-6 py-3 bg-slate-950 text-white rounded-full text-[9px] font-black uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-2xl backdrop-blur-md">
                                 Inject tensors into the plane

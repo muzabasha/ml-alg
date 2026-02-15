@@ -112,7 +112,7 @@ const DataVisualization: React.FC<VisualizationProps> = ({ data, algorithmType }
                     <p className="text-[10px] text-indigo-600 font-black uppercase tracking-widest mt-1">High-Precision Signal Map</p>
                 </div>
             </div>
-            <div className="relative" style={{ height: '500px' }}>
+            <div className="relative min-h-[300px] md:min-h-[400px] lg:min-h-[500px]">
                 <canvas ref={canvasRef}></canvas>
             </div>
         </div>
