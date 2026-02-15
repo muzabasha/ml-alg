@@ -27,11 +27,8 @@ export const CHALLENGES: Record<string, Challenge> = {
             'Hinge Loss'
         ],
         correctAnswer: 'Mean Squared Error (MSE)',
-        hints: [
-            'Think about the "least squares" method',
-            'The loss function involves squaring the differences',
-            'MSE = (1/n) * Σ(y_actual - y_predicted)²'
-        ],
+        hint: 'Think about the "least squares" method - MSE = (1/n) * Σ(y_actual - y_predicted)²',
+        explanation: 'Linear Regression minimizes the Mean Squared Error (MSE), which measures the average squared difference between predicted and actual values.',
         difficulty: ChallengeDifficulty.Easy
     },
     'logistic_regression_challenge': {
@@ -46,11 +43,8 @@ export const CHALLENGES: Record<string, Challenge> = {
             'Softmax'
         ],
         correctAnswer: 'Sigmoid',
-        hints: [
-            'The function maps any real number to a value between 0 and 1',
-            'It has an S-shaped curve',
-            'σ(z) = 1 / (1 + e^(-z))'
-        ],
+        hint: 'The sigmoid function maps any real number to a value between 0 and 1: σ(z) = 1 / (1 + e^(-z))',
+        explanation: 'Logistic Regression uses the sigmoid activation function to transform linear outputs into probabilities between 0 and 1.',
         difficulty: ChallengeDifficulty.Easy
     },
     'knn_challenge': {
@@ -65,11 +59,8 @@ export const CHALLENGES: Record<string, Challenge> = {
             'It becomes linear'
         ],
         correctAnswer: 'It becomes smoother and more generalized',
-        hints: [
-            'Larger K means considering more neighbors',
-            'More neighbors lead to averaging over more data points',
-            'Think about the bias-variance tradeoff'
-        ],
+        hint: 'Larger K means considering more neighbors, which leads to averaging over more data points and smoother boundaries.',
+        explanation: 'As K increases, the decision boundary becomes smoother because predictions are based on more neighbors, reducing overfitting but potentially increasing bias.',
         difficulty: ChallengeDifficulty.Medium
     },
     'kmeans_challenge': {
@@ -84,11 +75,8 @@ export const CHALLENGES: Record<string, Challenge> = {
             'It cannot find any cluster patterns'
         ],
         correctAnswer: 'It requires knowing the number of clusters (K) in advance',
-        hints: [
-            'Think about what you need to specify before running the algorithm',
-            'The "K" in K-Means is a hyperparameter',
-            'You must choose K before the algorithm starts'
-        ],
+        hint: 'The "K" in K-Means is a hyperparameter that you must specify before running the algorithm.',
+        explanation: 'K-Means requires you to specify the number of clusters (K) beforehand, which can be challenging when the optimal number is unknown.',
         difficulty: ChallengeDifficulty.Easy
     },
     'naive_bayes_challenge': {
@@ -103,11 +91,8 @@ export const CHALLENGES: Record<string, Challenge> = {
             'Features have equal importance'
         ],
         correctAnswer: 'Features are conditionally independent given the class',
-        hints: [
-            'The word "naive" refers to this assumption',
-            'It assumes features don\'t influence each other',
-            'P(X₁, X₂|Y) = P(X₁|Y) × P(X₂|Y)'
-        ],
+        hint: 'The "naive" assumption means features don\'t influence each other: P(X₁, X₂|Y) = P(X₁|Y) × P(X₂|Y)',
+        explanation: 'Naive Bayes assumes that all features are conditionally independent given the class label, which simplifies probability calculations.',
         difficulty: ChallengeDifficulty.Medium
     },
     'decision_tree_challenge': {
@@ -122,11 +107,8 @@ export const CHALLENGES: Record<string, Challenge> = {
             'Euclidean Distance'
         ],
         correctAnswer: 'Information Gain (Entropy)',
-        hints: [
-            'It measures the reduction in uncertainty',
-            'Based on information theory',
-            'Entropy = -Σ p(x) log₂ p(x)'
-        ],
+        hint: 'Information Gain measures the reduction in uncertainty using entropy: Entropy = -Σ p(x) log₂ p(x)',
+        explanation: 'Decision Trees use Information Gain based on entropy to measure how well a split reduces uncertainty in the data.',
         difficulty: ChallengeDifficulty.Medium
     },
     'svm_challenge': {
@@ -141,11 +123,8 @@ export const CHALLENGES: Record<string, Challenge> = {
             'Maximize the number of features'
         ],
         correctAnswer: 'Maximize the margin between classes',
-        hints: [
-            'SVM finds the optimal separating hyperplane',
-            'The margin is the distance between the hyperplane and nearest points',
-            'Larger margin = better generalization'
-        ],
+        hint: 'SVM finds the optimal separating hyperplane with the largest margin between classes for better generalization.',
+        explanation: 'Support Vector Machines aim to maximize the margin (distance) between the decision boundary and the nearest data points from each class.',
         difficulty: ChallengeDifficulty.Hard
     },
     'ann_challenge': {
@@ -160,11 +139,8 @@ export const CHALLENGES: Record<string, Challenge> = {
             'Stochastic Sampling'
         ],
         correctAnswer: 'Backpropagation',
-        hints: [
-            'It propagates errors backward through the network',
-            'Uses the chain rule to compute gradients',
-            'Updates weights from output layer to input layer'
-        ],
+        hint: 'Backpropagation uses the chain rule to compute gradients and propagates errors backward through the network.',
+        explanation: 'Backpropagation is the algorithm that computes gradients of the loss function with respect to weights by propagating errors backward through the network layers.',
         difficulty: ChallengeDifficulty.Medium
     },
     'cnn_challenge': {
@@ -179,11 +155,8 @@ export const CHALLENGES: Record<string, Challenge> = {
             'They work only with text data'
         ],
         correctAnswer: 'They reduce the number of parameters through weight sharing',
-        hints: [
-            'Convolutional filters are applied across the entire input',
-            'Same filter weights are used at different positions',
-            'This is called parameter sharing or weight tying'
-        ],
+        hint: 'Convolutional filters use the same weights across different positions in the input (parameter sharing).',
+        explanation: 'Convolutional layers reduce parameters by sharing the same filter weights across the entire input, making CNNs more efficient than fully connected networks.',
         difficulty: ChallengeDifficulty.Hard
     },
     'rnn_challenge': {
@@ -198,11 +171,8 @@ export const CHALLENGES: Record<string, Challenge> = {
             'Lack of parallelization'
         ],
         correctAnswer: 'Vanishing/Exploding Gradients',
-        hints: [
-            'Standard RNNs struggle with long sequences',
-            'Gradients become very small or very large during backpropagation',
-            'LSTM uses gates to control information flow'
-        ],
+        hint: 'LSTM uses gates to control information flow and prevent gradients from becoming too small or too large during backpropagation.',
+        explanation: 'LSTM and GRU architectures solve the vanishing/exploding gradient problem that occurs in standard RNNs when processing long sequences.',
         difficulty: ChallengeDifficulty.Hard
     },
     'transformer_challenge': {
@@ -217,11 +187,8 @@ export const CHALLENGES: Record<string, Challenge> = {
             'Pooling layers'
         ],
         correctAnswer: 'Self-Attention mechanism',
-        hints: [
-            'It computes relationships between all positions simultaneously',
-            'No sequential processing required',
-            'Attention(Q, K, V) = softmax(QK^T/√d_k)V'
-        ],
+        hint: 'Self-attention computes relationships between all positions simultaneously: Attention(Q, K, V) = softmax(QK^T/√d_k)V',
+        explanation: 'The self-attention mechanism allows Transformers to process all positions in parallel by computing relationships between all tokens simultaneously, unlike RNNs which process sequentially.',
         difficulty: ChallengeDifficulty.Hard
     }
 };
