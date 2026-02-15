@@ -323,13 +323,13 @@ const TransformerPlayground: React.FC = () => {
                     </div>
 
                     <div className="lg:col-span-3 space-y-8">
-                        <div ref={containerRef} className="bg-slate-900 rounded-[2.5rem] p-1 shadow-2xl overflow-hidden">
+                        <div ref={containerRef} className="bg-white rounded-[2.5rem] p-1 shadow-2xl overflow-hidden border border-slate-200">
                             <canvas
                                 ref={canvasRef}
                                 width={canvasSize.width}
                                 height={canvasSize.height}
                                 onClick={handleCanvasClick}
-                                className="w-full cursor-crosshair bg-slate-900"
+                                className="w-full cursor-crosshair bg-slate-50"
                                 style={{ display: 'block' }}
                             />
                         </div>
@@ -344,16 +344,16 @@ const TransformerPlayground: React.FC = () => {
 
             {activeTab === 'context' && (
                 <div className="space-y-8 animate-fadeIn">
-                    <div className="bg-indigo-900 rounded-[3rem] p-12 text-white shadow-2xl relative overflow-hidden">
-                        <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-[100px] -mr-48 -mt-48"></div>
+                    <div className="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-[3rem] p-12 text-white shadow-2xl relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-[100px] -mr-48 -mt-48"></div>
                         <h3 className="text-3xl font-black mb-6">Polysemy & Attention Shift</h3>
-                        <p className="text-indigo-200 text-lg font-light leading-relaxed max-w-2xl mb-12">
+                        <p className="text-indigo-100 text-lg font-light leading-relaxed max-w-2xl mb-12">
                             How does a Transformer know if <span className="text-white font-bold italic">bank</span> means a river edge or a financial institution? It looks at the <strong>context words</strong>.
                         </p>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
                             {[contextExamples[contextPair].s1, contextExamples[contextPair].s2].map((s, i) => (
-                                <div key={i} className="bg-white/5 border border-white/10 p-8 rounded-[2.5rem] hover:bg-white/10 transition group">
+                                <div key={i} className="bg-white/10 backdrop-blur-sm border border-white/20 p-8 rounded-[2.5rem] hover:bg-white/20 transition group">
                                     <h4 className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-6 underline decoration-indigo-500">Observation {i + 1}</h4>
                                     <div className="text-xl font-medium mb-8">
                                         {s.split(' ').map((w, j) => (
@@ -375,9 +375,9 @@ const TransformerPlayground: React.FC = () => {
                             ))}
                         </div>
 
-                        <div className="p-8 bg-indigo-950/50 rounded-3xl border border-white/5">
-                            <h5 className="text-[10px] font-black uppercase text-indigo-400 mb-4">Architectural Interpretation</h5>
-                            <p className="text-sm font-light leading-relaxed text-indigo-100">{contextExamples[contextPair].explanation}</p>
+                        <div className="p-8 bg-white/10 backdrop-blur-sm rounded-3xl border border-white/20">
+                            <h5 className="text-[10px] font-black uppercase text-indigo-100 mb-4">Architectural Interpretation</h5>
+                            <p className="text-sm font-light leading-relaxed text-white">{contextExamples[contextPair].explanation}</p>
                         </div>
                     </div>
 

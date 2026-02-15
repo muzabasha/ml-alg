@@ -19,7 +19,7 @@
     }
 
     body {
-        @apply bg-[#fcfcfd] text-slate-900 antialiased selection:bg-indigo-100 selection:text-indigo-900;
+        @apply bg-white text-slate-900 antialiased selection:bg-indigo-100 selection:text-indigo-900;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
     }
@@ -30,7 +30,7 @@
     h4,
     h5,
     h6 {
-        @apply tracking-tighter text-slate-950;
+        @apply tracking-tighter text-slate-900;
     }
 }
 

@@ -222,15 +222,15 @@ const MLPlayground: React.FC<MLPlaygroundProps> = ({ algorithmType }) => {
 
     return (
         <div className="my-16 bg-white rounded-[4rem] border border-slate-100 shadow-[0_64px_128px_-32px_rgba(2,6,23,0.08)] overflow-hidden animate-fadeIn">
-            <div className="bg-slate-950 p-12 md:p-16 text-white relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-600 opacity-20 blur-[100px] rounded-full -mr-48 -mt-48"></div>
+            <div className="bg-gradient-to-br from-indigo-600 to-purple-700 p-12 md:p-16 text-white relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 blur-[100px] rounded-full -mr-48 -mt-48"></div>
                 <div className="relative z-10 flex flex-col md:flex-row justify-between items-end gap-8">
                     <div className="max-w-xl">
-                        <span className="inline-block px-4 py-2 bg-indigo-600 rounded-full text-[10px] font-black uppercase tracking-[0.2em] mb-6 shadow-xl">Simulation Core</span>
+                        <span className="inline-block px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-[10px] font-black uppercase tracking-[0.2em] mb-6 shadow-xl border border-white/30">Simulation Core</span>
                         <h3 className="text-4xl md:text-5xl font-black tracking-tighter leading-[0.9] mb-4">
-                            Model <span className="text-indigo-400 italic">Playground.</span>
+                            Model <span className="text-white italic">Playground.</span>
                         </h3>
-                        <p className="text-slate-400 font-light italic text-lg leading-relaxed">
+                        <p className="text-indigo-100 font-light italic text-lg leading-relaxed">
                             Observe stochastic convergence in real-time. Manually inject tensors or utilize synthetic manifold generators.
                         </p>
                     </div>
@@ -303,7 +303,7 @@ const MLPlayground: React.FC<MLPlaygroundProps> = ({ algorithmType }) => {
                         </div>
                         <canvas ref={canvasRef} width={canvasSize.width} height={canvasSize.height} onClick={handleCanvasClick} className="w-full cursor-crosshair transition-all" style={{ display: 'block' }} />
                         {datasetType === 'manual' && (
-                            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 px-6 py-3 bg-slate-950 text-white rounded-full text-[9px] font-black uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-2xl backdrop-blur-md">
+                            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 px-6 py-3 bg-indigo-600 text-white rounded-full text-[9px] font-black uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-2xl backdrop-blur-md">
                                 Inject tensors into the plane
                             </div>
                         )}

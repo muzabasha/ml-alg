@@ -79,14 +79,14 @@ const HomePage: React.FC = () => {
 
                             <div className="flex justify-between items-start mb-10">
                                 <div className={`w-16 h-16 rounded-[1.5rem] flex items-center justify-center text-3xl italic font-black transition-all duration-700 ${algo.difficulty === 'Beginner' ? 'bg-emerald-50 text-emerald-600 group-hover:rotate-12' :
-                                        algo.difficulty === 'Intermediate' ? 'bg-indigo-50 text-indigo-600 group-hover:rotate-12' :
-                                            'bg-rose-50 text-rose-600 group-hover:rotate-12'
+                                    algo.difficulty === 'Intermediate' ? 'bg-indigo-50 text-indigo-600 group-hover:rotate-12' :
+                                        'bg-rose-50 text-rose-600 group-hover:rotate-12'
                                     } group-hover:bg-white group-hover:shadow-2xl`}>
                                     {algo.name[0]}
                                 </div>
                                 <span className={`text-[9px] font-black uppercase tracking-[0.3em] px-3 py-1 rounded-full border transition-colors ${algo.difficulty === 'Beginner' ? 'text-emerald-500 border-emerald-100 bg-emerald-50/30' :
-                                        algo.difficulty === 'Intermediate' ? 'text-indigo-500 border-indigo-100 bg-indigo-50/30' :
-                                            'text-rose-500 border-rose-100 bg-rose-50/30'
+                                    algo.difficulty === 'Intermediate' ? 'text-indigo-500 border-indigo-100 bg-indigo-50/30' :
+                                        'text-rose-500 border-rose-100 bg-rose-50/30'
                                     }`}>
                                     {algo.difficulty}
                                 </span>
@@ -110,17 +110,16 @@ const HomePage: React.FC = () => {
             </section>
 
             {/* Deep Theory Section */}
-            <section className="bg-slate-950 py-56 text-white relative overflow-hidden">
-                <div className="absolute inset-0 bg-[url('/noise.png')] opacity-10 pointer-events-none"></div>
-                <div className="absolute top-0 left-0 w-full h-[500px] bg-gradient-to-b from-indigo-900/20 to-transparent"></div>
+            <section className="bg-slate-50 py-56 relative overflow-hidden border-y border-slate-200">
+                <div className="absolute top-0 left-0 w-full h-[500px] bg-gradient-to-b from-indigo-50 to-transparent"></div>
 
                 <div className="container mx-auto px-6 relative z-10">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-32 items-center">
                         <div className="space-y-16">
                             <div>
-                                <span className="text-indigo-400 font-black text-[10px] uppercase tracking-[0.5em] block mb-8">Structural Sovereignty</span>
-                                <h3 className="text-6xl md:text-7xl font-black mb-12 leading-[0.9] tracking-tighter">
-                                    Master the <br /><span className="text-indigo-500 italic">Numerical DNA.</span>
+                                <span className="text-indigo-600 font-black text-[10px] uppercase tracking-[0.5em] block mb-8">Structural Sovereignty</span>
+                                <h3 className="text-6xl md:text-7xl font-black mb-12 leading-[0.9] tracking-tighter text-slate-900">
+                                    Master the <br /><span className="text-indigo-600 italic">Numerical DNA.</span>
                                 </h3>
                             </div>
 
@@ -131,10 +130,10 @@ const HomePage: React.FC = () => {
                                     { title: "Tensor Topology", desc: "Understand high-dimensional geometry and how loss manifolds evolve over time.", icon: "🌌" }
                                 ].map((item, i) => (
                                     <div key={i} className="flex gap-10 group">
-                                        <div className="text-5xl text-slate-800 group-hover:text-indigo-500 transition-all duration-500 transform group-hover:scale-125 group-hover:rotate-12">{item.icon}</div>
+                                        <div className="text-5xl group-hover:scale-125 group-hover:rotate-12 transition-all duration-500">{item.icon}</div>
                                         <div className="space-y-3">
-                                            <h4 className="text-2xl font-black tracking-tight text-white/95">{item.title}</h4>
-                                            <p className="text-slate-400 font-light text-lg italic leading-relaxed opacity-80 group-hover:opacity-100 transition-opacity">{item.desc}</p>
+                                            <h4 className="text-2xl font-black tracking-tight text-slate-900">{item.title}</h4>
+                                            <p className="text-slate-600 font-light text-lg italic leading-relaxed">{item.desc}</p>
                                         </div>
                                     </div>
                                 ))}
@@ -142,10 +141,10 @@ const HomePage: React.FC = () => {
                         </div>
 
                         <div className="relative">
-                            <div className="absolute -inset-20 bg-indigo-600/10 blur-[150px] rounded-full"></div>
-                            <div className="bg-white/5 backdrop-blur-3xl border border-white/10 rounded-[4rem] p-16 md:p-24 relative z-10 shadow-[0_80px_160px_-40px_rgba(0,0,0,0.5)] overflow-hidden group">
-                                <div className="absolute top-0 right-0 w-48 h-48 bg-indigo-600/10 rounded-full -mr-24 -mt-24 blur-3xl group-hover:scale-150 transition-transform duration-1000"></div>
-                                <h4 className="text-[10px] font-black mb-12 uppercase tracking-[0.5em] text-indigo-500">Modeller's Protocol</h4>
+                            <div className="absolute -inset-20 bg-indigo-100 blur-[150px] rounded-full"></div>
+                            <div className="bg-white border border-slate-200 rounded-[4rem] p-16 md:p-24 relative z-10 shadow-2xl overflow-hidden group">
+                                <div className="absolute top-0 right-0 w-48 h-48 bg-indigo-50 rounded-full -mr-24 -mt-24 blur-3xl group-hover:scale-150 transition-transform duration-1000"></div>
+                                <h4 className="text-[10px] font-black mb-12 uppercase tracking-[0.5em] text-indigo-600">Modeller's Protocol</h4>
                                 <div className="space-y-8">
                                     {[
                                         "Derive MLE for Sigmoid Projection",
@@ -155,15 +154,15 @@ const HomePage: React.FC = () => {
                                         "Execute Manual Backpropagation"
                                     ].map((check, i) => (
                                         <div key={i} className="flex items-center gap-6 group/item">
-                                            <div className="w-6 h-6 rounded-full border border-indigo-500/50 flex items-center justify-center text-[10px] text-indigo-400 bg-indigo-500/5 group-hover/item:bg-indigo-600 group-hover/item:text-white transition-all shadow-2xl">✓</div>
-                                            <span className="text-lg font-medium text-slate-300 group-hover/item:text-white transition-colors italic">{check}</span>
+                                            <div className="w-6 h-6 rounded-full border border-indigo-200 flex items-center justify-center text-[10px] text-indigo-600 bg-indigo-50 group-hover/item:bg-indigo-600 group-hover/item:text-white transition-all shadow-sm">✓</div>
+                                            <span className="text-lg font-medium text-slate-700 group-hover/item:text-slate-900 transition-colors italic">{check}</span>
                                         </div>
                                     ))}
                                 </div>
-                                <div className="mt-20 p-12 bg-indigo-600 rounded-[3rem] text-center shadow-2xl shadow-indigo-900/50 transition-all duration-700 hover:scale-[1.05] relative overflow-hidden group/card">
+                                <div className="mt-20 p-12 bg-indigo-600 rounded-[3rem] text-center shadow-2xl shadow-indigo-200 transition-all duration-700 hover:scale-[1.05] relative overflow-hidden group/card">
                                     <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent"></div>
-                                    <p className="text-[10px] font-black uppercase tracking-[0.4em] mb-4 text-indigo-200 relative z-10">Lab Mastery Index</p>
-                                    <div className="text-6xl font-black tracking-tighter relative z-10">98.4%</div>
+                                    <p className="text-[10px] font-black uppercase tracking-[0.4em] mb-4 text-indigo-100 relative z-10">Lab Mastery Index</p>
+                                    <div className="text-6xl font-black tracking-tighter relative z-10 text-white">98.4%</div>
                                     <p className="text-[10px] font-black mt-4 text-indigo-100 uppercase tracking-widest relative z-10 italic">Superior Proficiency Rating</p>
                                 </div>
                             </div>
@@ -174,21 +173,21 @@ const HomePage: React.FC = () => {
 
             {/* Final CTA Lab Exit */}
             <section className="container mx-auto px-6 py-56">
-                <div className="bg-slate-900 rounded-[5rem] p-24 md:p-44 text-center text-white shadow-[0_80px_160px_-40px_rgba(2,6,23,0.4)] relative overflow-hidden group">
+                <div className="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-[5rem] p-24 md:p-44 text-center text-white shadow-2xl relative overflow-hidden group">
                     <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-5 pointer-events-none"></div>
-                    <div className="absolute -top-44 -left-44 w-[600px] h-[600px] bg-indigo-600/10 rounded-full blur-[150px] transition-all duration-1000 group-hover:scale-150"></div>
+                    <div className="absolute -top-44 -left-44 w-[600px] h-[600px] bg-white/10 rounded-full blur-[150px] transition-all duration-1000 group-hover:scale-150"></div>
 
                     <div className="relative z-10">
-                        <span className="text-[10px] font-black uppercase tracking-[0.5em] text-indigo-400 mb-12 block">Architectural Graduation</span>
+                        <span className="text-[10px] font-black uppercase tracking-[0.5em] text-indigo-100 mb-12 block">Architectural Graduation</span>
                         <h2 className="text-5xl md:text-8xl font-black mb-16 leading-[0.85] tracking-tighter">
-                            Ready to Code the <br /><span className="text-white italic underline decoration-indigo-600 underline-offset-[20px]">Future of Logic?</span>
+                            Ready to Code the <br /><span className="text-white italic underline decoration-white/30 underline-offset-[20px]">Future of Logic?</span>
                         </h2>
                         <div className="flex flex-col sm:flex-row justify-center gap-8 mt-24">
-                            <Link href="/datasets" className="bg-white text-slate-950 px-20 py-8 rounded-[2.5rem] font-black text-xs uppercase tracking-widest hover:bg-slate-50 transition-all active:scale-95 shadow-2xl hover:shadow-white/10 group/btn">
+                            <Link href="/datasets" className="bg-white text-indigo-600 px-20 py-8 rounded-[2.5rem] font-black text-xs uppercase tracking-widest hover:bg-slate-50 transition-all active:scale-95 shadow-2xl group/btn">
                                 Enter Research Hub
-                                <span className="inline-block ml-4 transition-transform group-hover/btn:translate-x-3 text-2xl text-indigo-600">→</span>
+                                <span className="inline-block ml-4 transition-transform group-hover/btn:translate-x-3 text-2xl">→</span>
                             </Link>
-                            <Link href="/instructor" className="bg-white/5 border border-white/10 text-white px-20 py-8 rounded-[2.5rem] font-black text-xs uppercase tracking-widest hover:bg-white/10 transition-all active:scale-95">
+                            <Link href="/instructor" className="bg-white/10 border border-white/20 text-white px-20 py-8 rounded-[2.5rem] font-black text-xs uppercase tracking-widest hover:bg-white/20 transition-all active:scale-95 backdrop-blur-sm">
                                 Meet the Architect
                             </Link>
                         </div>
