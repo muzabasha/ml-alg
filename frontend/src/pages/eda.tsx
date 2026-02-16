@@ -6,7 +6,18 @@ import { InlineMath, BlockMath } from 'react-katex';
 import Layout from '../components/Layout';
 import WorkflowNavButtons from '../components/WorkflowNavButtons';
 
-const Chart = dynamic(() => import('react-chartjs-2').then(mod => mod.Chart), {
+// Dynamically import Chart.js components with SSR disabled
+const Scatter = dynamic(() => import('react-chartjs-2').then(mod => mod.Scatter), {
+    ssr: false,
+    loading: () => <div className="animate-pulse bg-slate-900/5 h-64 rounded-3xl"></div>
+});
+
+const Line = dynamic(() => import('react-chartjs-2').then(mod => mod.Line), {
+    ssr: false,
+    loading: () => <div className="animate-pulse bg-slate-900/5 h-64 rounded-3xl"></div>
+});
+
+const Bar = dynamic(() => import('react-chartjs-2').then(mod => mod.Bar), {
     ssr: false,
     loading: () => <div className="animate-pulse bg-slate-900/5 h-64 rounded-3xl"></div>
 });
@@ -22,7 +33,8 @@ import {
     Tooltip,
     Legend,
     ArcElement,
-    RadialLinearScale
+    RadialLinearScale,
+    Filler
 } from 'chart.js';
 
 ChartJS.register(
@@ -35,7 +47,8 @@ ChartJS.register(
     Tooltip,
     Legend,
     ArcElement,
-    RadialLinearScale
+    RadialLinearScale,
+    Filler
 );
 
 const CodeBlock = dynamic(() => import('../components/CodeBlock'), {
@@ -155,11 +168,25 @@ const EDAPage: React.FC = () => {
                             </div>
                             <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-300 mb-10">Real-time Spectral Observation</h3>
                             <div className="h-[450px]">
-                                {activeAnalysis !== 'image' ? (
-                                    <Chart type={dataMockups[activeAnalysis as keyof typeof dataMockups].type}
-                                        data={dataMockups[activeAnalysis as keyof typeof dataMockups].data}
-                                        options={chartOptions} />
-                                ) : (
+                                {activeAnalysis === 'classification' && (
+                                    <Scatter
+                                        data={dataMockups.classification.data}
+                                        options={chartOptions}
+                                    />
+                                )}
+                                {activeAnalysis === 'regression' && (
+                                    <Line
+                                        data={dataMockups.regression.data}
+                                        options={chartOptions}
+                                    />
+                                )}
+                                {activeAnalysis === 'timeseries' && (
+                                    <Bar
+                                        data={dataMockups.timeseries.data}
+                                        options={chartOptions}
+                                    />
+                                )}
+                                {activeAnalysis === 'image' && (
                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-6 items-center h-full">
                                         {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
                                             <div key={i} className="aspect-square bg-slate-900 rounded-3xl flex flex-col items-center justify-center p-4 border border-white/5 hover:border-indigo-500 transition-all cursor-crosshair group/item shadow-2xl">
