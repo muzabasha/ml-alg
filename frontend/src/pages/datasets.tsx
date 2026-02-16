@@ -889,10 +889,10 @@ const DatasetsPage = () => {
                         <button
                             key={lib}
                             onClick={() => setFilter(lib as any)}
-                            className={`px - 8 py - 4 rounded - [1.5rem] text - [10px] font - black uppercase tracking - widest transition - all ${filter === lib
+                            className={`px-8 py-4 rounded-[1.5rem] text-[10px] font-black uppercase tracking-widest transition-all ${filter === lib
                                 ? 'bg-indigo-600 text-white shadow-2xl shadow-indigo-100 scale-[1.02]'
                                 : 'bg-transparent text-slate-400 hover:text-slate-900'
-                                } `}
+                                }`}
                         >
                             {lib}
                         </button>
@@ -906,26 +906,27 @@ const DatasetsPage = () => {
                             <button
                                 key={dataset.id}
                                 onClick={() => setSelectedDataset(dataset.id)}
-                                className={`w - full p - 8 rounded - [2.5rem] text - left transition - all duration - 500 group border - 2 ${selectedDataset === dataset.id
+                                className={`w-full p-8 rounded-[2.5rem] text-left transition-all duration-500 group border-2 ${selectedDataset === dataset.id
                                     ? 'bg-white border-indigo-600 shadow-2xl shadow-indigo-100 -translate-y-1'
                                     : 'bg-white border-slate-50 hover:border-indigo-200 text-slate-500'
-                                    } `}
+                                    }`}
                             >
                                 <div className="flex justify-between items-start mb-6">
-                                    <span className={`text - [9px] font - black uppercase tracking - widest px - 3 py - 1 rounded - lg ${dataset.task === 'Classification' ? 'bg-emerald-50 text-emerald-600' :
+                                    <span className={`text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-lg ${dataset.task === 'Classification' ? 'bg-emerald-50 text-emerald-600' :
                                         dataset.task === 'Regression' ? 'bg-amber-50 text-amber-600' :
                                             'bg-purple-50 text-purple-600'
-                                        } `}>
+                                        }`}>
                                         {dataset.task}
                                     </span>
                                     <span className="text-[8px] font-black text-slate-300 uppercase opacity-50">{dataset.library}</span>
                                 </div>
-                                <h3 className={`text - xl font - black leading - tight transition - colors mb - 2 ${selectedDataset === dataset.id ? 'text-indigo-600' : 'text-slate-900'} `}>
+                                <h3 className={`text-xl font-black leading-tight transition-colors mb-2 ${selectedDataset === dataset.id ? 'text-indigo-600' : 'text-slate-900'
+                                    }`}>
                                     {dataset.name}
                                 </h3>
                                 <div className="flex gap-4 text-[10px] font-black uppercase tracking-widest text-slate-300">
                                     <span>N={dataset.samples}</span>
-                                    <span className="w-1 h-1 bg-slate-200 rounded-full mt-1.5 font-black uppercase tracking-widest text-indigo-400"></span>
+                                    <span className="w-1 h-1 bg-slate-200 rounded-full mt-1.5"></span>
                                     <span>M={dataset.features} Features</span>
                                 </div>
                             </button>
@@ -959,10 +960,10 @@ const DatasetsPage = () => {
                                     { label: 'Class Labels', value: currentDataset.classes || 'N/A', sub: 'Unique Manifolds', color: 'purple' },
                                     { label: 'Ideal Algorithm', value: currentDataset.task === 'Classification' ? 'SVM' : 'LASSO', sub: 'Highest Prob.', color: 'rose' }
                                 ].map((stat, i) => (
-                                    <div key={i} className={`bg - white p - 8 rounded - [2.5rem] border border - slate - 100 shadow - sm hover: border - ${stat.color} -300 transition - all duration - 300 group`}>
-                                        <span className={`text - [9px] font - black uppercase text - slate - 400 mb - 4 block tracking - widest`}>{stat.label}</span>
-                                        <div className={`text - 4xl font - black text - slate - 900 mb - 1 group - hover: text - ${stat.color} -600 transition - colors`}>{stat.value}</div>
-                                        <span className={`text - [9px] font - black uppercase tracking - tighter text - slate - 300`}>{stat.sub}</span>
+                                    <div key={i} className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm hover:border-indigo-300 transition-all duration-300 group">
+                                        <span className="text-[9px] font-black uppercase text-slate-400 mb-4 block tracking-widest">{stat.label}</span>
+                                        <div className="text-4xl font-black text-slate-900 mb-1 group-hover:text-indigo-600 transition-colors">{stat.value}</div>
+                                        <span className="text-[9px] font-black uppercase tracking-tighter text-slate-300">{stat.sub}</span>
                                     </div>
                                 ))}
                             </div>
