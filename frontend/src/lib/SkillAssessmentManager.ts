@@ -289,7 +289,7 @@ export class SkillAssessmentManager {
     private findChallengeById(challengeId: string): Challenge | null {
         // Extract algorithm ID from challenge ID (format: algorithmId_challenge)
         const algorithmId = challengeId.replace('_challenge', '');
-        return getChallengeForAlgorithm(algorithmId);
+        return getChallengeForAlgorithm(algorithmId) || null;
     }
 
     private validateResponse(challenge: Challenge, answer: string): boolean {
