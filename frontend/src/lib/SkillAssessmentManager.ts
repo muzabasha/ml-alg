@@ -221,7 +221,7 @@ export class SkillAssessmentManager {
     }
 
     /**
-     * Get next hint for a challenge
+     * Get hint for a challenge
      */
     getNextHint(challengeId: string): string | null {
         const challenge = this.findChallengeById(challengeId);
@@ -229,14 +229,13 @@ export class SkillAssessmentManager {
 
         const hintsUsed = this.currentHintsUsed.get(challengeId) || 0;
 
-        if (hintsUsed >= challenge.hints.length) {
-            return null; // No more hints available
+        // Only one hint available per challenge
+        if (hintsUsed >= 1 || !challenge.hint) {
+            return null; // Hint already used or not available
         }
 
-        const hint = challenge.hints[hintsUsed];
-        this.currentHintsUsed.set(challengeId, hintsUsed + 1);
-
-        return hint;
+        this.currentHintsUsed.set(challengeId, 1);
+        return challenge.hint;
     }
 
     /**
@@ -387,11 +386,10 @@ export class SkillAssessmentManager {
     private getNextHints(challenge: Challenge): string[] {
         const hintsUsed = this.currentHintsUsed.get(challenge.id) || 0;
 
-        // Return next hint if available
-        if (hintsUsed < challenge.hints.length) {
-            const nextHint = challenge.hints[hintsUsed];
-            this.currentHintsUsed.set(challenge.id, hintsUsed + 1);
-            return [nextHint];
+        // Return hint if available and not yet used
+        if (hintsUsed < 1 && challenge.hint) {
+            this.currentHintsUsed.set(challenge.id, 1);
+            return [challenge.hint];
         }
 
         return [];
