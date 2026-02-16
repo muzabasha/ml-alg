@@ -1,5 +1,11 @@
 import React from 'react';
-import { InlineMath } from 'react-katex';
+import dynamic from 'next/dynamic';
+
+// Dynamic import for react-katex to avoid SSR issues
+const InlineMath = dynamic(
+    () => import('react-katex').then((mod) => mod.InlineMath),
+    { ssr: false }
+);
 
 /**
  * Renders text with inline LaTeX expressions

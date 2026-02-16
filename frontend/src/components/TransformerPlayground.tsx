@@ -1,7 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import 'katex/dist/katex.min.css';
-import { InlineMath, BlockMath } from 'react-katex';
+
+// Dynamic import for react-katex to avoid SSR issues
+const BlockMath = dynamic(
+    () => import('react-katex').then((mod) => mod.BlockMath),
+    { ssr: false }
+);
+
+const InlineMath = dynamic(
+    () => import('react-katex').then((mod) => mod.InlineMath),
+    { ssr: false }
+);
 
 interface Token {
     text: string;
