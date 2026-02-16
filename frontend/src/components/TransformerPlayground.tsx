@@ -410,18 +410,18 @@ const TransformerPlayground: React.FC = () => {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {[
-                            { step: "01", title: "Input Embedding", desc: "Discrete word IDs are transformed into continuous vectors in latent space.", math: "X_{emb} = W_e \cdot Tokens", color: "indigo" },
-                            { step: "02", title: "Positional Encoding", desc: "Since Transformers have no recurrence, we inject order using Sine waves.", math: "PE_{(pos, 2i)} = \sin(pos/10000^{2i/d})", color: "purple" },
-                            { step: "03", title: "Multi-Head Attention", desc: "The core engine. It computes 'relevance scores' using Query/Key dot products.", math: "Attn = \text{softmax}(\frac{QK^T}{\sqrt{d_k}})V", color: "emerald" },
-                            { step: "04", title: "Residual Add & Norm", desc: "Original input is added back to output to prevent gradient vanishing.", math: "\text{LayerNorm}(x + \text{Sublayer}(x))", color: "amber" },
-                            { step: "05", title: "Feed-Forward (FFN)", desc: "Deep non-linear expansion (usually 4x d_model) for complex feature extraction.", math: "\text{FFN}(x) = \text{ReLU}(xW_1 + b_1)W_2 + b_2", color: "rose" },
-                            { step: "06", title: "Output Projection", desc: "Contextual vectors are projected back to vocabulary space for prediction.", math: "y = \text{softmax}(Linear(z))", color: "slate" }
+                            { step: "01", title: "Input Embedding", desc: "Discrete word IDs are transformed into continuous vectors in latent space.", math: "X_{emb} = W_e \\cdot Tokens", color: "indigo", height: "h-16" },
+                            { step: "02", title: "Positional Encoding", desc: "Since Transformers have no recurrence, we inject order using Sine waves.", math: "\\begin{aligned}PE_{(pos, 2i)} = \\\\\\sin(pos/10000^{2i/d})\\end{aligned}", color: "purple", height: "h-20" },
+                            { step: "03", title: "Multi-Head Attention", desc: "The core engine. It computes 'relevance scores' using Query/Key dot products.", math: "\\begin{aligned}Attn = \\text{softmax}\\\\(\\frac{QK^T}{\\sqrt{d_k}})V\\end{aligned}", color: "emerald", height: "h-24" },
+                            { step: "04", title: "Residual Add & Norm", desc: "Original input is added back to output to prevent gradient vanishing.", math: "\\begin{aligned}\\text{LayerNorm}\\\\(x + \\text{Sublayer}(x))\\end{aligned}", color: "amber", height: "h-20" },
+                            { step: "05", title: "Feed-Forward (FFN)", desc: "Deep non-linear expansion (usually 4x d_model) for complex feature extraction.", math: "\\begin{aligned}\\text{FFN}(x) = \\\\\\text{ReLU}(xW_1 + b_1)\\\\W_2 + b_2\\end{aligned}", color: "rose", height: "h-28" },
+                            { step: "06", title: "Output Projection", desc: "Contextual vectors are projected back to vocabulary space for prediction.", math: "y = \\text{softmax}(Linear(z))", color: "slate", height: "h-16" }
                         ].map((s, i) => (
                             <div key={i} className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm border-t-8 transition-all hover:scale-[1.02] hover:shadow-xl" style={{ borderTopColor: `var(--color-${s.color}-500, ${s.color === 'indigo' ? '#6366f1' : s.color === 'purple' ? '#a855f7' : s.color === 'emerald' ? '#10b981' : s.color === 'amber' ? '#f59e0b' : s.color === 'rose' ? '#f43f5e' : '#1e293b'})` }}>
                                 <div className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mb-4">Step {s.step}</div>
                                 <h4 className="text-xl font-black text-slate-900 mb-4">{s.title}</h4>
                                 <p className="text-xs text-slate-500 font-medium leading-relaxed mb-8">{s.desc}</p>
-                                <div className="p-6 bg-slate-50 rounded-2xl h-16 flex items-center justify-center">
+                                <div className={`p-6 bg-slate-50 rounded-2xl ${s.height} flex items-center justify-center overflow-x-auto`}>
                                     <BlockMath math={s.math} />
                                 </div>
                             </div>
