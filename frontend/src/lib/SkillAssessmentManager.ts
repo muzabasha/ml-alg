@@ -79,7 +79,7 @@ export class SkillAssessmentManager {
         }
 
         // Validate response
-        const isCorrect = this.validateResponse(challenge, response.answer);
+        const isCorrect = this.validateResponse(challenge, response.selectedAnswer);
 
         // Calculate score based on correctness, time, and hints
         const score = this.calculateScore(
@@ -111,7 +111,7 @@ export class SkillAssessmentManager {
 
         // Generate feedback and explanation
         const feedback = this.generateFeedback(isCorrect, score, response.timeSpent);
-        const explanation = this.generateExplanation(challenge, response.answer);
+        const explanation = this.generateExplanation(challenge, response.selectedAnswer);
 
         // Provide hints if incorrect
         const hints = isCorrect ? undefined : this.getNextHints(challenge);
