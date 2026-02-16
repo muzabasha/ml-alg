@@ -12,12 +12,12 @@ import { useLearningPath } from '../contexts/LearningPathContext';
  * Workflow step order
  */
 const STEP_ORDER: WorkflowStep[] = [
-    WorkflowStep.Theory,
-    WorkflowStep.Dataset,
-    WorkflowStep.EDA,
-    WorkflowStep.Preprocessing,
-    WorkflowStep.FeatureEngineering,
-    WorkflowStep.TrainEvaluate
+    WorkflowStep.Introduction,
+    WorkflowStep.Mathematics,
+    WorkflowStep.Intuition,
+    WorkflowStep.Implementation,
+    WorkflowStep.Visualization,
+    WorkflowStep.Practice
 ];
 
 /**
@@ -25,7 +25,7 @@ const STEP_ORDER: WorkflowStep[] = [
  */
 export const useStepNavigation = (algorithmId: string) => {
     const { markStepComplete, getAlgorithmStatus, getAlgorithmProgress } = useLearningPath();
-    const [currentStep, setCurrentStep] = useState<WorkflowStep>(WorkflowStep.Theory);
+    const [currentStep, setCurrentStep] = useState<WorkflowStep>(WorkflowStep.Introduction);
     const [completedSteps, setCompletedSteps] = useState<Set<WorkflowStep>>(new Set());
 
     /**

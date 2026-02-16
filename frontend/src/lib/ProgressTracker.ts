@@ -122,12 +122,12 @@ export class ProgressTracker {
         const completedSteps = algoProgress?.completedSteps || [];
 
         return {
-            [WorkflowStep.Theory]: completedSteps.includes(WorkflowStep.Theory),
-            [WorkflowStep.Dataset]: completedSteps.includes(WorkflowStep.Dataset),
-            [WorkflowStep.EDA]: completedSteps.includes(WorkflowStep.EDA),
-            [WorkflowStep.Preprocessing]: completedSteps.includes(WorkflowStep.Preprocessing),
-            [WorkflowStep.FeatureEngineering]: completedSteps.includes(WorkflowStep.FeatureEngineering),
-            [WorkflowStep.TrainEvaluate]: completedSteps.includes(WorkflowStep.TrainEvaluate)
+            [WorkflowStep.Introduction]: completedSteps.includes(WorkflowStep.Introduction),
+            [WorkflowStep.Mathematics]: completedSteps.includes(WorkflowStep.Mathematics),
+            [WorkflowStep.Intuition]: completedSteps.includes(WorkflowStep.Intuition),
+            [WorkflowStep.Implementation]: completedSteps.includes(WorkflowStep.Implementation),
+            [WorkflowStep.Visualization]: completedSteps.includes(WorkflowStep.Visualization),
+            [WorkflowStep.Practice]: completedSteps.includes(WorkflowStep.Practice)
         };
     }
 

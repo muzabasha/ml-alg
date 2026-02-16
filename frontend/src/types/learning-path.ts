@@ -146,12 +146,12 @@ export interface NavigationResult {
  * Step completion progress for an algorithm
  */
 export interface StepProgress {
-    [WorkflowStep.Theory]: boolean;
-    [WorkflowStep.Dataset]: boolean;
-    [WorkflowStep.EDA]: boolean;
-    [WorkflowStep.Preprocessing]: boolean;
-    [WorkflowStep.FeatureEngineering]: boolean;
-    [WorkflowStep.TrainEvaluate]: boolean;
+    [WorkflowStep.Introduction]: boolean;
+    [WorkflowStep.Mathematics]: boolean;
+    [WorkflowStep.Intuition]: boolean;
+    [WorkflowStep.Implementation]: boolean;
+    [WorkflowStep.Visualization]: boolean;
+    [WorkflowStep.Practice]: boolean;
 }
 
 /**
