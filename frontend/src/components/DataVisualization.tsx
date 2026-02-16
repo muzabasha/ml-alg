@@ -12,7 +12,8 @@ import {
     Filler,
     ScatterController
 } from 'chart.js';
-import { baseChartOptions, scatterChartOptions, chartColors, ChartLoadingPlaceholder, ChartErrorPlaceholder } from '../config/chartConfig';
+import { baseChartOptions, scatterChartOptions, chartColors } from '../config/chartConfig';
+import { ChartLoadingPlaceholder, ChartErrorPlaceholder } from './ChartPlaceholders';
 
 // Register Chart.js components
 ChartJS.register(
