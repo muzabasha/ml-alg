@@ -12,6 +12,7 @@ import {
     Filler,
     ScatterController
 } from 'chart.js';
+import { baseChartOptions, scatterChartOptions, chartColors, ChartLoadingPlaceholder, ChartErrorPlaceholder } from '../config/chartConfig';
 
 // Register Chart.js components
 ChartJS.register(
@@ -36,10 +37,12 @@ const DataVisualization: React.FC<VisualizationProps> = ({ data, algorithmType }
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const chartRef = useRef<ChartJS | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         if (!canvasRef.current || !data) {
             setError('No signal data available for rendering');
+            setIsLoading(false);
             return;
         }
 
@@ -50,39 +53,27 @@ const DataVisualization: React.FC<VisualizationProps> = ({ data, algorithmType }
         const ctx = canvasRef.current.getContext('2d');
         if (!ctx) {
             setError('Canvas core initialization failed');
+            setIsLoading(false);
             return;
         }
 
         try {
+            setIsLoading(true);
             const chartData = parseDataForVisualization(data, algorithmType);
 
             if (!chartData) {
                 setError('Signal decomposition failed');
+                setIsLoading(false);
                 return;
             }
 
-            // Apply premium styling to chart config
-            chartData.options = {
-                ...chartData.options,
-                font: { family: 'Outfit' },
-                plugins: {
-                    ...chartData.options.plugins,
-                    legend: {
-                        ...chartData.options.plugins.legend,
-                        labels: {
-                            font: { family: 'Outfit', weight: '900', size: 10 },
-                            usePointStyle: true,
-                            padding: 20
-                        }
-                    }
-                }
-            };
-
             chartRef.current = new ChartJS(ctx, chartData);
             setError(null);
+            setIsLoading(false);
         } catch (err) {
             console.error('Chart creation error:', err);
             setError('Rendering engine overflow');
+            setIsLoading(false);
         }
 
         return () => {
@@ -92,12 +83,22 @@ const DataVisualization: React.FC<VisualizationProps> = ({ data, algorithmType }
         };
     }, [data, algorithmType]);
 
+    if (isLoading) {
+        return (
+            <div className="my-12 p-12 bg-white rounded-[4rem] border border-slate-100 shadow-[0_64px_128px_-32px_rgba(2,6,23,0.05)] relative overflow-hidden">
+                <div className="relative min-h-[300px] md:min-h-[400px] lg:min-h-[500px]">
+                    <ChartLoadingPlaceholder />
+                </div>
+            </div>
+        );
+    }
+
     if (error) {
         return (
-            <div className="my-12 p-12 bg-rose-50 rounded-[3rem] border border-rose-100 flex flex-col items-center justify-center text-center group">
-                <div className="w-16 h-16 bg-white rounded-2xl shadow-xl flex items-center justify-center text-3xl mb-6 group-hover:rotate-12 transition-transform">⚠️</div>
-                <h4 className="text-xs font-black text-rose-900 uppercase tracking-[0.4em] mb-4">Signal Lost</h4>
-                <p className="text-sm text-rose-700 italic opacity-70">{error}</p>
+            <div className="my-12 p-12 bg-white rounded-[4rem] border border-slate-100 shadow-[0_64px_128px_-32px_rgba(2,6,23,0.05)] relative overflow-hidden">
+                <div className="relative min-h-[300px] md:min-h-[400px] lg:min-h-[500px]">
+                    <ChartErrorPlaceholder message={error} />
+                </div>
             </div>
         );
     }
@@ -148,11 +149,12 @@ function createScatterPlotWithLine(tableData: any[], outputData: any): any {
         const datasets: any[] = [{
             label: 'Actual Tensors',
             data: dataPoints,
-            backgroundColor: 'rgba(79, 70, 229, 0.8)',
-            borderColor: 'rgba(79, 70, 229, 1)',
+            backgroundColor: chartColors.primary.main,
+            borderColor: chartColors.primary.border,
             borderWidth: 2,
             pointRadius: 8,
             pointHoverRadius: 12,
+            pointStyle: 'circle',
             type: 'scatter'
         }];
 
@@ -171,10 +173,11 @@ function createScatterPlotWithLine(tableData: any[], outputData: any): any {
                     datasets.push({
                         label: 'Model Predictions',
                         data: predictionPoints,
-                        backgroundColor: 'rgba(124, 58, 237, 0.4)',
-                        borderColor: 'rgba(124, 58, 237, 1)',
+                        backgroundColor: chartColors.quaternary.light,
+                        borderColor: chartColors.quaternary.border,
                         borderWidth: 3,
                         pointRadius: 6,
+                        pointHoverRadius: 10,
                         type: 'scatter',
                         pointStyle: 'triangle'
                     });
@@ -183,7 +186,7 @@ function createScatterPlotWithLine(tableData: any[], outputData: any): any {
                     datasets.push({
                         label: 'Fitted Signal',
                         data: sortedPoints,
-                        borderColor: 'rgba(124, 58, 237, 0.8)',
+                        borderColor: chartColors.quaternary.main,
                         borderWidth: 4,
                         fill: false,
                         type: 'line',
@@ -198,33 +201,37 @@ function createScatterPlotWithLine(tableData: any[], outputData: any): any {
             type: 'scatter',
             data: { datasets },
             options: {
-                responsive: true,
-                maintainAspectRatio: false,
+                ...scatterChartOptions,
                 plugins: {
-                    legend: { display: true, position: 'top' },
+                    ...scatterChartOptions.plugins,
                     title: {
                         display: true,
                         text: `${xKey} vs ${yKey} Projection`,
-                        font: { family: 'Outfit', size: 24, weight: '900' },
+                        font: { family: 'Outfit', size: 20, weight: '900' },
                         color: '#0f172a',
-                        padding: 30
-                    },
-                    tooltip: {
-                        backgroundColor: '#0f172a',
-                        padding: 16,
-                        titleFont: { family: 'Outfit', weight: '900' },
-                        bodyFont: { family: 'Outfit' },
-                        cornerRadius: 16
+                        padding: { top: 10, bottom: 30 }
                     }
                 },
                 scales: {
                     x: {
-                        grid: { color: 'rgba(0,0,0,0.03)' },
-                        title: { display: true, text: xKey, font: { weight: '900', family: 'Outfit' }, color: '#64748b' }
+                        ...scatterChartOptions.scales?.x,
+                        title: {
+                            display: true,
+                            text: xKey,
+                            font: { weight: '900', family: 'Outfit', size: 12 },
+                            color: '#64748b',
+                            padding: { top: 10 }
+                        }
                     },
                     y: {
-                        grid: { color: 'rgba(0,0,0,0.03)' },
-                        title: { display: true, text: yKey, font: { weight: '900', family: 'Outfit' }, color: '#64748b' }
+                        ...scatterChartOptions.scales?.y,
+                        title: {
+                            display: true,
+                            text: yKey,
+                            font: { weight: '900', family: 'Outfit', size: 12 },
+                            color: '#64748b',
+                            padding: { bottom: 10 }
+                        }
                     }
                 }
             }

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import 'katex/dist/katex.min.css';
+import { scatterChartOptions, lineChartOptions, barChartOptions, chartColors } from '../config/chartConfig';
 
 // Dynamic import for react-katex to avoid SSR issues
 const BlockMath = dynamic(
@@ -20,17 +21,38 @@ import WorkflowNavButtons from '../components/WorkflowNavButtons';
 // Dynamically import Chart.js components with SSR disabled
 const Scatter = dynamic(() => import('react-chartjs-2').then(mod => mod.Scatter), {
     ssr: false,
-    loading: () => <div className="animate-pulse bg-slate-900/5 h-64 rounded-3xl"></div>
+    loading: () => (
+        <div className="animate-pulse bg-slate-50 h-full rounded-2xl flex items-center justify-center border border-slate-100">
+            <div className="text-center space-y-3">
+                <div className="w-10 h-10 border-3 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
+                <p className="text-xs font-black text-indigo-600 uppercase tracking-widest">Loading Chart</p>
+            </div>
+        </div>
+    )
 });
 
 const Line = dynamic(() => import('react-chartjs-2').then(mod => mod.Line), {
     ssr: false,
-    loading: () => <div className="animate-pulse bg-slate-900/5 h-64 rounded-3xl"></div>
+    loading: () => (
+        <div className="animate-pulse bg-slate-50 h-full rounded-2xl flex items-center justify-center border border-slate-100">
+            <div className="text-center space-y-3">
+                <div className="w-10 h-10 border-3 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
+                <p className="text-xs font-black text-indigo-600 uppercase tracking-widest">Loading Chart</p>
+            </div>
+        </div>
+    )
 });
 
 const Bar = dynamic(() => import('react-chartjs-2').then(mod => mod.Bar), {
     ssr: false,
-    loading: () => <div className="animate-pulse bg-slate-900/5 h-64 rounded-3xl"></div>
+    loading: () => (
+        <div className="animate-pulse bg-slate-50 h-full rounded-2xl flex items-center justify-center border border-slate-100">
+            <div className="text-center space-y-3">
+                <div className="w-10 h-10 border-3 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
+                <p className="text-xs font-black text-indigo-600 uppercase tracking-widest">Loading Chart</p>
+            </div>
+        </div>
+    )
 });
 
 import {
@@ -89,8 +111,24 @@ const EDAPage: React.FC = () => {
             type: 'scatter' as const,
             data: {
                 datasets: [
-                    { label: 'Class A (Iris)', data: [{ x: 1, y: 2 }, { x: 1.5, y: 1.8 }, { x: 2, y: 2.2 }], backgroundColor: 'rgba(79, 70, 229, 0.7)' },
-                    { label: 'Class B (Wine)', data: [{ x: 5, y: 5 }, { x: 5.5, y: 5.2 }, { x: 6, y: 4.8 }], backgroundColor: 'rgba(244, 63, 94, 0.7)' }
+                    {
+                        label: 'Class A (Iris)',
+                        data: [{ x: 1, y: 2 }, { x: 1.5, y: 1.8 }, { x: 2, y: 2.2 }],
+                        backgroundColor: chartColors.primary.main,
+                        borderColor: chartColors.primary.border,
+                        borderWidth: 2,
+                        pointRadius: 8,
+                        pointHoverRadius: 12
+                    },
+                    {
+                        label: 'Class B (Wine)',
+                        data: [{ x: 5, y: 5 }, { x: 5.5, y: 5.2 }, { x: 6, y: 4.8 }],
+                        backgroundColor: chartColors.danger.main,
+                        borderColor: chartColors.danger.border,
+                        borderWidth: 2,
+                        pointRadius: 8,
+                        pointHoverRadius: 12
+                    }
                 ]
             }
         },
@@ -101,9 +139,13 @@ const EDAPage: React.FC = () => {
                 datasets: [{
                     label: 'Predicted (Housing)',
                     data: [1, 2.2, 3.1, 4.4, 5.0, 6.2],
-                    borderColor: 'rgba(16, 185, 129, 1)',
-                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                    fill: true
+                    borderColor: chartColors.secondary.border,
+                    backgroundColor: chartColors.secondary.lighter,
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 5,
+                    pointHoverRadius: 9
                 }]
             }
         },
@@ -114,7 +156,9 @@ const EDAPage: React.FC = () => {
                 datasets: [{
                     label: 'Trend (Macrodata)',
                     data: [12, 19, 3, 5, 2, 3],
-                    backgroundColor: 'rgba(139, 92, 246, 0.6)',
+                    backgroundColor: chartColors.quaternary.main,
+                    borderRadius: 8,
+                    borderWidth: 0
                 }]
             }
         }
@@ -182,19 +226,19 @@ const EDAPage: React.FC = () => {
                                 {activeAnalysis === 'classification' && (
                                     <Scatter
                                         data={dataMockups.classification.data}
-                                        options={chartOptions}
+                                        options={scatterChartOptions}
                                     />
                                 )}
                                 {activeAnalysis === 'regression' && (
                                     <Line
                                         data={dataMockups.regression.data}
-                                        options={chartOptions}
+                                        options={lineChartOptions}
                                     />
                                 )}
                                 {activeAnalysis === 'timeseries' && (
                                     <Bar
                                         data={dataMockups.timeseries.data}
-                                        options={chartOptions}
+                                        options={barChartOptions}
                                     />
                                 )}
                                 {activeAnalysis === 'image' && (
