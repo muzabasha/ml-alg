@@ -22,14 +22,14 @@ const AlgorithmProgressExample: React.FC = () => {
         // 2. Check if algorithm is completed
         // 3. Check for newly unlocked algorithms
         // 4. Display unlock notifications automatically
-        markStepComplete('linear_regression', WorkflowStep.Theory);
+        markStepComplete('linear_regression', WorkflowStep.Introduction);
     };
 
     return (
         <div>
             <h2>Algorithm Progress</h2>
             <button onClick={handleCompleteStep}>
-                Complete Theory Step
+                Complete Introduction Step
             </button>
             <p>Status: {getAlgorithmStatus('linear_regression')}</p>
         </div>
